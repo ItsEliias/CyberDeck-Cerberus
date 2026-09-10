@@ -1,0 +1,52 @@
+/* CyberDeck shell extras — everything themes off the Cerberus vars (--bg/--fg/--panel/--border/--red). */
+
+#deck-view { padding: 22px; overflow-y: auto; }
+
+.deck-panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px 20px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+.deck-panel-title {
+  display: flex; align-items: center; gap: 9px;
+  color: var(--red);
+  font-family: 'Fira Code', 'JetBrains Mono', monospace;
+  font-size: 13px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  margin-bottom: 6px;
+}
+.deck-panel-title::before { content: '// '; opacity: 0.7; }
+.deck-muted { color: var(--fg); opacity: 0.65; font-size: 13px; margin: 2px 0 14px; }
+.deck-stub {
+  color: var(--fg); opacity: 0.5;
+  font-family: 'Fira Code', 'JetBrains Mono', monospace;
+  font-size: 12px; line-height: 1.6;
+  border-left: 2px solid var(--red);
+  padding-left: 12px;
+}
+
+/* Theme swatch grid */
+.deck-swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; margin-top: 6px; }
+.deck-swatch {
+  display: flex; align-items: center; gap: 9px;
+  background: transparent; cursor: pointer; text-align: left;
+  border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px;
+  color: var(--fg); transition: border-color .15s, background .15s;
+}
+.deck-swatch:hover { border-color: var(--red); }
+.deck-swatch--on { border-color: var(--red); box-shadow: 0 0 0 1px var(--red) inset; }
+.deck-swatch-chip {
+  flex-shrink: 0; width: 34px; height: 22px; border-radius: 5px; border: 1px solid;
+  display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; overflow: hidden;
+}
+.deck-swatch-chip span { display: block; }
+.deck-swatch-chip span:first-child { grid-row: 1 / span 2; }
+.deck-swatch-name { font-size: 11px; font-family: 'Fira Code', monospace; text-transform: capitalize; opacity: 0.85; }
+
+/* Active nav emphasis (rail + sidebar) */
+.icon-rail-btn.active { color: var(--red); }
+.list-item.active { color: var(--red); }
+.list-item.active .sidebar-action-icon { opacity: 1 !important; }

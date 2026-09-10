@@ -1,0 +1,392 @@
+/**
+ * chat.js — 1:1 agent chat panel (Phase 2).
+ *
+ * Exports openAgentChat(container, agentId, agentName, agentAvatar, accentColor).
+ * Replaces the AGENTS tab content with a threaded chat view; "← Back" restores
+ * the roster via buildAgentsTab / loadAgents.
+ */
+
+import { notifyCCComplete, requestNotifyPermission } from './cc-notify.js';
+
+function _esc(s) {
+  const d = document.createElement('div');
+  d.textContent = String(s ?? '');
+  return d.innerHTML;
+}
+
+function _buildChatPanel(agentName, agentAvatar, accentColor, ttsVoice) {
+  const glyph = agentAvatar || (agentName || '?')[0];
+  const callBtn = `<button class="cc-chat-call-btn" title="Voice call">📞</button>`;
+  return `
+<div class="cc-agents-tab cc-agent-chat" id="cc-agent-chat">
+  <div class="cc-agent-chat-header" style="--cat-accent:${_esc(accentColor)}">
+    <button class="cc-chat-back-btn" title="Back to roster">← Back</button>
+    <span class="cc-agent-chat-sigil" style="background:${_esc(accentColor)}">${_esc(glyph)}</span>
+    <span class="cc-agent-chat-name">${_esc(agentName)}</span>
+    ${callBtn}
+    <button class="cc-chat-export-btn" title="Export thread as Markdown">↓ MD</button>
+    <button class="cc-chat-summarise-btn" title="Summarise this thread">// SUMMARISE</button>
+    <button class="cc-chat-clear-btn" title="Clear conversation">Clear</button>
+  </div>
+  <div class="cc-chat-summary" id="cc-chat-summary" hidden></div>
+  <div class="cc-chat-messages" id="cc-chat-messages">
+    <div class="cc-empty">Loading…</div>
+  </div>
+  <div class="cc-chat-input-row">
+    <textarea class="cc-chat-input" id="cc-chat-input"
+      placeholder="Message ${_esc(agentName)}… (Ctrl+Enter to send)" rows="2"></textarea>
+    <button class="cc-chat-stop-btn" title="Stop audio">⏹ STOP</button>
+    <button class="cc-chat-send-btn" id="cc-chat-send-btn">Send</button>
+  </div>
+</div>`.trim();
+}
+
+function _msgBubble(role, content, timestamp) {
+  const ts = timestamp ? new Date(timestamp + 'Z').toLocaleTimeString() : '';
+  return `<div class="cc-chat-msg cc-chat-msg--${role}">
+  <div class="cc-chat-msg-meta">
+    <span class="cc-chat-msg-role">${role === 'user' ? 'YOU' : 'AGENT'}</span>
+    ${ts ? `<span class="cc-chat-msg-ts">${_esc(ts)}</span>` : ''}
+  </div>
+  <div class="cc-chat-msg-content">${_esc(content)}</div>
+</div>`;
+}
+
+function _contextDivider(trimmed) {
+  return `<div class="cc-ctx-divider">
+  <span class="cc-ctx-divider-line"></span>
+  <span class="cc-ctx-divider-label">// context window — ${trimmed} earlier message${trimmed !== 1 ? 's' : ''} not sent to LLM</span>
+  <span class="cc-ctx-divider-line"></span>
+</div>`;
+}
+
+async function _loadThread(agentId, messagesEl) {
+  try {
+    const res = await fetch(`/api/agents/${encodeURIComponent(agentId)}/thread`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const { messages = [], context_window = 20 } = await res.json();
+    if (!messages.length) {
+      messagesEl.innerHTML = '<div class="cc-empty">No messages yet — start the conversation.</div>';
+      return;
+    }
+    const trimmed = Math.max(0, messages.length - context_window);
+    const bubbles = messages.map(m => _msgBubble(m.role, m.content, m.timestamp));
+    if (trimmed > 0) {
+      bubbles.splice(trimmed, 0, _contextDivider(trimmed));
+    }
+    messagesEl.innerHTML = bubbles.join('');
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  } catch (e) {
+    messagesEl.innerHTML = `<div class="cc-empty">Could not load thread — ${_esc(e.message)}</div>`;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// TTS — fire-and-forget, same provider detection as voice.js
+// ---------------------------------------------------------------------------
+
+// Voice ID prefixes that belong to Kokoro and must always route to the server.
+// Browser speechSynthesis has no Kokoro voices — routing them browser-side
+// produces the OS default voice instead of the selected agent voice.
+const _KOKORO_PREFIXES = ['af_', 'am_', 'bf_', 'bm_'];
+
+function _isKokoroVoice(voiceId) {
+  return !!voiceId && _KOKORO_PREFIXES.some(p => voiceId.startsWith(p));
+}
+
+let _ttsChatProvider = null;
+
+async function _getTtsChatProvider() {
+  if (_ttsChatProvider) return _ttsChatProvider;
+  try {
+    const res = await fetch('/api/tts/stats');
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    _ttsChatProvider = data.provider || 'disabled';
+  } catch (_) { _ttsChatProvider = 'disabled'; }
+  return _ttsChatProvider;
+}
+
+async function _streamSSE(body, contentEl) {
+  const reader = body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+  let eventType = 'message';
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split('\n');
+    buffer = lines.pop() ?? '';
+    for (const line of lines) {
+      if (line.startsWith('event:')) { eventType = line.slice(6).trim(); continue; }
+      if (!line.startsWith('data:')) { eventType = 'message'; continue; }
+      const raw = line.slice(5).trim();
+      if (raw === '[DONE]') return;
+      if (eventType === 'error') {
+        try {
+          const obj = JSON.parse(raw);
+          contentEl.textContent = `Error: ${obj.error || raw}`;
+        } catch (_) { contentEl.textContent = `Error: ${raw}`; }
+        contentEl.classList.remove('cc-chat-streaming');
+        contentEl.classList.add('cc-chat-error');
+        eventType = 'message'; continue;
+      }
+      try {
+        const obj = JSON.parse(raw);
+        if (obj.type === 'usage') continue;
+        contentEl.textContent += obj.delta || obj.text || obj.content || '';
+      } catch (_) { contentEl.textContent += raw; }
+      eventType = 'message';
+    }
+  }
+}
+
+async function _sendMessage(agentId, input, messagesEl, sendBtn, ttsVoice = '', speakFn = null, agentName = '') {
+  const text = input?.value?.trim();
+  if (!text) return;
+
+  // Optimistically append user bubble
+  messagesEl.insertAdjacentHTML('beforeend', _msgBubble('user', text, null));
+  input.value = '';
+  sendBtn.disabled = true;
+  sendBtn.textContent = '…';
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+
+  // Append streaming assistant bubble
+  const asstWrap = document.createElement('div');
+  asstWrap.innerHTML = _msgBubble('assistant', '', null);
+  const asstBubble = asstWrap.firstChild;
+  const contentEl  = asstBubble.querySelector('.cc-chat-msg-content');
+  contentEl.classList.add('cc-chat-streaming');
+  messagesEl.appendChild(asstBubble);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+
+  let errored = false;
+  try {
+    const res = await fetch(`/api/agents/${encodeURIComponent(agentId)}/thread/send`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'text/event-stream' },
+      body: JSON.stringify({ message: text }),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    await _streamSSE(res.body, contentEl);
+    contentEl.classList.remove('cc-chat-streaming');
+    notifyCCComplete({
+      title: '[C]ERBERUS',
+      body:  `${agentName || 'Agent'} replied`,
+      tag:   `cc-agent-${agentId}`,
+    });
+  } catch (e) {
+    errored = true;
+    contentEl.textContent = `Error: ${e.message}`;
+    contentEl.classList.remove('cc-chat-streaming');
+    contentEl.classList.add('cc-chat-error');
+  } finally {
+    sendBtn.disabled = false;
+    sendBtn.textContent = 'Send';
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  // Speak the reply if a voice is configured and the response was not an error
+  if (!errored && ttsVoice && speakFn && contentEl.textContent && !contentEl.classList.contains('cc-chat-error')) {
+    speakFn(contentEl.textContent, ttsVoice);
+  }
+}
+
+// ---- Public API ----
+
+export async function openAgentChat(container, agentId, agentName, agentAvatar, accentColor, ttsVoice = '') {
+  // Lazy permission prompt — only fires on first user-initiated chat open,
+  // matching the spec's "request permission on CC init" intent without
+  // touching index.js.
+  requestNotifyPermission();
+
+  container.innerHTML = _buildChatPanel(agentName, agentAvatar, accentColor || 'rgba(197,201,208,0.5)', ttsVoice);
+
+  const messagesEl  = container.querySelector('#cc-chat-messages');
+  const input       = container.querySelector('#cc-chat-input');
+  const sendBtn     = container.querySelector('#cc-chat-send-btn');
+  const backBtn       = container.querySelector('.cc-chat-back-btn');
+  const clearBtn      = container.querySelector('.cc-chat-clear-btn');
+  const exportBtn     = container.querySelector('.cc-chat-export-btn');
+  const summariseBtn  = container.querySelector('.cc-chat-summarise-btn');
+  const summaryEl     = container.querySelector('#cc-chat-summary');
+  const stopBtn       = container.querySelector('.cc-chat-stop-btn');
+  const chatCallBtn   = container.querySelector('.cc-chat-call-btn');
+  const chatPanel     = container.querySelector('#cc-agent-chat');
+
+  // Summarise this thread — POST /api/agents/{id}/thread/summarise.
+  // Shows the result inline below the header for 5s and saves it as a
+  // Note (the backend writes the note; the inline panel is just feedback).
+  let _summaryFade = null;
+  summariseBtn?.addEventListener('click', async () => {
+    if (summariseBtn.disabled) return;
+    const original = summariseBtn.textContent;
+    summariseBtn.disabled = true;
+    summariseBtn.textContent = '// SUMMARISING…';
+    if (summaryEl) {
+      summaryEl.hidden = false;
+      summaryEl.textContent = '…';
+      summaryEl.classList.remove('cc-chat-summary--fade');
+    }
+    if (_summaryFade) { clearTimeout(_summaryFade); _summaryFade = null; }
+    try {
+      const res = await fetch(
+        `/api/agents/${encodeURIComponent(agentId)}/thread/summarise`,
+        { method: 'POST', credentials: 'same-origin' },
+      );
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      if (summaryEl) summaryEl.textContent = (data?.summary || '').trim() || '(empty)';
+    } catch (e) {
+      if (summaryEl) summaryEl.textContent = `Summary failed — ${e.message}`;
+    } finally {
+      summariseBtn.disabled = false;
+      summariseBtn.textContent = original;
+      // Fade after 5s — matches spec. CSS handles the visual fade; this
+      // just hides the panel once the transition completes.
+      if (summaryEl) {
+        _summaryFade = setTimeout(() => {
+          summaryEl.classList.add('cc-chat-summary--fade');
+          _summaryFade = setTimeout(() => {
+            summaryEl.hidden = true;
+            summaryEl.classList.remove('cc-chat-summary--fade');
+            _summaryFade = null;
+          }, 400);
+        }, 5000);
+      }
+    }
+  });
+
+  // ---- Audio lifecycle (Bug 3) ----
+  let _currentAudio = null;
+
+  function _stopAudio() {
+    if (_currentAudio) {
+      _currentAudio.pause();
+      _currentAudio.currentTime = 0;
+      _currentAudio = null;
+    }
+    chatPanel?.classList.remove('cc-chat--speaking');
+  }
+
+  // ---- TTS (Bug 2 + Bug 3) ----
+  async function _speakChatReply(text, voice) {
+    if (!text || !voice) return;
+
+    // Kokoro voice IDs always route to server — they don't exist in the browser voice list
+    if (!_isKokoroVoice(voice)) {
+      const provider = await _getTtsChatProvider();
+      if (provider === 'disabled') return;
+      if (provider === 'browser') {
+        _stopAudio();
+        const utt = new SpeechSynthesisUtterance(text);
+        const voices = speechSynthesis.getVoices();
+        const match = voices.find(v => v.name === voice || v.voiceURI === voice);
+        if (match) utt.voice = match;
+        speechSynthesis.speak(utt);
+        return;
+      }
+    }
+
+    // Server-side TTS
+    try {
+      const res = await fetch('/api/tts/synthesize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, format: 'base64', voice }),
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      const b64 = data.audio_base64 || data.audio || '';
+      if (!b64) return;
+      _stopAudio();
+      const audio = new Audio(`data:audio/wav;base64,${b64}`);
+      _currentAudio = audio;
+      chatPanel?.classList.add('cc-chat--speaking');
+      audio.onended = () => _stopAudio();
+      audio.onerror = () => _stopAudio();
+      audio.play().catch(() => _stopAudio());
+    } catch (_) { _stopAudio(); }
+  }
+
+  // ---- Event wiring ----
+
+  stopBtn?.addEventListener('click', () => _stopAudio());
+
+  chatCallBtn?.addEventListener('click', async () => {
+    _stopAudio();
+    const { openVoiceCall } = await import('./voice.js');
+    openVoiceCall(container, agentId, agentName, agentAvatar, accentColor || 'rgba(197,201,208,0.5)', ttsVoice);
+  });
+
+  // Back — re-mount the roster
+  backBtn?.addEventListener('click', async () => {
+    _stopAudio();
+    const { buildAgentsTab, loadAgents } = await import('./agents.js');
+    container.innerHTML = buildAgentsTab();
+    await loadAgents(container);
+  });
+
+  // Export thread → Markdown download. Filename comes from the server's
+  // Content-Disposition; we fall back to a sensible default if parsing fails.
+  // Object URL is revoked after the click so we don't leak the blob.
+  exportBtn?.addEventListener('click', async () => {
+    if (exportBtn.disabled) return;
+    const original = exportBtn.textContent;
+    exportBtn.disabled = true;
+    exportBtn.textContent = '…';
+    let blobUrl = null;
+    try {
+      const res = await fetch(
+        `/api/agents/${encodeURIComponent(agentId)}/thread/export`,
+        { credentials: 'same-origin' },
+      );
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const cd = res.headers.get('content-disposition') || '';
+      const m = /filename\s*=\s*"?([^";]+)"?/i.exec(cd);
+      const slug = (agentName || 'agent').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'agent';
+      const filename = m ? m[1] : `cerberus-${slug}-${new Date().toISOString().slice(0, 10)}.md`;
+      const blob = await res.blob();
+      blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = filename;
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    } catch (_) {
+      // Silent — the button reverts below so the user can retry.
+    } finally {
+      if (blobUrl) URL.revokeObjectURL(blobUrl);
+      exportBtn.disabled = false;
+      exportBtn.textContent = original;
+    }
+  });
+
+  // Clear thread
+  clearBtn?.addEventListener('click', async () => {
+    _stopAudio();
+    if (!confirm('Clear this conversation? All messages will be deleted.')) return;
+    try {
+      await fetch(`/api/agents/${encodeURIComponent(agentId)}/thread`, { method: 'DELETE' });
+      messagesEl.innerHTML = '<div class="cc-empty">Thread cleared.</div>';
+    } catch (e) {
+      alert(`Failed to clear thread: ${e.message}`);
+    }
+  });
+
+  // Send
+  sendBtn?.addEventListener('click', () => _sendMessage(agentId, input, messagesEl, sendBtn, ttsVoice, _speakChatReply, agentName));
+  input?.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      _sendMessage(agentId, input, messagesEl, sendBtn, ttsVoice, _speakChatReply, agentName);
+    }
+  });
+
+  await _loadThread(agentId, messagesEl);
+  input?.focus();
+}

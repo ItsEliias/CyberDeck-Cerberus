@@ -1,0 +1,387 @@
+/**
+ * static/js/cyberapps/command-center/index.js
+ *
+ * Command Center — real-time JARVIS-aesthetic overview of Cerberus + CyberOS.
+ * Five sub-tabs: COMMAND | COUNCIL | WORKSPACE | FINANCE | ASSISTANT
+ *
+ * Self-registers with window.CYBER_APPS_REGISTRY using unshift() (priority: first).
+ */
+
+import { buildCommandTab, applyVitals, applyTimeseries, applySwarm, applyAgents, applyGateway, applyTasks, applyModelStatus, loadCommandTab, destroyCommandTab } from './command.js';
+import { buildCouncilTab, initCouncil, loadCouncil } from './council.js';
+import { buildWorkspaceTab, loadWorkspace } from './workspace.js';
+import { buildFinanceTab, loadFinance }     from './finance.js';
+import { buildTraderTab, loadTrader }       from './trader.js';
+import { buildAssistantTab, initAssistant, destroyAssistant } from './assistant.js';
+import { buildGatewayTab, loadGateway } from './gateway.js';
+import { buildAgentsTab, loadAgents } from './agents.js';
+import { buildRoomsTab, loadRooms } from './rooms.js';
+import { buildObservabilityTab, loadObservability } from './observability.js';
+import { buildCompareTab, loadCompareTab } from './cc-compare.js';
+import { initShortcuts, destroyShortcuts } from './shortcuts.js';
+import { initTour } from './cc-tour.js';
+import { openSettings, closeSettings, isSettingsOpen } from './cc-settings.js';
+import * as Poll from './poll.js';
+import { t, setLocale, getLocale, AVAILABLE_LOCALES } from '/static/js/i18n.js';
+
+// Inject CC stylesheet once — version param busts browser/SW cache on updates
+(function injectCSS() {
+  if (document.getElementById('cc-styles-link')) return;
+  const link = document.createElement('link');
+  link.id   = 'cc-styles-link';
+  link.rel  = 'stylesheet';
+  link.href = '/static/js/cyberapps/command-center/styles.css?v=359';
+  document.head.appendChild(link);
+})();
+
+// ---- Tab config ----
+
+// `label` is the English fallback (also what shortcuts.js / older
+// callers expect on the object). Display now goes through
+// `t("nav.<id>")`; CSS upper-cases at the leaf so the translated
+// title-case strings ("Command", "Comando") render uppercased.
+const TABS = [
+  { id: 'command',       label: 'COMMAND'   },
+  { id: 'council',       label: 'COUNCIL'   },
+  { id: 'workspace',     label: 'WORKSPACE' },
+  { id: 'finance',       label: 'FINANCE'   },
+  { id: 'trader',        label: 'TRADER',   adminOnly: true },
+  { id: 'assistant',     label: 'ASSISTANT' },
+  { id: 'gateway',       label: 'GATEWAY'   },
+  { id: 'agents',        label: 'AGENTS'    },
+  { id: 'rooms',         label: 'ROOMS'     },
+  { id: 'compare',       label: 'COMPARE'   },
+  { id: 'observability', label: 'OBSERVE'   },
+];
+
+function _tabLabel(tab) {
+  // t() falls back to en, then the key itself; safe even when no
+  // translation exists. Older code-paths can still read tab.label.
+  return t(`nav.${tab.id}`) || tab.label;
+}
+
+function _renderTabNavHTML(activeTab) {
+  // Local var named `tab` so it doesn't shadow the imported `t()` helper.
+  // adminOnly tabs are hidden from non-admin users (window._isAdmin set by app.js).
+  return TABS
+    .filter(tab => !tab.adminOnly || window._isAdmin)
+    .map(tab => `
+    <button class="cc-tab-btn${tab.id === activeTab ? ' active' : ''}"
+      data-tab="${tab.id}">${_tabLabel(tab)}
+    </button>`).join('');
+}
+
+// ---- Module state ----
+
+let _container  = null;
+let _activeTab  = 'command';
+let _clockTimer = null;
+let _orbWrap    = null;
+
+// ---- init / destroy ----
+
+export function init(container, _ctx) {
+  _container = container;
+  _activeTab = 'command';
+  _render();
+}
+
+export function destroy() {
+  Poll.destroy();
+  destroyAssistant();
+  destroyShortcuts();
+  if (_clockTimer) { clearInterval(_clockTimer); _clockTimer = null; }
+  _container = _orbWrap = null;
+}
+
+// ---- Shell render ----
+
+function _render() {
+  if (!_container) return;
+  _container.innerHTML = '';
+
+  const shell = document.createElement('div');
+  shell.className = 'cc-shell';
+
+  shell.innerHTML = `
+    <div class="cc-brand-bar">
+      <span class="cc-wordmark">
+        <span class="hud-bracket">[</span><span class="hud-lead">C</span><span class="hud-bracket">]</span>ERBERUS
+      </span>
+      <span class="cc-wordmark-sub">COMMAND CENTER</span>
+      <div class="cc-brand-chips">
+        <div class="hud-chip"><span class="hud-chip-dot hud-chip-dot--online"></span>ONLINE</div>
+        <div class="hud-chip" id="cc-agents-chip"><span class="hud-chip-dot hud-chip-dot--agents"></span><span id="cc-agents-chip-count">— AGENTS</span></div>
+        <div class="hud-chip"><span class="hud-chip-dot hud-chip-dot--auth"></span>AUTH</div>
+      </div>
+      <span class="cc-brand-spacer"></span>
+      <span class="cc-clock" id="cc-clock">--:--:--</span>
+      <select class="cc-locale-picker" id="cc-locale-picker"
+        title="Interface language" aria-label="Interface language">
+        ${AVAILABLE_LOCALES.map(loc => `
+          <option value="${loc}"${loc === getLocale() ? ' selected' : ''}>${loc.toUpperCase()}</option>
+        `).join('')}
+      </select>
+      <button class="cc-refresh-btn" id="cc-refresh">REFRESH</button>
+      <button class="cc-gear-btn" id="cc-settings-gear" aria-label="Settings (,)" title="Settings (,)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06
+            a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09
+            A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83
+            l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09
+            A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83
+            l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09
+            a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83
+            l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09
+            a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+      </button>
+    </div>
+    <nav class="cc-tab-nav" id="cc-tab-nav">${_renderTabNavHTML(_activeTab)}</nav>
+    <div class="cc-tab-content" id="cc-tab-content"></div>
+  `.trim();
+
+  _container.appendChild(shell);
+
+  // Wire tab buttons
+  shell.querySelectorAll('.cc-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => _switchTab(btn.dataset.tab, shell));
+  });
+
+  // Wire refresh
+  const refreshBtn = shell.querySelector('#cc-refresh');
+  if (refreshBtn) {
+    refreshBtn.addEventListener('click', () => {
+      Poll.destroy();
+      Poll.start(_pollCallbacks(shell));
+    });
+  }
+
+  // Wire settings gear button
+  const gearBtn = shell.querySelector('#cc-settings-gear');
+  if (gearBtn) {
+    gearBtn.addEventListener('click', () => openSettings(shell));
+  }
+
+  // cerberus:open-settings — dispatched by shortcuts.js , key and command palette
+  const _onOpenSettings = () => {
+    if (isSettingsOpen()) closeSettings();
+    else openSettings(shell);
+  };
+  document.addEventListener('cerberus:open-settings', _onOpenSettings);
+
+  // Language picker — setLocale() persists + dispatches the event the
+  // listener below picks up to re-render the nav. We don't need to
+  // listen here because setLocale fires synchronously.
+  const localePicker = shell.querySelector('#cc-locale-picker');
+  if (localePicker) {
+    localePicker.addEventListener('change', () => setLocale(localePicker.value));
+  }
+
+  // Re-render the tab nav when the locale changes. Other modules can
+  // subscribe to the same event for their own labels — keeping the
+  // listener at the shell level means tab content also gets refreshed
+  // via _mountTab(_activeTab) so newly-mounted children see the new locale.
+  const _onLocaleChanged = () => {
+    const nav = shell.querySelector('#cc-tab-nav');
+    if (nav) {
+      nav.innerHTML = _renderTabNavHTML(_activeTab);
+      nav.querySelectorAll('.cc-tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => _switchTab(btn.dataset.tab, shell));
+      });
+    }
+    if (localePicker) localePicker.value = getLocale();
+  };
+  document.addEventListener('cerberus:locale-changed', _onLocaleChanged);
+
+  _startClock(shell);
+  _mountTab('command', shell);
+  Poll.start(_pollCallbacks(shell));
+  _startGatewayBadgePoll(shell);
+  initShortcuts(shell, TABS);
+  initTour(shell);
+}
+
+// ---- GATEWAY tab pending-approval badge ----
+// Polls /api/gateway/status from the CC shell so the GATEWAY tab pill shows
+// the pending-approval count even when the user is on another tab. Visible
+// only when count > 0; styled crimson via tokens (see styles.css).
+const _GW_BADGE_POLL_MS = 60_000;
+const _GW_BADGE_TIMER_KEY = '__gwBadgeTimer';
+
+function _startGatewayBadgePoll(shell) {
+  if (!shell) return;
+  const prev = shell[_GW_BADGE_TIMER_KEY];
+  if (prev) clearInterval(prev);
+  _refreshGatewayBadge(shell);
+  shell[_GW_BADGE_TIMER_KEY] = setInterval(() => _refreshGatewayBadge(shell), _GW_BADGE_POLL_MS);
+}
+
+async function _refreshGatewayBadge(shell) {
+  if (!shell || !shell.querySelector) return;
+  try {
+    const r = await fetch('/api/gateway/status', { credentials: 'same-origin' });
+    if (!r.ok) return _setGatewayBadge(shell, 0);
+    const data = await r.json();
+    _setGatewayBadge(shell, Number(data.pending_approvals || 0));
+  } catch (_) {
+    _setGatewayBadge(shell, 0);
+  }
+}
+
+function _setGatewayBadge(shell, count) {
+  const btn = shell.querySelector('.cc-tab-btn[data-tab="gateway"]');
+  if (!btn) return;
+  let badge = btn.querySelector('.cc-tab-badge');
+  if (!badge) {
+    badge = document.createElement('span');
+    badge.className = 'cc-tab-badge';
+    btn.appendChild(badge);
+  }
+  badge.textContent = String(count);
+  if (count > 0) badge.removeAttribute('hidden');
+  else badge.setAttribute('hidden', '');
+}
+
+// ---- Tab switching ----
+
+function _switchTab(id, shell) {
+  if (id === _activeTab) return;
+
+  // Tear down ASSISTANT streaming on tab switch
+  if (_activeTab === 'assistant') destroyAssistant();
+  // Tear down COMMAND's task-feed poller — Poll.js handles its own lifecycle
+  // separately, but the 10s active-tasks loop needs an explicit stop.
+  if (_activeTab === 'command') destroyCommandTab();
+
+  _activeTab = id;
+
+  // Update pills
+  shell.querySelectorAll('.cc-tab-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.tab === id);
+  });
+
+  _mountTab(id, shell);
+}
+
+function _mountTab(id, shell) {
+  const content = shell.querySelector('#cc-tab-content');
+  if (!content) return;
+
+  if (id === 'command') {
+    content.innerHTML = buildCommandTab();
+    _orbWrap = content.querySelector('#cc-orb-mount');
+    // Immediately populate if we have cached data
+    Poll.destroy();
+    Poll.start(_pollCallbacks(shell));
+    // First paint for the task feed + model panel — Poll.js handles the
+    // periodic refresh, but we want both panels populated before the next tick.
+    loadCommandTab(content).catch(() => { /* loader paints its own error state */ });
+  } else if (id === 'council') {
+    content.innerHTML = buildCouncilTab();
+    initCouncil(content);
+    loadCouncil(content);
+  } else if (id === 'workspace') {
+    content.innerHTML = buildWorkspaceTab();
+    loadWorkspace(content);
+  } else if (id === 'finance') {
+    content.innerHTML = buildFinanceTab();
+    loadFinance(content);
+  } else if (id === 'trader') {
+    content.innerHTML = buildTraderTab();
+    loadTrader(content);
+  } else if (id === 'assistant') {
+    content.innerHTML = buildAssistantTab();
+    initAssistant(content);
+  } else if (id === 'gateway') {
+    content.innerHTML = buildGatewayTab();
+    loadGateway(content);
+  } else if (id === 'agents') {
+    content.innerHTML = buildAgentsTab();
+    loadAgents(content);
+  } else if (id === 'rooms') {
+    content.innerHTML = buildRoomsTab();
+    loadRooms(content);
+  } else if (id === 'compare') {
+    content.innerHTML = buildCompareTab();
+    loadCompareTab(content);
+  } else if (id === 'observability') {
+    content.innerHTML = buildObservabilityTab();
+    loadObservability(content);
+  }
+}
+
+// ---- Poll callbacks ----
+
+function _pollCallbacks(shell) {
+  return {
+    onVitals(v) {
+      const c = shell.querySelector('#cc-tab-content');
+      if (_activeTab === 'command' && c) applyVitals(c, v);
+    },
+    onTimeseries(ts) {
+      const c = shell.querySelector('#cc-tab-content');
+      if (_activeTab === 'command' && c) applyTimeseries(c, ts);
+    },
+    onSwarm(sw) {
+      const c = shell.querySelector('#cc-tab-content');
+      if (_activeTab === 'command' && c) applySwarm(c, sw, _orbWrap);
+      const chipCount = shell.querySelector('#cc-agents-chip-count');
+      if (chipCount && sw.active != null) chipCount.textContent = sw.active + ' AGENTS';
+    },
+    onAgents(agents) {
+      const c = shell.querySelector('#cc-tab-content');
+      if (_activeTab === 'command' && c) applyAgents(c, agents);
+    },
+    onGateway(gw) {
+      const c = shell.querySelector('#cc-tab-content');
+      if (_activeTab === 'command' && c) applyGateway(c, gw);
+    },
+    onTasks(tasks) {
+      const c = shell.querySelector('#cc-tab-content');
+      if (_activeTab === 'command' && c) applyTasks(c, tasks);
+    },
+    onModelStatus(status) {
+      const c = shell.querySelector('#cc-tab-content');
+      if (_activeTab === 'command' && c) applyModelStatus(c, status);
+    },
+    onError(e) { console.warn('[Command Center] poll error:', e); },
+  };
+}
+
+// ---- Clock ----
+
+function _startClock(shell) {
+  const el = shell.querySelector('#cc-clock');
+  if (!el) return;
+  const tick = () => {
+    el.textContent = new Date().toLocaleTimeString('en-GB', {
+      hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false,
+    });
+  };
+  tick();
+  _clockTimer = setInterval(tick, 1000);
+}
+
+// ---- Self-register (priority: first via unshift) ----
+
+const SHIELD_ICON = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+  stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M12 2L3 6V12C3 17.5 7 22 12 24C17 22 21 17.5 21 12V6Z"/>
+  <line x1="9" y1="12" x2="11.5" y2="15" stroke="currentColor" stroke-width="1.6"/>
+  <line x1="11.5" y1="15" x2="16" y2="10" stroke="currentColor" stroke-width="1.6"/>
+</svg>`.trim();
+
+if (window.CYBER_APPS_REGISTRY) {
+  window.CYBER_APPS_REGISTRY.unshift({
+    id:       'command-center',
+    name:     'Command Center',
+    icon:     SHIELD_ICON,
+    init,
+    destroy,
+    vault:    false,
+    priority: 'first',
+  });
+}
