@@ -15,3 +15,4 @@ dist/
 build/
 # (cyberdeck.spec is tracked; PyInstaller auto-specs are named build-*.spec)
 .env
+.claude-flow/
