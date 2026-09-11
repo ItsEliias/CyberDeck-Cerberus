@@ -21,11 +21,12 @@ from modules.feeds import bp as feeds_bp
 from modules.topology import bp as topology_bp
 from modules.board import bp as board_bp
 from modules.flashcards import bp as flashcards_bp
+from modules.snippets import bp as snippets_bp
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
 for _bp in (knowledge_bp, courses_bp, credentials_bp, targets_bp, netlab_bp,
             home_bp, playbooks_bp, reports_bp, feeds_bp, topology_bp, board_bp,
-            flashcards_bp):
+            flashcards_bp, snippets_bp):
     app.register_blueprint(_bp)
 
 # ── The 12 CyberDeck modules the shell navigates between. ──────────────────────
@@ -42,6 +43,7 @@ MODULES = [
     {"id": "topology", "label": "Topology", "blurb": "Host graph"},
     {"id": "reports", "label": "Reports", "blurb": "Draft + export"},
     {"id": "credentials", "label": "Credentials", "blurb": "Encrypted vault"},
+    {"id": "snippets", "label": "Snippets", "blurb": "Payloads + commands"},
     {"id": "feeds", "label": "Feeds", "blurb": "Security news"},
     {"id": "terminal", "label": "Terminal", "blurb": "Shell"},
 ]

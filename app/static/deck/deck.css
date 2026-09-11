@@ -247,6 +247,24 @@
 .tp-hint { position: absolute; left: 14px; bottom: 12px; font-size: 11px; font-family: 'Fira Code', monospace; opacity: .6; background: color-mix(in srgb, var(--bg) 80%, transparent); padding: 5px 9px; border-radius: 6px; }
 .tp-canvas .co-input, .co-head .co-input { display: inline-block; }
 
+/* ── Snippets ────────────────────────────────────────────────────────────────── */
+.sn-vars { display: flex; flex-wrap: wrap; gap: 10px; padding: 12px 22px; border-bottom: 1px solid var(--border); background: color-mix(in srgb, var(--fg) 3%, transparent); }
+.sn-var { display: flex; flex-direction: column; gap: 3px; }
+.sn-var span { font-family: 'Fira Code', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: .05em; color: var(--deck-accent); }
+.sn-var .co-input { width: 130px; padding: 5px 8px; font-size: 12px; }
+.sn-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
+.sn-item { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; }
+.sn-item:hover { border-color: color-mix(in srgb, var(--deck-accent) 40%, var(--border)); }
+.sn-top { display: flex; align-items: center; margin-bottom: 6px; }
+.sn-title { font-size: 13px; font-weight: 600; }
+.sn-btns { margin-left: auto; display: flex; gap: 6px; align-items: center; }
+.sn-copy { background: transparent; border: 1px solid var(--border); border-radius: 5px; color: var(--deck-accent); font-family: 'Fira Code', monospace; font-size: 10px; text-transform: uppercase; padding: 3px 9px; cursor: pointer; }
+.sn-copy:hover { border-color: var(--deck-accent); background: color-mix(in srgb, var(--deck-accent) 12%, transparent); }
+.sn-del { background: transparent; border: none; color: var(--fg); opacity: .35; cursor: pointer; font-size: 15px; }
+.sn-del:hover { opacity: 1; color: var(--red); }
+.sn-cmd { display: block; font-family: 'Fira Code', monospace; font-size: 12.5px; color: var(--fg); background: var(--bg); border: 1px solid color-mix(in srgb, var(--border) 70%, transparent); border-radius: 6px; padding: 8px 10px; overflow-x: auto; white-space: pre; }
+.sn-cmd--todo { color: color-mix(in srgb, var(--fg) 65%, transparent); }
+
 /* ── Flashcards ──────────────────────────────────────────────────────────────── */
 .fc-due { color: var(--deck-accent); border-color: color-mix(in srgb, var(--deck-accent) 50%, var(--border)) !important; }
 .fc-review-wrap { display: flex; flex-direction: column; align-items: center; justify-content: center; height: calc(100% - 58px); padding: 24px; gap: 22px; }
