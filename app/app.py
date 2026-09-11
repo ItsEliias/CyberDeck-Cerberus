@@ -14,9 +14,13 @@ from modules.courses import bp as courses_bp
 from modules.credentials import bp as credentials_bp
 from modules.targets import bp as targets_bp
 from modules.netlab import bp as netlab_bp
+from modules.home import bp as home_bp
+from modules.playbooks import bp as playbooks_bp
+from modules.reports import bp as reports_bp
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
-for _bp in (knowledge_bp, courses_bp, credentials_bp, targets_bp, netlab_bp):
+for _bp in (knowledge_bp, courses_bp, credentials_bp, targets_bp, netlab_bp,
+            home_bp, playbooks_bp, reports_bp):
     app.register_blueprint(_bp)
 
 # ── The 12 CyberDeck modules the shell navigates between. ──────────────────────
