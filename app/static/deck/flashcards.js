@@ -67,6 +67,7 @@
       var b = e.target.closest('.fc-grade'); if (!b) return;
       var c = session.cards[session.i];
       post('/api/flashcards/review/' + c.id, { grade: parseInt(b.getAttribute('data-g'), 10) });
+      post('/api/activity/log', { kind: 'review' });
       session.i++; session.done++; renderCard();
     });
   }

@@ -53,6 +53,7 @@
       .then(function (d) {
         if (d.error) { pane.innerHTML = '<div class="kb-loading">' + esc(d.error) + '</div>'; return; }
         currentRaw = d.raw || '';
+        fetch('/api/activity/log', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ kind: 'read' }) });
         pane.innerHTML =
           '<div class="kb-note-head"><span>' + esc(d.title) + '</span>' +
           '<button class="kb-edit-btn" id="kb-edit">Edit</button></div>' +
