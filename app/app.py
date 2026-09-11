@@ -11,10 +11,13 @@ from flask import Flask, render_template, jsonify
 
 from modules.knowledge import bp as knowledge_bp
 from modules.courses import bp as courses_bp
+from modules.credentials import bp as credentials_bp
+from modules.targets import bp as targets_bp
+from modules.netlab import bp as netlab_bp
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
-app.register_blueprint(knowledge_bp)
-app.register_blueprint(courses_bp)
+for _bp in (knowledge_bp, courses_bp, credentials_bp, targets_bp, netlab_bp):
+    app.register_blueprint(_bp)
 
 # ── The 12 CyberDeck modules the shell navigates between. ──────────────────────
 # (label, icon key, blurb) — icons resolved to inline SVG in the template/deck.js.

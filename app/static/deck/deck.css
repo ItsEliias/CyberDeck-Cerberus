@@ -155,6 +155,42 @@
 .co-frame { width: 100%; height: 78vh; border: 1px solid var(--border); border-radius: 8px; background: #fff; }
 .co-openext { padding: 20px 0; } .co-openext a { color: var(--red); text-decoration: none; } .co-openext a:hover { text-decoration: underline; }
 
+/* ── Credentials ─────────────────────────────────────────────────────────────── */
+.cr-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; align-items: start; }
+.cr-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.cr-table th { text-align: left; font-family: 'Fira Code', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: .05em; opacity: .5; padding: 8px 12px; border-bottom: 1px solid var(--border); }
+.cr-table td { padding: 9px 12px; border-bottom: 1px solid color-mix(in srgb, var(--border) 60%, transparent); }
+.cr-mono { font-family: 'Fira Code', monospace; font-size: 12px; }
+.cr-eye { background: transparent; border: 1px solid var(--border); border-radius: 4px; color: var(--red); font-size: 10px; padding: 1px 6px; cursor: pointer; margin-left: 6px; }
+.cr-del { background: transparent; border: none; color: var(--fg); opacity: .4; cursor: pointer; font-size: 13px; }
+.cr-del:hover { opacity: 1; color: var(--red); }
+.cr-addwrap { border-top: 1px solid var(--border); margin-top: 6px; }
+
+/* ── Targets ─────────────────────────────────────────────────────────────────── */
+.status { text-transform: uppercase; letter-spacing: .04em; }
+.status--active { color: var(--red); border-color: color-mix(in srgb, var(--red) 50%, var(--border)); }
+.status--done { opacity: .5; }
+.sev { font-family: 'Fira Code', monospace; font-size: 10px; text-transform: uppercase; padding: 2px 7px; border-radius: 4px; flex-shrink: 0; }
+.sev--info { background: color-mix(in srgb, var(--fg) 14%, transparent); }
+.sev--low { background: color-mix(in srgb, #4a90d9 30%, transparent); }
+.sev--medium { background: color-mix(in srgb, #d9a441 34%, transparent); }
+.sev--high { background: color-mix(in srgb, #e0632a 40%, transparent); }
+.sev--critical { background: color-mix(in srgb, var(--red) 55%, transparent); color: #fff; }
+.tg-finding { display: flex; align-items: flex-start; gap: 10px; padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 6px; }
+.tg-finding-body { flex: 1; min-width: 0; }
+.tg-finding-title { font-size: 13px; font-weight: 600; }
+.tg-finding-notes { font-size: 12px; opacity: .6; margin-top: 2px; }
+
+/* ── NetLab ──────────────────────────────────────────────────────────────────── */
+.nl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; }
+.nl-cell { display: flex; justify-content: space-between; gap: 10px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 7px; }
+.nl-k { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; opacity: .55; }
+.nl-v { font-family: 'Fira Code', monospace; font-size: 13px; color: var(--red); }
+.nl-ports { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px; }
+.nl-port { display: flex; gap: 8px; align-items: baseline; padding: 5px 10px; border: 1px solid var(--border); border-radius: 6px; }
+.nl-port-n { font-family: 'Fira Code', monospace; color: var(--red); font-size: 13px; min-width: 44px; }
+.nl-port-s { font-size: 12px; opacity: .8; }
+
 /* Active nav emphasis (rail + sidebar) */
 .icon-rail-btn.active { color: var(--red); }
 .list-item.active { color: var(--red); }
