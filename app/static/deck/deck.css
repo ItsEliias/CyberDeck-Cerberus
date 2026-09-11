@@ -222,6 +222,31 @@
 .rp-text { width: 100%; height: 100%; box-sizing: border-box; background: var(--bg); color: var(--fg); border: none; padding: 22px 28px; resize: none; outline: none; font-family: 'Fira Code', monospace; font-size: 13.5px; line-height: 1.7; }
 .rp-status { font-family: 'Fira Code', monospace; font-size: 11px; opacity: .5; margin-left: 12px; }
 
+/* ── Feeds ───────────────────────────────────────────────────────────────────── */
+.fd-list { display: flex; flex-direction: column; gap: 8px; }
+.fd-item { display: block; text-decoration: none; color: var(--fg); background: var(--panel); border: 1px solid var(--border); border-radius: 9px; padding: 12px 15px; }
+.fd-item:hover { border-color: var(--red); }
+.fd-item-top { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 5px; }
+.fd-src { font-family: 'Fira Code', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: .05em; color: var(--red); }
+.fd-date { font-size: 10px; opacity: .45; font-family: 'Fira Code', monospace; }
+.fd-title { font-size: 14px; font-weight: 600; line-height: 1.4; }
+.fd-sum { font-size: 12px; opacity: .6; margin-top: 4px; line-height: 1.5; }
+
+/* ── Topology ────────────────────────────────────────────────────────────────── */
+#deck-view:has(.tp-canvas) { padding: 0; height: 100%; }
+.tp-canvas { position: relative; height: calc(100% - 58px); background:
+  radial-gradient(circle, color-mix(in srgb, var(--fg) 7%, transparent) 1px, transparent 1px) 0 0 / 26px 26px; }
+#tp-svg { width: 100%; height: 100%; display: block; }
+.tp-edge { stroke: color-mix(in srgb, var(--fg) 40%, transparent); stroke-width: 2; }
+.tp-edge:hover { stroke: var(--red); cursor: pointer; }
+.tp-node { cursor: grab; }
+.tp-node circle { stroke: var(--bg); stroke-width: 2; transition: filter .1s; }
+.tp-node--on circle { stroke: var(--red); stroke-width: 3; filter: drop-shadow(0 0 6px var(--red)); }
+.tp-node-label { fill: var(--fg); font-size: 12px; font-family: 'Fira Code', monospace; }
+.tp-node-kind { fill: #fff; font-size: 13px; font-weight: 700; }
+.tp-hint { position: absolute; left: 14px; bottom: 12px; font-size: 11px; font-family: 'Fira Code', monospace; opacity: .6; background: color-mix(in srgb, var(--bg) 80%, transparent); padding: 5px 9px; border-radius: 6px; }
+.tp-canvas .co-input, .co-head .co-input { display: inline-block; }
+
 /* Active nav emphasis (rail + sidebar) */
 .icon-rail-btn.active { color: var(--red); }
 .list-item.active { color: var(--red); }
