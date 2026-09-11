@@ -48,9 +48,12 @@ def main():
     _wait_ready(port)
 
     import webview  # imported here so headless component checks don't require a display
+    from modules.shell_bridge import DesktopApi
+
     webview.create_window(
         "CyberDeck",
         f"http://127.0.0.1:{port}/",
+        js_api=DesktopApi(),   # Terminal talks to this in-process, not over the web port
         width=1400, height=900, min_size=(940, 620),
     )
     webview.start()  # blocks on the main thread until the window closes (Cocoa requirement)
