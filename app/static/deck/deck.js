@@ -19,6 +19,7 @@
     playbooks: '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M9 16l2 2 4-4"/>',
     netlab: '<rect x="9" y="2" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="16" y="16" width="6" height="6" rx="1"/><path d="M12 8v4M12 12H5v4M12 12h7v4"/>',
     targets: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',
+    board: '<rect x="3" y="3" width="18" height="18" rx="2"/><rect x="7" y="7" width="3" height="8"/><rect x="14" y="7" width="3" height="5"/>',
     topology: '<circle cx="5" cy="6" r="3"/><circle cx="19" cy="6" r="3"/><circle cx="12" cy="18" r="3"/><path d="M7.5 7.5l3 8M16.5 7.5l-3 8M8 6h8"/>',
     reports: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/>',
     credentials: '<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
@@ -40,6 +41,7 @@
     { id: 'playbooks', label: 'Playbooks', blurb: 'Repeatable procedures' },
     { id: 'netlab', label: 'NetLab', blurb: 'Network tools' },
     { id: 'targets', label: 'Targets', blurb: 'Engagement targets + findings' },
+    { id: 'board', label: 'Attack Board', blurb: 'Kanban of attack progress' },
     { id: 'topology', label: 'Topology', blurb: 'Host graph' },
     { id: 'reports', label: 'Reports', blurb: 'Draft + export' },
     { id: 'credentials', label: 'Credentials', blurb: 'Encrypted vault' },
@@ -109,7 +111,7 @@
     var html = '<div class="section"><div class="section-header-flex"><span class="section-title">Study</span></div>';
     ['home', 'courses', 'knowledge', 'playbooks'].forEach(function (id) { html += navItem(id); });
     html += '</div><div class="section"><div class="section-header-flex"><span class="section-title">Engagement</span></div>';
-    ['netlab', 'targets', 'topology', 'reports', 'credentials'].forEach(function (id) { html += navItem(id); });
+    ['netlab', 'targets', 'board', 'topology', 'reports', 'credentials'].forEach(function (id) { html += navItem(id); });
     html += '</div><div class="section"><div class="section-header-flex"><span class="section-title">Feeds &amp; tools</span></div>';
     ['feeds', 'terminal'].forEach(function (id) { html += navItem(id); });
     html += '</div>';

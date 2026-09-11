@@ -15,9 +15,20 @@
       '<button class="co-btn co-btn--primary" id="rp-new">+ New report</button></div>' +
       '<div class="co-body"><div class="kb-loading">Loading…</div></div>';
     root.querySelector('#rp-new').addEventListener('click', function () {
-      var title = prompt('Report title:', 'Engagement report');
-      if (title == null) return;
-      post('/api/reports/create', { title: title }).then(function (d) { if (d.id) showEditor(d.id); });
+      Deck.modal({
+        title: 'New report', width: 440,
+        body: '<label class="co-label">Report title</label><input id="rp-newt" class="co-input" value="Engagement report">',
+        footer: '<button class="co-btn" id="rp-cancel">Cancel</button><button class="co-btn co-btn--primary" id="rp-createbtn">Create</button>',
+        onMount: function (m) {
+          function create() {
+            var title = m.querySelector('#rp-newt').value.trim() || 'Untitled report';
+            post('/api/reports/create', { title: title }).then(function (d) { Deck.closeModal(); if (d.id) { Deck.toast('Report created'); showEditor(d.id); } });
+          }
+          m.querySelector('#rp-createbtn').addEventListener('click', create);
+          m.querySelector('#rp-cancel').addEventListener('click', Deck.closeModal);
+          m.querySelector('#rp-newt').addEventListener('keydown', function (e) { if (e.key === 'Enter') create(); });
+        },
+      });
     });
     get('/api/reports/list').then(function (d) {
       var body = root.querySelector('.co-body');
