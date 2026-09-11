@@ -1,0 +1,46 @@
+name: Build desktop app
+
+# Windows-first, then macOS. Manual trigger (or on a version tag).
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt pyinstaller pythonnet
+      - name: Build CyberDeck.exe
+        run: pyinstaller --noconfirm cyberdeck.spec
+      - uses: actions/upload-artifact@v4
+        with:
+          name: CyberDeck-windows
+          path: dist/CyberDeck.exe
+
+  macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt pyinstaller
+      - name: Build CyberDeck.app
+        run: pyinstaller --noconfirm cyberdeck.spec
+      - name: Zip app
+        run: cd dist && zip -r CyberDeck-macos.zip CyberDeck.app
+      - uses: actions/upload-artifact@v4
+        with:
+          name: CyberDeck-macos
+          path: dist/CyberDeck-macos.zip

@@ -7,6 +7,9 @@ app/modules/ and get registered here.
 """
 from __future__ import annotations
 
+import os
+import sys
+
 from flask import Flask, render_template, jsonify
 
 from modules.knowledge import bp as knowledge_bp
@@ -27,7 +30,14 @@ from modules.activity import bp as activity_bp
 from modules.scanparse import bp as scan_bp
 from modules.sessions import bp as sessions_bp
 
-app = Flask(__name__, static_folder="static", template_folder="templates")
+# When frozen by PyInstaller, static/ + templates/ are unpacked into sys._MEIPASS.
+if getattr(sys, "frozen", False):
+    _base = sys._MEIPASS  # type: ignore[attr-defined]
+    _static, _templates = os.path.join(_base, "static"), os.path.join(_base, "templates")
+else:
+    _static, _templates = "static", "templates"
+
+app = Flask(__name__, static_folder=_static, template_folder=_templates)
 for _bp in (knowledge_bp, courses_bp, credentials_bp, targets_bp, netlab_bp,
             home_bp, playbooks_bp, reports_bp, feeds_bp, topology_bp, board_bp,
             flashcards_bp, snippets_bp, search_bp, activity_bp, scan_bp, sessions_bp):

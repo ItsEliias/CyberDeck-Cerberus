@@ -13,5 +13,5 @@ data/
 node_modules/
 dist/
 build/
-*.spec
+# (cyberdeck.spec is tracked; PyInstaller auto-specs are named build-*.spec)
 .env
