@@ -25,11 +25,12 @@ from modules.snippets import bp as snippets_bp
 from modules.search import bp as search_bp
 from modules.activity import bp as activity_bp
 from modules.scanparse import bp as scan_bp
+from modules.sessions import bp as sessions_bp
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
 for _bp in (knowledge_bp, courses_bp, credentials_bp, targets_bp, netlab_bp,
             home_bp, playbooks_bp, reports_bp, feeds_bp, topology_bp, board_bp,
-            flashcards_bp, snippets_bp, search_bp, activity_bp, scan_bp):
+            flashcards_bp, snippets_bp, search_bp, activity_bp, scan_bp, sessions_bp):
     app.register_blueprint(_bp)
 
 # ── The 12 CyberDeck modules the shell navigates between. ──────────────────────
@@ -45,6 +46,7 @@ MODULES = [
     {"id": "targets", "label": "Targets", "blurb": "Engagement targets + findings"},
     {"id": "board", "label": "Attack Board", "blurb": "Kanban of attack progress"},
     {"id": "scan", "label": "Scan Import", "blurb": "Parse nmap/gobuster → targets"},
+    {"id": "sessions", "label": "Sessions", "blurb": "CTF/box tracker + timer"},
     {"id": "topology", "label": "Topology", "blurb": "Host graph"},
     {"id": "reports", "label": "Reports", "blurb": "Draft + export"},
     {"id": "credentials", "label": "Credentials", "blurb": "Encrypted vault"},
