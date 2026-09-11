@@ -187,6 +187,8 @@
     });
     document.getElementById('sidebar-brand-btn').addEventListener('click', function () { route('home'); });
     document.getElementById('btn-settings').addEventListener('click', function () { route('settings'); });
+    var pill = document.getElementById('deck-search-pill');
+    if (pill) pill.addEventListener('click', function () { if (window.DeckCmd) DeckCmd.open(); });
     route('home');
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);

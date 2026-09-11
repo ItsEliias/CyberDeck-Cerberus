@@ -80,7 +80,17 @@
       treeData = d.tree;
       // auto-expand top level
       (treeData.children || []).forEach(function (c) { if (c.type === 'folder') expanded[c.path] = true; });
-      drawTree(root);
+      // deep-link from the command palette: open a specific note + expand its folders
+      var pending = window.__deckPendingNote;
+      if (pending) {
+        window.__deckPendingNote = null;
+        var parts = pending.split('/'); var acc = '';
+        for (var i = 0; i < parts.length - 1; i++) { acc = acc ? acc + '/' + parts[i] : parts[i]; expanded[acc] = true; }
+        drawTree(root);
+        openNote(root, pending);
+      } else {
+        drawTree(root);
+      }
     });
   };
 })();

@@ -79,12 +79,17 @@
     <h1 class="a11y-visually-hidden">CyberDeck</h1>
     <div class="chat-top-bar">
       <div class="chat-meta-overlay"><span id="deck-title">CyberDeck</span></div>
+      <button class="deck-search-pill" id="deck-search-pill" style="margin-left:auto;" title="Search (Ctrl/Cmd+K)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="10" cy="10" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+        Search <kbd>⌘K</kbd>
+      </button>
     </div>
     <div id="deck-view"><!-- active module rendered here by deck.js --></div>
   </main>
 
   <script src="/static/deck/deck.js"></script>
   <script src="/static/deck/deck-ui.js"></script>
+  <script src="/static/deck/deck-cmd.js"></script>
   <script src="/static/deck/knowledge.js"></script>
   <script src="/static/deck/courses.js"></script>
   <script src="/static/deck/credentials.js"></script>
