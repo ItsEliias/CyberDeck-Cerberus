@@ -9,6 +9,8 @@ from pathlib import Path
 
 from flask import Blueprint, jsonify, request, Response
 
+from . import targets
+
 bp = Blueprint("reports", __name__, url_prefix="/api/reports")
 
 REPORTS_DIR = Path(os.environ.get(
@@ -104,6 +106,40 @@ def delete(rid):
         return jsonify(error="not found"), 404
     f.unlink()
     return jsonify(ok=True)
+
+
+@bp.route("/from-target", methods=["POST"])
+def from_target():
+    """Generate a report draft from a target's findings + evidence."""
+    tid = (request.get_json(silent=True) or {}).get("tid")
+    tgt = next((t for t in targets._load()["targets"] if t["id"] == tid), None)
+    if not tgt:
+        return jsonify(error="target not found"), 404
+
+    order = {"critical": 0, "high": 1, "medium": 2, "low": 3, "info": 4}
+    findings = sorted(tgt.get("findings", []), key=lambda f: order.get(f.get("severity"), 9))
+    lines = [f"# {tgt['name']} — Engagement report", "",
+             "## Scope", "", f"- Target: {tgt.get('host') or tgt['name']}",
+             f"- OS: {tgt.get('os') or '—'}", f"- Status: {tgt.get('status', '')}", "",
+             "## Findings", ""]
+    if not findings:
+        lines.append("_No findings recorded._")
+    for i, f in enumerate(findings, 1):
+        lines += [f"### {i}. {f['title']} — {f.get('severity', 'info').title()}", "",
+                  (f.get("notes") or "_No description._"), ""]
+        for ev in f.get("evidence", []):
+            if ev.get("image"):
+                lines.append(f"![{ev['name']}](/api/targets/evidence/{ev['id']})")
+            else:
+                lines.append(f"- Evidence: [{ev['name']}](/api/targets/evidence/{ev['id']})")
+        if f.get("evidence"):
+            lines.append("")
+    lines += ["## Conclusion", ""]
+
+    REPORTS_DIR.mkdir(parents=True, exist_ok=True)
+    rid = secrets.token_hex(6)
+    _path(rid).write_text("\n".join(lines), "utf-8")
+    return jsonify(ok=True, id=rid)
 
 
 @bp.route("/<rid>/export")

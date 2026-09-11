@@ -47,14 +47,22 @@
       var statusOpts = meta.statuses.map(function (s) { return '<option value="' + s + '"' + (s === t.status ? ' selected' : '') + '>' + s + '</option>'; }).join('');
       var sevOpts = meta.severities.map(function (s) { return '<option value="' + s + '">' + s + '</option>'; }).join('');
       var findings = (t.findings || []).map(function (f) {
+        var ev = (f.evidence || []).map(function (e) {
+          return e.image
+            ? '<a class="tg-ev" href="/api/targets/evidence/' + esc(e.id) + '" target="_blank" rel="noopener"><img src="/api/targets/evidence/' + esc(e.id) + '" alt="' + esc(e.name) + '"><button class="tg-ev-del" data-ev="' + esc(e.id) + '" title="Remove">×</button></a>'
+            : '<span class="tg-ev tg-ev-file"><a href="/api/targets/evidence/' + esc(e.id) + '" target="_blank" rel="noopener">' + esc(e.name) + '</a><button class="tg-ev-del" data-ev="' + esc(e.id) + '" title="Remove">×</button></span>';
+        }).join('');
         return '<div class="tg-finding"><span class="' + sevClass(f.severity) + '">' + esc(f.severity) + '</span>' +
           '<div class="tg-finding-body"><div class="tg-finding-title">' + esc(f.title) + '</div>' +
-          (f.notes ? '<div class="tg-finding-notes">' + esc(f.notes) + '</div>' : '') + '</div>' +
+          (f.notes ? '<div class="tg-finding-notes">' + esc(f.notes) + '</div>' : '') +
+          '<div class="tg-ev-row">' + ev + '<button class="tg-attach" data-attach="' + esc(f.id) + '">+ evidence</button></div></div>' +
           '<button class="cr-del" data-df="' + esc(f.id) + '">✕</button></div>';
       }).join('') || '<div class="co-muted" style="padding:10px 0;">No findings yet.</div>';
       root.innerHTML = '<div class="co-head"><button class="co-btn" id="tg-back">← Targets</button>' +
         '<span class="co-title" style="margin-left:10px;">' + esc(t.name) + '</span>' +
-        '<button class="co-btn" id="tg-delT" style="margin-left:auto;">Delete target</button></div>' +
+        '<button class="co-btn co-btn--primary" id="tg-report" style="margin-left:auto;">Generate report</button>' +
+        '<button class="co-btn" id="tg-delT" style="margin-left:8px;">Delete target</button></div>' +
+        '<input type="file" id="tg-file" accept="image/*,.pdf,.txt,.log" style="display:none;">' +
         '<div class="co-body"><div class="co-muted" style="margin-bottom:14px;">' + esc(t.host || '—') + (t.os ? ' · ' + esc(t.os) : '') +
         ' &nbsp; Status: <select id="tg-status" class="co-input" style="width:auto;display:inline-block;padding:4px 8px;">' + statusOpts + '</select></div>' +
         '<div class="co-title" style="font-size:12px;margin:6px 0 10px;">Findings</div><div id="tg-findings">' + findings + '</div>' +
@@ -71,7 +79,24 @@
         if (!body.title.trim()) return;
         post('/api/targets/' + tid + '/finding', body).then(function () { showDetail(tid); });
       });
+      root.querySelector('#tg-report').addEventListener('click', function () {
+        post('/api/reports/from-target', { tid: tid }).then(function (r) {
+          if (r.id) { Deck.toast('Report drafted from findings'); document.querySelector('[data-nav="reports"]').click(); }
+        });
+      });
+      var pendingFinding = null;
+      var fileInput = root.querySelector('#tg-file');
+      fileInput.addEventListener('change', function () {
+        if (!fileInput.files.length || !pendingFinding) return;
+        var fd = new FormData(); fd.append('file', fileInput.files[0]);
+        fetch('/api/targets/' + tid + '/finding/' + pendingFinding + '/evidence', { method: 'POST', body: fd })
+          .then(function (r) { return r.json(); }).then(function () { fileInput.value = ''; Deck.toast('Evidence attached'); showDetail(tid); });
+      });
       root.querySelector('#tg-findings').addEventListener('click', function (e) {
+        var at = e.target.closest('[data-attach]');
+        if (at) { pendingFinding = at.getAttribute('data-attach'); fileInput.click(); return; }
+        var ed = e.target.closest('[data-ev]');
+        if (ed) { e.preventDefault(); del('/api/targets/evidence/' + ed.getAttribute('data-ev')).then(function () { showDetail(tid); }); return; }
         var d2 = e.target.closest('[data-df]'); if (d2) del('/api/targets/' + tid + '/finding/' + d2.getAttribute('data-df')).then(function () { showDetail(tid); });
       });
     });

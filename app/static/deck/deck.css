@@ -193,6 +193,16 @@
 .tg-finding-body { flex: 1; min-width: 0; }
 .tg-finding-title { font-size: 13px; font-weight: 600; }
 .tg-finding-notes { font-size: 12px; opacity: .6; margin-top: 2px; }
+.tg-ev-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; align-items: center; }
+.tg-ev { position: relative; display: inline-block; }
+.tg-ev img { height: 54px; width: auto; max-width: 120px; object-fit: cover; border: 1px solid var(--border); border-radius: 6px; display: block; }
+.tg-ev:hover img { border-color: var(--deck-accent); }
+.tg-ev-file { font-size: 11px; font-family: 'Fira Code', monospace; border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; }
+.tg-ev-file a { color: var(--fg); text-decoration: none; }
+.tg-ev-del { position: absolute; top: -6px; right: -6px; background: var(--panel); border: 1px solid var(--border); border-radius: 50%; width: 18px; height: 18px; line-height: 1; color: var(--red); cursor: pointer; font-size: 12px; }
+.tg-ev-file .tg-ev-del { position: static; margin-left: 6px; border: none; width: auto; height: auto; }
+.tg-attach { background: transparent; border: 1px dashed var(--border); border-radius: 6px; color: var(--fg); opacity: .7; font-size: 11px; font-family: 'Fira Code', monospace; padding: 5px 10px; cursor: pointer; }
+.tg-attach:hover { border-color: var(--deck-accent); color: var(--deck-accent); opacity: 1; }
 
 /* ── NetLab ──────────────────────────────────────────────────────────────────── */
 .nl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; }
