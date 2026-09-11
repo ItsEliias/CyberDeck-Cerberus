@@ -42,6 +42,8 @@
     side.innerHTML = renderItems(treeData.children || [], 0);
   }
 
+  var currentRaw = '';
+
   function openNote(rootEl, path) {
     current = path;
     var pane = rootEl.querySelector('#kb-note');
@@ -50,22 +52,95 @@
       .then(function (r) { return r.json(); })
       .then(function (d) {
         if (d.error) { pane.innerHTML = '<div class="kb-loading">' + esc(d.error) + '</div>'; return; }
-        pane.innerHTML = '<div class="kb-note-head">' + esc(d.title) + '</div>' +
-          '<div class="md-body">' + d.html + '</div>';
+        currentRaw = d.raw || '';
+        pane.innerHTML =
+          '<div class="kb-note-head"><span>' + esc(d.title) + '</span>' +
+          '<button class="kb-edit-btn" id="kb-edit">Edit</button></div>' +
+          '<div class="md-body">' + d.html + '</div>' +
+          '<div id="kb-backlinks"></div>';
         pane.scrollTop = 0;
+        loadBacklinks(rootEl, path);
       })
       .catch(function () { pane.innerHTML = '<div class="kb-loading">Failed to load note.</div>'; });
     drawTree(rootEl);  // refresh active highlight
   }
 
+  function loadBacklinks(rootEl, path) {
+    fetch('/api/knowledge/backlinks?path=' + encodeURIComponent(path)).then(function (r) { return r.json(); }).then(function (d) {
+      var box = rootEl.querySelector('#kb-backlinks'); if (!box) return;
+      var bl = d.backlinks || [];
+      if (!bl.length) return;
+      box.innerHTML = '<div class="kb-bl-head">// ' + bl.length + ' linked mention' + (bl.length === 1 ? '' : 's') + '</div>' +
+        bl.map(function (b) { return '<button class="kb-bl" data-file="' + esc(b.path) + '">' + esc(b.title) + '</button>'; }).join('');
+    });
+  }
+
+  function editNote(rootEl) {
+    var pane = rootEl.querySelector('#kb-note');
+    pane.innerHTML = '<div class="kb-note-head"><span>Editing — ' + esc(current) + '</span>' +
+      '<span style="margin-left:auto;display:flex;gap:8px;"><button class="kb-edit-btn" id="kb-cancel">Cancel</button>' +
+      '<button class="co-btn co-btn--primary" id="kb-save">Save</button></span></div>' +
+      '<textarea id="kb-editor" class="kb-editor" spellcheck="false"></textarea>';
+    pane.querySelector('#kb-editor').value = currentRaw;
+    pane.querySelector('#kb-editor').focus();
+    pane.querySelector('#kb-cancel').addEventListener('click', function () { openNote(rootEl, current); });
+    pane.querySelector('#kb-save').addEventListener('click', function () {
+      var content = pane.querySelector('#kb-editor').value;
+      fetch('/api/knowledge/save', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path: current, content: content }) })
+        .then(function (r) { return r.json(); }).then(function () { if (window.Deck) Deck.toast('Saved'); openNote(rootEl, current); });
+    });
+  }
+
+  function resolveWiki(rootEl, target) {
+    fetch('/api/knowledge/resolve?target=' + encodeURIComponent(target)).then(function (r) { return r.json(); }).then(function (d) {
+      if (d.path) openNote(rootEl, d.path);
+      else if (window.Deck) Deck.toast('No note named "' + target + '"', 'error');
+    });
+  }
+
+  function reloadTree(rootEl, thenOpen) {
+    fetch('/api/knowledge/tree').then(function (r) { return r.json(); }).then(function (d) {
+      treeData = d.tree; drawTree(rootEl); if (thenOpen) openNote(rootEl, thenOpen);
+    });
+  }
+
+  function newNoteModal(rootEl) {
+    Deck.modal({
+      title: 'New note', width: 460,
+      body: '<label class="co-label">Folder (optional)</label><input id="kb-nf" class="co-input" placeholder="e.g. 03-thm-notes">' +
+        '<label class="co-label">Name</label><input id="kb-nn" class="co-input" placeholder="My note">',
+      footer: '<button class="co-btn" id="kb-nc">Cancel</button><button class="co-btn co-btn--primary" id="kb-nok">Create</button>',
+      onMount: function (m) {
+        m.querySelector('#kb-nc').addEventListener('click', Deck.closeModal);
+        m.querySelector('#kb-nok').addEventListener('click', function () {
+          var name = m.querySelector('#kb-nn').value.trim(); if (!name) return;
+          fetch('/api/knowledge/create', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ folder: m.querySelector('#kb-nf').value, name: name }) })
+            .then(function (r) { return r.json(); }).then(function (d) {
+              if (d.error) { Deck.toast(d.error, 'error'); return; }
+              Deck.closeModal(); Deck.toast('Note created');
+              var parts = d.path.split('/'); var acc = '';
+              for (var i = 0; i < parts.length - 1; i++) { acc = acc ? acc + '/' + parts[i] : parts[i]; expanded[acc] = true; }
+              reloadTree(rootEl, d.path);
+            });
+        });
+      },
+    });
+  }
+
   window.DeckViews.knowledge = function (root) {
     root.innerHTML =
       '<div class="kb-wrap">' +
-      '  <div class="kb-side"><div class="kb-side-head">Vault</div><div id="kb-tree" class="kb-tree"></div></div>' +
+      '  <div class="kb-side"><div class="kb-side-head">Vault<button class="kb-new-btn" id="kb-new" title="New note">+</button></div><div id="kb-tree" class="kb-tree"></div></div>' +
       '  <div id="kb-note" class="kb-note"><div class="kb-loading">Select a note from the vault.</div></div>' +
       '</div>';
 
     root.addEventListener('click', function (e) {
+      var wl = e.target.closest('.md-wikilink');
+      if (wl) { resolveWiki(root, wl.getAttribute('data-target') || wl.textContent); return; }
+      if (e.target.closest('#kb-edit')) { editNote(root); return; }
+      if (e.target.closest('#kb-new')) { newNoteModal(root); return; }
+      var bl = e.target.closest('.kb-bl');
+      if (bl) { openNote(root, bl.getAttribute('data-file')); return; }
       var folder = e.target.closest('.kb-folder');
       if (folder) { var p = folder.getAttribute('data-folder'); expanded[p] = !expanded[p]; drawTree(root); return; }
       var file = e.target.closest('.kb-file');

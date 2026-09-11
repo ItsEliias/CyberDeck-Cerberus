@@ -109,4 +109,56 @@ def read_note(relpath: str) -> dict:
         # Minimal fallback: escape + preserve line breaks so notes still read.
         from html import escape
         html = "<pre class='md-fallback'>" + escape(raw) + "</pre>"
-    return {"path": relpath, "title": title, "html": html}
+    return {"path": relpath, "title": title, "html": html, "raw": raw}
+
+
+def write_note(relpath: str, content: str) -> dict:
+    """Create/overwrite a vault .md file (containment-checked)."""
+    target = _safe_resolve(relpath)
+    if target.suffix.lower() != ".md":
+        raise ValueError("notes must be .md")
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(content, encoding="utf-8")
+    return {"path": relpath}
+
+
+def _note_index() -> dict:
+    """stem(lowercased) → first matching relpath, for wikilink resolution."""
+    root = vault_root()
+    idx = {}
+    for r, dirs, files in os.walk(root):
+        dirs[:] = [d for d in dirs if not d.startswith(".") and d not in _HIDE]
+        for n in files:
+            if n.lower().endswith(".md"):
+                p = Path(r) / n
+                idx.setdefault(p.stem.lower(), str(p.relative_to(root)))
+    return idx
+
+
+def resolve_wikilink(target: str):
+    return _note_index().get((target or "").strip().lower())
+
+
+def backlinks(relpath: str) -> list:
+    """Notes that reference this note by [[wikilink]] to its filename."""
+    target = _safe_resolve(relpath)
+    stem = target.stem.lower()
+    root = vault_root()
+    out = []
+    for r, dirs, files in os.walk(root):
+        dirs[:] = [d for d in dirs if not d.startswith(".") and d not in _HIDE]
+        for n in files:
+            if not n.lower().endswith(".md"):
+                continue
+            p = Path(r) / n
+            if p == target:
+                continue
+            try:
+                text = p.read_text("utf-8", errors="ignore")
+            except OSError:
+                continue
+            for m in _WIKILINK.finditer(text):
+                if m.group(1).strip().lower() == stem:
+                    out.append({"path": str(p.relative_to(root)), "title": p.stem})
+                    break
+    return out
