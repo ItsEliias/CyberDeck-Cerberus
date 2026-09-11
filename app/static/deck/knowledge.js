@@ -10,7 +10,10 @@
   var treeData = null;
 
   function fileSvg() {
-    return '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>';
+    return '<svg class="kb-file-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>';
+  }
+  function folderSvg() {
+    return '<svg class="kb-folder-icon" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M3 7a2 2 0 0 1 2-2h3.5l2 2H19a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>';
   }
   function chevron(open) {
     return '<svg class="kb-chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(' + (open ? 90 : 0) + 'deg)"><polyline points="9 18 15 12 9 6"/></svg>';
@@ -23,7 +26,7 @@
       if (it.type === 'folder') {
         var open = !!expanded[it.path];
         html += '<div class="kb-row kb-folder" data-folder="' + esc(it.path) + '" style="' + pad + '">' +
-          chevron(open) + '<span class="kb-name">' + esc(it.name) + '</span>' +
+          chevron(open) + folderSvg() + '<span class="kb-name">' + esc(it.name) + '</span>' +
           '<span class="kb-count">' + it.count + '</span></div>';
         if (open) html += '<div class="kb-children">' + renderItems(it.children || [], depth + 1) + '</div>';
       } else {
