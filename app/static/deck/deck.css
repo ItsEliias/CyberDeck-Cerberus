@@ -247,6 +247,20 @@
 .tp-hint { position: absolute; left: 14px; bottom: 12px; font-size: 11px; font-family: 'Fira Code', monospace; opacity: .6; background: color-mix(in srgb, var(--bg) 80%, transparent); padding: 5px 9px; border-radius: 6px; }
 .tp-canvas .co-input, .co-head .co-input { display: inline-block; }
 
+/* ── Flashcards ──────────────────────────────────────────────────────────────── */
+.fc-due { color: var(--deck-accent); border-color: color-mix(in srgb, var(--deck-accent) 50%, var(--border)) !important; }
+.fc-review-wrap { display: flex; flex-direction: column; align-items: center; justify-content: center; height: calc(100% - 58px); padding: 24px; gap: 22px; }
+.fc-card { width: 100%; max-width: 640px; min-height: 220px; background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 30px 34px; display: flex; flex-direction: column; justify-content: center;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--deck-accent) 18%, transparent), 0 14px 44px rgba(0,0,0,.4); }
+.fc-front { font-size: 19px; line-height: 1.5; text-align: center; }
+.fc-back { font-size: 16px; line-height: 1.6; opacity: .92; margin-top: 4px; }
+.fc-back hr { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+.fc-actions { display: flex; gap: 10px; }
+.fc-actions .co-btn { min-width: 84px; }
+.fc-prop { display: flex; gap: 9px; align-items: flex-start; padding: 8px 4px; border-bottom: 1px solid color-mix(in srgb, var(--border) 60%, transparent); font-size: 13px; }
+.fc-prop input { accent-color: var(--deck-accent); margin-top: 3px; }
+.fc-proplist { max-height: 260px; overflow-y: auto; margin-top: 6px; }
+
 /* ── Attack Board (kanban) ───────────────────────────────────────────────────── */
 #deck-view:has(.bd-wrap) { padding: 0; height: 100%; }
 .bd-wrap { display: flex; gap: 14px; padding: 18px; height: calc(100% - 58px); overflow-x: auto; align-items: flex-start; }

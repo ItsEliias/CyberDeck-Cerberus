@@ -20,10 +20,12 @@ from modules.reports import bp as reports_bp
 from modules.feeds import bp as feeds_bp
 from modules.topology import bp as topology_bp
 from modules.board import bp as board_bp
+from modules.flashcards import bp as flashcards_bp
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
 for _bp in (knowledge_bp, courses_bp, credentials_bp, targets_bp, netlab_bp,
-            home_bp, playbooks_bp, reports_bp, feeds_bp, topology_bp, board_bp):
+            home_bp, playbooks_bp, reports_bp, feeds_bp, topology_bp, board_bp,
+            flashcards_bp):
     app.register_blueprint(_bp)
 
 # ── The 12 CyberDeck modules the shell navigates between. ──────────────────────
@@ -33,6 +35,7 @@ MODULES = [
     {"id": "courses", "label": "Courses", "blurb": "Structured study"},
     {"id": "knowledge", "label": "Knowledge", "blurb": "Your vault, Obsidian-style"},
     {"id": "playbooks", "label": "Playbooks", "blurb": "Repeatable procedures"},
+    {"id": "flashcards", "label": "Flashcards", "blurb": "Spaced-repetition review"},
     {"id": "netlab", "label": "NetLab", "blurb": "Network tools"},
     {"id": "targets", "label": "Targets", "blurb": "Engagement targets + findings"},
     {"id": "board", "label": "Attack Board", "blurb": "Kanban of attack progress"},

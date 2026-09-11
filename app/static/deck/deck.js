@@ -17,6 +17,7 @@
     courses: '<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>',
     knowledge: '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>',
     playbooks: '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M9 16l2 2 4-4"/>',
+    flashcards: '<rect x="3" y="6" width="14" height="11" rx="2"/><path d="M7 6V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1"/>',
     netlab: '<rect x="9" y="2" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="16" y="16" width="6" height="6" rx="1"/><path d="M12 8v4M12 12H5v4M12 12h7v4"/>',
     targets: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',
     board: '<rect x="3" y="3" width="18" height="18" rx="2"/><rect x="7" y="7" width="3" height="8"/><rect x="14" y="7" width="3" height="5"/>',
@@ -39,6 +40,7 @@
     { id: 'courses', label: 'Courses', blurb: 'Structured study' },
     { id: 'knowledge', label: 'Knowledge', blurb: 'Your vault, Obsidian-style' },
     { id: 'playbooks', label: 'Playbooks', blurb: 'Repeatable procedures' },
+    { id: 'flashcards', label: 'Flashcards', blurb: 'Spaced-repetition review' },
     { id: 'netlab', label: 'NetLab', blurb: 'Network tools' },
     { id: 'targets', label: 'Targets', blurb: 'Engagement targets + findings' },
     { id: 'board', label: 'Attack Board', blurb: 'Kanban of attack progress' },
@@ -109,7 +111,7 @@
   function renderSidebar() {
     var inner = document.getElementById('sidebar-inner');
     var html = '<div class="section"><div class="section-header-flex"><span class="section-title">Study</span></div>';
-    ['home', 'courses', 'knowledge', 'playbooks'].forEach(function (id) { html += navItem(id); });
+    ['home', 'courses', 'knowledge', 'playbooks', 'flashcards'].forEach(function (id) { html += navItem(id); });
     html += '</div><div class="section"><div class="section-header-flex"><span class="section-title">Engagement</span></div>';
     ['netlab', 'targets', 'board', 'topology', 'reports', 'credentials'].forEach(function (id) { html += navItem(id); });
     html += '</div><div class="section"><div class="section-header-flex"><span class="section-title">Feeds &amp; tools</span></div>';
