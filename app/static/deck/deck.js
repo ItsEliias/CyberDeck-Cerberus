@@ -8,6 +8,9 @@
 (function () {
   'use strict';
 
+  // Modules can register a custom renderer: window.DeckViews[id](rootEl).
+  window.DeckViews = window.DeckViews || {};
+
   // ── Icons (lucide-style, 24x24 stroke) ──────────────────────────────────────
   var I = {
     home: '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
@@ -121,6 +124,7 @@
 
   function moduleView(id) {
     if (id === 'settings') return settingsView();
+    if (window.DeckViews[id]) return '<div id="deck-module-root" class="deck-module-root"></div>';
     var m = MODULES.filter(function (x) { return x.id === id; })[0] || { label: id, blurb: '' };
     return '<div class="deck-panel">' +
       '<div class="deck-panel-title">' + svg(id, 18) + '<span>' + m.label + '</span></div>' +
@@ -155,6 +159,7 @@
     Array.prototype.forEach.call(document.querySelectorAll('[data-nav]'), function (el) {
       el.classList.toggle('active', el.getAttribute('data-nav') === id);
     });
+    if (window.DeckViews[id]) window.DeckViews[id](document.getElementById('deck-module-root'));
     if (id === 'settings') wireSwatches();
   }
 

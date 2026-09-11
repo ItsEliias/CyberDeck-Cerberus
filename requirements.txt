@@ -1,5 +1,6 @@
 # CyberDeck-on-Cerberus — Python deps (kept minimal; grows per module in P2)
 Flask>=3.0,<4.0
+Markdown>=3.5
 # P2+ (added as modules land):
 # PyYAML>=6.0          # course/playbook frontmatter
 # Markdown>=3.5        # note rendering
