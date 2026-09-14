@@ -565,3 +565,13 @@ body.deck-reduce-motion *, body.deck-reduce-motion *::before, body.deck-reduce-m
 .tk-flag { display: flex; justify-content: space-between; gap: 12px; padding: 5px 8px; background: color-mix(in srgb, var(--fg) 4%, transparent); border-radius: 5px; }
 .tk-flag code { font-family: 'Fira Code', monospace; font-size: 11px; color: var(--fg); }
 .tk-flag span { opacity: .55; font-size: 11px; }
+
+/* Home — Today plan */
+.hm-today { display: flex; flex-direction: column; gap: 8px; }
+.hm-plan { display: flex; align-items: center; gap: 12px; text-align: left; width: 100%; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; color: var(--fg); cursor: pointer; transition: border-color .12s, background .12s; }
+.hm-plan:hover { border-color: color-mix(in srgb, var(--deck-accent) 45%, var(--border)); }
+.hm-plan-ico { font-size: 18px; flex-shrink: 0; }
+.hm-plan-main { flex: 1; font-size: 14px; display: flex; flex-direction: column; gap: 2px; }
+.hm-plan-main b { color: var(--deck-accent); }
+.hm-plan-sub { font-size: 11px; opacity: .55; font-weight: 400; }
+.hm-plan-arrow { opacity: .4; flex-shrink: 0; }
