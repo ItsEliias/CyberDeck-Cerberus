@@ -102,6 +102,42 @@
     try { var t = JSON.parse(localStorage.getItem(THEME_KEY)); return (t && t.name) || 'dark'; } catch (e) { return 'dark'; }
   }
 
+  // ── Preferences (font / density / accent / layout / motion) ────────────────────
+  // Ported from Cerberus's appearance settings, trimmed to what fits an offline
+  // study hub. Each persists per machine and applies live on top of the theme.
+  var PREFS = {
+    font:    { key: 'deck-font',    def: 'mono' },
+    density: { key: 'deck-density', def: 'comfortable' },
+    accent:  { key: 'deck-accent',  def: '' },
+    side:    { key: 'deck-side',    def: 'left' },
+    frost:   { key: 'deck-frost',   def: '1' },
+    motion:  { key: 'deck-motion',  def: '0' }
+  };
+  var FONTS = {
+    mono:  "'Fira Code', 'JetBrains Mono', ui-monospace, monospace",
+    sans:  "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
+    serif: "Georgia, 'Times New Roman', Cambria, serif"
+  };
+  function getPref(name) {
+    try { var v = localStorage.getItem(PREFS[name].key); return v == null ? PREFS[name].def : v; }
+    catch (e) { return PREFS[name].def; }
+  }
+  function setPref(name, val) { try { localStorage.setItem(PREFS[name].key, val); } catch (e) {} }
+  function applyPrefs() {
+    var root = document.documentElement, body = document.body;
+    root.style.setProperty('--font-family', FONTS[getPref('font')] || FONTS.mono);
+    root.classList.remove('density-compact', 'density-comfortable', 'density-spacious');
+    root.classList.add('density-' + getPref('density'));
+    var acc = getPref('accent');
+    if (acc) { root.style.setProperty('--red', acc); root.style.setProperty('--brand-color', acc); }
+    body.classList.toggle('deck-side-right', getPref('side') === 'right');
+    body.classList.toggle('deck-no-frost', getPref('frost') !== '1');
+    body.classList.toggle('deck-reduce-motion', getPref('motion') === '1');
+  }
+  // Re-assert the palette then re-layer prefs — used after a theme change or an
+  // accent reset, both of which rewrite --red/--brand-color from the theme.
+  function refreshTheme() { applyTheme(currentTheme()); applyPrefs(); }
+
   // ── Rendering ────────────────────────────────────────────────────────────────
   var state = { active: 'home' };
 
@@ -160,8 +196,40 @@
         '<span class="deck-swatch-name">' + name + '</span></button>';
     }).join('');
     return '<div class="deck-panel"><div class="deck-panel-title">' + svg('settings', 18) + '<span>Theme</span></div>' +
-      '<p class="deck-muted">Cerberus\'s 22 palettes. Click to apply — saved on this machine.</p>' +
-      '<div class="deck-swatches">' + swatches + '</div></div>';
+        '<p class="deck-muted">Cerberus\'s 22 palettes. Click to apply — saved on this machine.</p>' +
+        '<div class="deck-swatches">' + swatches + '</div></div>' +
+      '<div class="deck-panel"><div class="deck-panel-title">' + svg('panel', 18) + '<span>Appearance</span></div>' +
+        setRow('Accent', 'Recolours the accent on top of the current theme.',
+          '<input type="color" class="deck-color" id="deck-accent-input" value="' + (getPref('accent') || '#c0392b') + '">' +
+          '<button class="co-btn" id="deck-accent-reset">Reset</button>') +
+        setRow('Font', 'Applies across the whole app.',
+          seg('font', getPref('font'), [{ v: 'mono', l: 'Mono' }, { v: 'sans', l: 'Sans' }, { v: 'serif', l: 'Serif' }])) +
+        setRow('Density', 'Spacing of lists, cards and headers.',
+          seg('density', getPref('density'), [{ v: 'compact', l: 'Compact' }, { v: 'comfortable', l: 'Comfortable' }, { v: 'spacious', l: 'Spacious' }])) +
+      '</div>' +
+      '<div class="deck-panel"><div class="deck-panel-title">' + svg('board', 18) + '<span>Layout &amp; motion</span></div>' +
+        setRow('Sidebar side', 'Which edge the nav sits on.',
+          seg('side', getPref('side'), [{ v: 'left', l: 'Left' }, { v: 'right', l: 'Right' }])) +
+        setRow('Frosted glass', 'Blur behind the sidebar and panels.', toggle('frost', getPref('frost') === '1')) +
+        setRow('Reduce motion', 'Minimise animations and transitions.', toggle('motion', getPref('motion') === '1')) +
+      '</div>';
+  }
+
+  // Settings control builders (segmented buttons, labelled rows, switches).
+  function seg(name, cur, opts) {
+    return '<div class="deck-seg" role="group">' + opts.map(function (o) {
+      return '<button class="deck-seg-btn' + (o.v === cur ? ' deck-seg-btn--on' : '') +
+        '" data-set="' + name + '" data-val="' + o.v + '">' + o.l + '</button>';
+    }).join('') + '</div>';
+  }
+  function setRow(label, hint, control) {
+    return '<div class="deck-set-row"><div class="deck-set-meta"><span class="deck-set-label">' + label + '</span>' +
+      (hint ? '<span class="deck-set-hint">' + hint + '</span>' : '') + '</div>' +
+      '<div class="deck-set-control">' + control + '</div></div>';
+  }
+  function toggle(name, on) {
+    return '<button class="deck-toggle' + (on ? ' deck-toggle--on' : '') + '" data-toggle="' + name +
+      '" role="switch" aria-checked="' + (on ? 'true' : 'false') + '"><span class="deck-toggle-knob"></span></button>';
   }
 
   function route(id) {
@@ -174,19 +242,42 @@
       el.classList.toggle('active', el.getAttribute('data-nav') === id);
     });
     if (window.DeckViews[id]) window.DeckViews[id](document.getElementById('deck-module-root'));
-    if (id === 'settings') wireSwatches();
+    if (id === 'settings') wireSettings();
   }
 
-  function wireSwatches() {
-    Array.prototype.forEach.call(document.querySelectorAll('[data-theme]'), function (btn) {
-      btn.addEventListener('click', function () { applyTheme(btn.getAttribute('data-theme')); route('settings'); });
+  function wireSettings() {
+    var root = document.getElementById('deck-view');
+    // Theme swatches — re-layer prefs so an accent override survives the switch.
+    Array.prototype.forEach.call(root.querySelectorAll('[data-theme]'), function (btn) {
+      btn.addEventListener('click', function () { applyTheme(btn.getAttribute('data-theme')); applyPrefs(); route('settings'); });
     });
+    // Segmented prefs (font / density / side).
+    Array.prototype.forEach.call(root.querySelectorAll('[data-set]'), function (btn) {
+      btn.addEventListener('click', function () {
+        setPref(btn.getAttribute('data-set'), btn.getAttribute('data-val'));
+        applyPrefs(); route('settings');
+      });
+    });
+    // Switches (frosted / reduce motion).
+    Array.prototype.forEach.call(root.querySelectorAll('[data-toggle]'), function (btn) {
+      btn.addEventListener('click', function () {
+        var n = btn.getAttribute('data-toggle');
+        setPref(n, getPref(n) === '1' ? '0' : '1');
+        applyPrefs(); route('settings');
+      });
+    });
+    // Accent picker: live while dragging, no re-render (keeps the picker open).
+    var ai = root.querySelector('#deck-accent-input');
+    if (ai) ai.addEventListener('input', function () { setPref('accent', ai.value); applyPrefs(); });
+    var ar = root.querySelector('#deck-accent-reset');
+    if (ar) ar.addEventListener('click', function () { setPref('accent', ''); refreshTheme(); route('settings'); });
   }
 
   // ── Boot ──────────────────────────────────────────────────────────────────────
   function boot() {
     if (!THEMES[currentTheme()]) applyTheme('dark');
     else applyTheme(currentTheme());
+    applyPrefs();
     renderRail();
     renderSidebar();
     // Sidebar collapse — nav still works via the always-visible icon rail.

@@ -463,3 +463,43 @@
 }
 .rail-toggle:hover { opacity: 1; color: var(--deck-accent); background: color-mix(in srgb, var(--deck-accent) 12%, transparent); }
 .rail-toggle.active { opacity: 1; color: var(--deck-accent); }
+
+/* ── Settings controls ──────────────────────────────────────────────────────── */
+.deck-set-row { display: flex; align-items: center; gap: 18px; padding: 14px 0; border-top: 1px solid var(--border); flex-wrap: wrap; }
+.deck-set-row:first-of-type { border-top: none; padding-top: 4px; }
+.deck-set-meta { display: flex; flex-direction: column; gap: 2px; flex: 1 1 200px; min-width: 160px; }
+.deck-set-label { font-weight: 600; font-size: 13px; }
+.deck-set-hint { font-size: 11px; opacity: .55; }
+.deck-set-control { display: flex; align-items: center; gap: 8px; }
+
+.deck-seg { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.deck-seg-btn { background: transparent; color: var(--fg); border: none; border-left: 1px solid var(--border); padding: 7px 14px; font: inherit; font-size: 12px; cursor: pointer; opacity: .7; transition: background .12s, opacity .12s, color .12s; }
+.deck-seg-btn:first-child { border-left: none; }
+.deck-seg-btn:hover { opacity: 1; }
+.deck-seg-btn--on { background: color-mix(in srgb, var(--deck-accent) 16%, transparent); color: var(--deck-accent); opacity: 1; }
+
+.deck-color { width: 40px; height: 30px; padding: 0; border: 1px solid var(--border); border-radius: 8px; background: transparent; cursor: pointer; }
+
+.deck-toggle { position: relative; width: 42px; height: 24px; border-radius: 999px; border: 1px solid var(--border); background: color-mix(in srgb, var(--fg) 8%, transparent); cursor: pointer; transition: background .15s, border-color .15s; flex-shrink: 0; }
+.deck-toggle-knob { position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%; background: var(--fg); opacity: .7; transition: left .15s, background .15s; }
+.deck-toggle--on { background: color-mix(in srgb, var(--deck-accent) 30%, transparent); border-color: var(--deck-accent); }
+.deck-toggle--on .deck-toggle-knob { left: 20px; background: var(--deck-accent); opacity: 1; }
+
+/* ── Preference hooks (density / sidebar side / frost / motion) ──────────────── */
+:root.density-compact  .co-head    { padding: 10px 16px; }
+:root.density-compact  .deck-panel { padding: 14px 16px; }
+:root.density-compact  .list-item  { padding: 4px 9px; }
+:root.density-spacious .co-head    { padding: 22px 28px; }
+:root.density-spacious .deck-panel { padding: 30px 32px; }
+:root.density-spacious .list-item  { padding: 10px 12px; }
+
+/* Sidebar on the right: reverse the shell's flex row; swap the rail's divider. */
+body.deck-side-right { flex-direction: row-reverse; }
+body.deck-side-right .icon-rail { border-right: none; border-left: 1px solid var(--border); }
+
+body.deck-no-frost *, body.deck-no-frost *::before { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+
+body.deck-reduce-motion *, body.deck-reduce-motion *::before, body.deck-reduce-motion *::after {
+  animation-duration: .001ms !important; animation-iteration-count: 1 !important;
+  transition-duration: .001ms !important; scroll-behavior: auto !important;
+}
