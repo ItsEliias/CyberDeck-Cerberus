@@ -17,20 +17,51 @@
 
   function view(root) {
     root.innerHTML = '<div class="co-head"><span class="co-title">Progress</span></div><div class="co-body" id="pg-body"><div class="kb-loading">Loading…</div></div>';
+    var g = function (u, f) { return fetch(u).then(function (r) { return r.json(); }).catch(function () { return f; }); };
     Promise.all([
-      fetch('/api/activity/summary').then(function (r) { return r.json(); }),
-      fetch('/api/knowledge/tree').then(function (r) { return r.json(); }).catch(function () { return { tree: { children: [] } }; }),
+      g('/api/activity/summary', {}),
+      g('/api/knowledge/tree', { tree: { children: [] } }),
+      g('/api/courses/list', { courses: [] }),
+      g('/api/flashcards/stats', {}),
+      g('/api/flashcards/decks', { decks: [] }),
+      g('/api/playbooks/list', { playbooks: [] }),
+      g('/api/resources/list', { items: [] }),
     ]).then(function (res) {
       var a = res[0], tree = res[1].tree || { children: [] };
+      var courses = res[2].courses || [], fc = res[3] || {}, decks = res[4].decks || [];
+      var pbs = res[5].playbooks || [], rs = res[6] || {};
       var body = root.querySelector('#pg-body');
+
+      // ── What you've learned ──
+      var pbDone = pbs.filter(function (p) { return p.total > 0 && p.done >= p.total; }).length;
+      var learned = '<div class="pg-stats">' +
+        stat(fc.mature || 0, 'cards mastered') +
+        stat((fc.reviewed || 0) + '/' + (fc.total || 0), 'cards reviewed') +
+        stat(pbDone + '/' + pbs.length, 'playbooks done') +
+        stat(courses.length, 'courses') +
+        stat(rs.count != null ? rs.count : (rs.items || []).length, 'bookmarks') +
+        '</div>';
+      // Topics covered — de-duped across decks, playbooks, courses.
+      var seen = {}, uniq = [];
+      decks.map(function (d) { return d.deck; })
+        .concat(pbs.map(function (p) { return p.title; }))
+        .concat(courses.map(function (c) { return c.title; }))
+        .forEach(function (t) { var k = (t || '').toLowerCase(); if (t && !seen[k]) { seen[k] = 1; uniq.push(t); } });
+      var topics = uniq.slice(0, 28).map(function (t) { return '<span class="co-chip">' + esc(t) + '</span>'; }).join('') ||
+        '<span class="co-muted">import a course or review some cards to build this</span>';
+
       var kinds = Object.keys(a.by_kind || {}).map(function (k) { return '<span class="co-chip">' + esc(k) + ' ' + a.by_kind[k] + '</span>'; }).join('') || '<span class="co-muted">no activity logged yet</span>';
       var cover = (tree.children || []).filter(function (c) { return c.type === 'folder'; }).map(function (f) {
         return '<div class="pg-cov"><span class="pg-cov-name">' + esc(f.name) + '</span><span class="pg-cov-n">' + (f.count || 0) + '</span></div>';
       }).join('');
+
       body.innerHTML =
+        '<div class="deck-panel-title" style="margin:2px 0 10px;">What you’ve learned</div>' + learned +
+        '<div class="deck-panel-title" style="margin:24px 0 10px;">Topics covered</div><div class="co-chips">' + topics + '</div>' +
+        '<div class="deck-panel-title" style="margin:26px 0 10px;">Streak &amp; activity</div>' +
         '<div class="pg-stats">' +
-        stat(a.streak + '🔥', 'day streak') + stat(a.longest, 'longest streak') +
-        stat(a.today, 'today') + stat(a.week, 'this week') + stat(a.total, 'all-time actions') +
+        stat(a.streak + '🔥', 'day streak') + stat(a.longest || 0, 'longest') +
+        stat(a.today || 0, 'today') + stat(a.week || 0, 'this week') + stat(a.total || 0, 'all-time') +
         '</div>' +
         '<div class="deck-panel-title" style="margin:26px 0 10px;">Activity — last 20 weeks</div>' +
         heatmap(a.heatmap || []) +

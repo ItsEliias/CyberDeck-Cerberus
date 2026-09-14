@@ -518,3 +518,21 @@ body.deck-reduce-motion *, body.deck-reduce-motion *::before, body.deck-reduce-m
 .co-rec-done { color: var(--deck-accent); border-color: var(--deck-accent); opacity: .85; cursor: default; }
 .co-check { display: flex; align-items: center; gap: 8px; font-size: 12px; opacity: .82; cursor: pointer; }
 .co-check input { accent-color: var(--deck-accent); }
+.co-fc-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+
+/* Resources — bookmark library */
+.rs-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.rs-tag { background: transparent; border: 1px solid var(--border); border-radius: 999px; color: var(--fg); padding: 4px 12px; font-size: 12px; cursor: pointer; opacity: .7; }
+.rs-tag:hover { opacity: 1; }
+.rs-tag--on { background: color-mix(in srgb, var(--deck-accent) 16%, transparent); color: var(--deck-accent); border-color: var(--deck-accent); opacity: 1; }
+.rs-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-top: 1px solid color-mix(in srgb, var(--border) 60%, transparent); }
+.rs-item:first-of-type { border-top: none; }
+.rs-main { flex: 1; min-width: 0; }
+.rs-title { font-size: 14px; font-weight: 600; color: var(--fg); text-decoration: none; }
+.rs-title:hover { color: var(--deck-accent); }
+.rs-url { font-family: 'Fira Code', monospace; font-size: 11px; opacity: .5; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rs-note { font-size: 12px; opacity: .72; margin-top: 4px; }
+.rs-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
+.rs-chip { font-size: 10px; text-transform: uppercase; letter-spacing: .04em; padding: 2px 8px; border-radius: 5px; background: color-mix(in srgb, var(--fg) 8%, transparent); color: var(--fg); opacity: .7; }
+.rs-del { flex-shrink: 0; background: transparent; border: none; color: var(--fg); opacity: .35; font-size: 18px; line-height: 1; cursor: pointer; }
+.rs-del:hover { opacity: 1; color: var(--red); }

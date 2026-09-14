@@ -29,6 +29,7 @@ from modules.search import bp as search_bp
 from modules.activity import bp as activity_bp
 from modules.scanparse import bp as scan_bp
 from modules.sessions import bp as sessions_bp
+from modules.resources import bp as resources_bp
 
 # When frozen by PyInstaller, static/ + templates/ are unpacked into sys._MEIPASS.
 if getattr(sys, "frozen", False):
@@ -40,7 +41,8 @@ else:
 app = Flask(__name__, static_folder=_static, template_folder=_templates)
 for _bp in (knowledge_bp, courses_bp, credentials_bp, targets_bp, netlab_bp,
             home_bp, playbooks_bp, reports_bp, feeds_bp, topology_bp, board_bp,
-            flashcards_bp, snippets_bp, search_bp, activity_bp, scan_bp, sessions_bp):
+            flashcards_bp, snippets_bp, search_bp, activity_bp, scan_bp, sessions_bp,
+            resources_bp):
     app.register_blueprint(_bp)
 
 # ── The 12 CyberDeck modules the shell navigates between. ──────────────────────

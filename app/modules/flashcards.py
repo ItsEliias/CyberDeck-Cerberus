@@ -305,7 +305,10 @@ def delete(cid):
 @bp.route("/stats")
 def stats():
     d = _load()
-    return jsonify(total=len(d["cards"]), due=sum(1 for c in d["cards"] if _is_due(c)))
+    cards = d["cards"]
+    return jsonify(total=len(cards), due=sum(1 for c in cards if _is_due(c)),
+                   reviewed=sum(1 for c in cards if c.get("reps", 0) > 0),
+                   mature=sum(1 for c in cards if c.get("interval", 0) >= 21))
 
 
 # ── Generator (#4) ─────────────────────────────────────────────────────────────
@@ -317,13 +320,16 @@ _BOLD = re.compile(r"\*\*(.+?)\*\*")
 
 @bp.route("/generate", methods=["POST"])
 def generate():
-    """Propose cards from a vault note (offline heuristics). Does not save; UI confirms."""
-    path = (request.get_json(silent=True) or {}).get("path", "")
-    try:
-        target = vault._safe_resolve(path)
-        text = target.read_text("utf-8", errors="replace")
-    except Exception:
-        return jsonify(error="note not found"), 404
+    """Propose cards from raw text or a vault note (offline heuristics). No save; UI confirms."""
+    data = request.get_json(silent=True) or {}
+    text = data.get("text")
+    path = data.get("path", "")
+    if text is None:
+        try:
+            target = vault._safe_resolve(path)
+            text = target.read_text("utf-8", errors="replace")
+        except Exception:
+            return jsonify(error="note not found"), 404
 
     proposed, seen = [], set()
 
@@ -359,4 +365,5 @@ def generate():
             if "[ … ]" in cloze:
                 add(cloze, term)
 
-    return jsonify(deck=Path(path).stem, proposed=proposed[:30], count=len(proposed))
+    deck = (data.get("deck") or "").strip() or Path(path).stem or "Imported"
+    return jsonify(deck=deck, proposed=proposed[:30], count=len(proposed))

@@ -7,6 +7,7 @@
 
   var root = null;
   var scanCache = null;   // last scan result during import
+  var curCourseTitle = '';   // title of the course currently open in detail (deck name for flashcards)
 
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function fmtBytes(n) { if (!n) return ''; var u = ['B', 'KB', 'MB', 'GB', 'TB']; var i = 0; while (n >= 1024 && i < u.length - 1) { n /= 1024; i++; } return n.toFixed(n < 10 && i > 0 ? 1 : 0) + ' ' + u[i]; }
@@ -176,6 +177,7 @@
     get('/api/courses/' + encodeURIComponent(cid)).then(function (d) {
       if (d.error) { root.innerHTML = '<div class="co-warn">' + esc(d.error) + '</div>'; return; }
       var c = d.course, cats = d.categories || {};
+      curCourseTitle = c.title || '';
       var listHtml = Object.keys(cats).map(function (k) {
         var b = cats[k];
         var items = (b.items || []).map(function (it) {
@@ -210,7 +212,25 @@
     if (cat === 'notes' || cat === 'code' || /\.(txt|srt|vtt|csv)$/i.test(name)) {
       pane.innerHTML = head + '<div class="kb-loading">Loading…</div>';
       fetch(url).then(function (r) { return r.text(); }).then(function (t) {
-        pane.innerHTML = head + '<pre class="md-fallback">' + esc(t) + '</pre>';
+        pane.innerHTML = head +
+          '<div class="co-fc-bar"><button class="co-btn" id="co-mkfc">⚡ Make flashcards</button>' +
+          '<span id="co-fc-msg" class="co-muted"></span></div>' +
+          '<pre class="md-fallback">' + esc(t) + '</pre>';
+        var msg = pane.querySelector('#co-fc-msg');
+        pane.querySelector('#co-mkfc').addEventListener('click', function () {
+          msg.textContent = 'Generating…';
+          post('/api/flashcards/generate', { text: t, deck: curCourseTitle || name }).then(function (g) {
+            var cards = g.proposed || [];
+            if (!cards.length) { msg.textContent = 'No clear Q&A found in this file.'; return; }
+            msg.innerHTML = 'Proposed ' + cards.length + ' — <button class="co-btn co-btn--primary" id="co-fc-save">Save to “' + esc(g.deck) + '”</button>';
+            pane.querySelector('#co-fc-save').addEventListener('click', function () {
+              var saved = 0;
+              cards.reduce(function (ch, cd) {
+                return ch.then(function () { return post('/api/flashcards/card', { front: cd.front, back: cd.back, deck: g.deck }).then(function () { saved++; }); });
+              }, Promise.resolve()).then(function () { msg.textContent = 'Saved ' + saved + ' cards to Flashcards ✓'; });
+            });
+          }).catch(function () { msg.textContent = 'Generation failed.'; });
+        });
       });
       return;
     }
