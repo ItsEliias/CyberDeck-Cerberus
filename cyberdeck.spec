@@ -29,12 +29,12 @@ exe = EXE(
     name="CyberDeck",
     console=False,          # windowed app, no terminal
     disable_windowed_traceback=False,
-    icon=None,              # drop app/static/icon-256.png → set here later
+    icon="app/desktop_assets/cyberdeck.icns",
 )
 
 app = BUNDLE(              # macOS .app wrapper (ignored on Windows/Linux)
     exe,
     name="CyberDeck.app",
-    icon=None,
+    icon="app/desktop_assets/cyberdeck.icns",
     bundle_identifier="dev.cyberdeck.app",
 )

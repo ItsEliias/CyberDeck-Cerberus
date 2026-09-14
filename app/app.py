@@ -82,5 +82,10 @@ def modules():
 
 
 if __name__ == "__main__":
-    # P1: dev server. P4 wraps this in a desktop shell (pywebview/desktop_bridge).
-    app.run(host="127.0.0.1", port=7100, debug=True)
+    # Dev server by default (debug + reloader). The desktop launcher
+    # (build-macos-app.sh) runs this with CYBERDECK_DEBUG=0 so the reloader
+    # doesn't fork a second process the launcher can't track/kill, and
+    # CYBERDECK_PORT to pick the loopback port.
+    port = int(os.environ.get("CYBERDECK_PORT", "7100"))
+    debug = os.environ.get("CYBERDECK_DEBUG", "1") == "1"
+    app.run(host="127.0.0.1", port=port, debug=debug, use_reloader=debug, threaded=True)
