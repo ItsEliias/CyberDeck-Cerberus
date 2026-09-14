@@ -61,7 +61,27 @@
   }
 
   // ── Import from URL ─────────────────────────────────────────────────────────────
+  var _OWASP = 'https://raw.githubusercontent.com/OWASP/CheatSheetSeries/master/cheatsheets/';
+  var RECOMMENDED = [
+    { t: 'SQL Injection Prevention', u: _OWASP + 'SQL_Injection_Prevention_Cheat_Sheet.md' },
+    { t: 'Cross-Site Scripting (XSS) Prevention', u: _OWASP + 'Cross_Site_Scripting_Prevention_Cheat_Sheet.md' },
+    { t: 'Authentication', u: _OWASP + 'Authentication_Cheat_Sheet.md' },
+    { t: 'Authorization', u: _OWASP + 'Authorization_Cheat_Sheet.md' },
+    { t: 'Access Control', u: _OWASP + 'Access_Control_Cheat_Sheet.md' },
+    { t: 'Password Storage', u: _OWASP + 'Password_Storage_Cheat_Sheet.md' },
+    { t: 'Session Management', u: _OWASP + 'Session_Management_Cheat_Sheet.md' },
+    { t: 'Input Validation', u: _OWASP + 'Input_Validation_Cheat_Sheet.md' },
+    { t: 'CSRF Prevention', u: _OWASP + 'Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.md' },
+    { t: 'File Upload', u: _OWASP + 'File_Upload_Cheat_Sheet.md' },
+    { t: 'Cryptographic Storage', u: _OWASP + 'Cryptographic_Storage_Cheat_Sheet.md' },
+    { t: 'REST Security', u: _OWASP + 'REST_Security_Cheat_Sheet.md' }
+  ];
+
   function showUrlImport() {
+    var rows = RECOMMENDED.map(function (r, i) {
+      return '<div class="co-rec-row"><span class="co-rec-title">' + esc(r.t) + '</span>' +
+        '<button class="co-btn co-rec-btn" data-import="' + i + '">Import</button></div>';
+    }).join('');
     root.innerHTML = '<div class="co-head"><span class="co-title">Import from URL</span>' +
       '<button class="co-btn" id="co-cancel">Cancel</button></div>' +
       '<div class="co-body"><div class="co-form">' +
@@ -71,7 +91,10 @@
       '<input id="co-url-title" class="co-input" placeholder="Auto-detected from the page" />' +
       '<div class="co-row" style="margin-top:12px;"><button class="co-btn co-btn--primary" id="co-url-go">Fetch &amp; import</button></div>' +
       '<div class="co-muted">Fetches a freely-accessible page (article, lesson, cheat sheet) and saves it as a markdown course. Pages behind a login or paywall won\'t work.</div>' +
-      '<div id="co-url-res"></div></div></div>';
+      '<div id="co-url-res"></div>' +
+      '<div class="co-rec"><div class="co-rec-head"><span>Recommended — OWASP Cheat Sheets (free, CC-BY-SA)</span>' +
+      '<button class="co-btn" id="co-rec-all">Import all</button></div>' + rows + '</div>' +
+      '</div></div>';
     root.querySelector('#co-cancel').addEventListener('click', showList);
     var urlEl = root.querySelector('#co-url');
     var titleEl = root.querySelector('#co-url-title');
@@ -87,6 +110,24 @@
     }
     root.querySelector('#co-url-go').addEventListener('click', go);
     urlEl.addEventListener('keydown', function (e) { if (e.key === 'Enter') go(); });
+
+    // One recommended resource → returns a promise; updates its own button.
+    function importOne(btn) {
+      var r = RECOMMENDED[+btn.getAttribute('data-import')];
+      if (btn.disabled) return Promise.resolve();
+      btn.disabled = true; btn.textContent = '…';
+      return post('/api/courses/fetch-url', { url: r.u }).then(function (d) {
+        if (d.course) { btn.textContent = '✓ Imported'; btn.classList.add('co-rec-done'); }
+        else { btn.disabled = false; btn.textContent = 'Retry'; btn.title = d.error || 'failed'; }
+      }).catch(function () { btn.disabled = false; btn.textContent = 'Retry'; });
+    }
+    Array.prototype.forEach.call(root.querySelectorAll('[data-import]'), function (btn) {
+      btn.addEventListener('click', function () { importOne(btn); });
+    });
+    root.querySelector('#co-rec-all').addEventListener('click', function () {
+      var btns = Array.prototype.slice.call(root.querySelectorAll('[data-import]'));
+      btns.reduce(function (chain, btn) { return chain.then(function () { return importOne(btn); }); }, Promise.resolve());
+    });
     urlEl.focus();
   }
 

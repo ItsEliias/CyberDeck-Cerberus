@@ -507,3 +507,12 @@ body.deck-reduce-motion *, body.deck-reduce-motion *::before, body.deck-reduce-m
 /* Onboarding theme step — keep the 22-swatch grid inside the card. */
 .dw-themes { max-height: 230px; overflow-y: auto; margin: 4px 0 2px; padding-right: 4px; }
 #dw-card .deck-swatches { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+
+/* Courses — recommended one-click imports */
+.co-rec { margin-top: 20px; border-top: 1px solid var(--border); padding-top: 14px; }
+.co-rec-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; font-family: 'Fira Code', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--deck-accent); }
+.co-rec-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 7px 0; border-top: 1px solid color-mix(in srgb, var(--border) 55%, transparent); }
+.co-rec-row:first-of-type { border-top: none; }
+.co-rec-title { font-size: 13px; }
+.co-rec-btn { flex-shrink: 0; min-width: 96px; }
+.co-rec-done { color: var(--deck-accent); border-color: var(--deck-accent); opacity: .85; cursor: default; }
