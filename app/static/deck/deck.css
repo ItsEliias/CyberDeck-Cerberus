@@ -129,7 +129,7 @@
 .md-fallback { white-space: pre-wrap; font-family: 'Fira Code', monospace; font-size: 13px; }
 
 /* ── Courses module ──────────────────────────────────────────────────────────── */
-.co-head { display: flex; align-items: center; gap: 10px; padding: 16px 22px; border-bottom: 1px solid var(--border); }
+.co-head { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; row-gap: 8px; padding: 16px 22px; border-bottom: 1px solid var(--border); }
 .co-title { font-family: 'Fira Code', monospace; font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--red); }
 .co-title::before { content: '// '; opacity: .7; }
 .co-head .co-btn { margin-left: auto; }
