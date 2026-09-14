@@ -20,14 +20,16 @@
   function showList() {
     scanCache = null;
     root.innerHTML = '<div class="co-head"><span class="co-title">Courses</span>' +
-      '<button class="co-btn co-btn--primary" id="co-import">+ Import course</button></div>' +
+      '<button class="co-btn" id="co-import-url">+ Import URL</button>' +
+      '<button class="co-btn co-btn--primary" id="co-import">+ Import folder</button></div>' +
       '<div id="co-body" class="co-body"><div class="kb-loading">Loading…</div></div>';
     root.querySelector('#co-import').addEventListener('click', showImport);
+    root.querySelector('#co-import-url').addEventListener('click', showUrlImport);
     get('/api/courses/list').then(function (d) {
       var body = root.querySelector('#co-body');
       var list = d.courses || [];
       if (!list.length) {
-        body.innerHTML = '<div class="co-empty">No courses yet.<br>Import a folder of downloaded course material to get started — docs, notes, videos, code.<br><span class="co-muted">Nothing is scraped; it reads files already on your disk and indexes them in place.</span></div>';
+        body.innerHTML = '<div class="co-empty">No courses yet.<br><b>Import folder</b> — index course material already on your disk (docs, notes, videos, code).<br><b>Import URL</b> — pull a free article, lesson, or cheat sheet from the web as a markdown course.</div>';
         return;
       }
       body.innerHTML = '<div class="co-grid">' + list.map(function (c) {
@@ -56,6 +58,36 @@
     root.querySelector('#co-scan').addEventListener('click', function () { doScan(pathEl.value.trim()); });
     pathEl.addEventListener('keydown', function (e) { if (e.key === 'Enter') doScan(pathEl.value.trim()); });
     pathEl.focus();
+  }
+
+  // ── Import from URL ─────────────────────────────────────────────────────────────
+  function showUrlImport() {
+    root.innerHTML = '<div class="co-head"><span class="co-title">Import from URL</span>' +
+      '<button class="co-btn" id="co-cancel">Cancel</button></div>' +
+      '<div class="co-body"><div class="co-form">' +
+      '<label class="co-label">Page URL</label>' +
+      '<input id="co-url" class="co-input" placeholder="https://portswigger.net/web-security/sql-injection" />' +
+      '<label class="co-label" style="margin-top:10px;">Title (optional)</label>' +
+      '<input id="co-url-title" class="co-input" placeholder="Auto-detected from the page" />' +
+      '<div class="co-row" style="margin-top:12px;"><button class="co-btn co-btn--primary" id="co-url-go">Fetch &amp; import</button></div>' +
+      '<div class="co-muted">Fetches a freely-accessible page (article, lesson, cheat sheet) and saves it as a markdown course. Pages behind a login or paywall won\'t work.</div>' +
+      '<div id="co-url-res"></div></div></div>';
+    root.querySelector('#co-cancel').addEventListener('click', showList);
+    var urlEl = root.querySelector('#co-url');
+    var titleEl = root.querySelector('#co-url-title');
+    var res = root.querySelector('#co-url-res');
+    function go() {
+      var url = urlEl.value.trim();
+      if (!/^https?:\/\//i.test(url)) { res.innerHTML = '<div class="co-warn">Enter a full http(s):// URL.</div>'; return; }
+      res.innerHTML = '<div class="kb-loading">Fetching…</div>';
+      post('/api/courses/fetch-url', { url: url, title: titleEl.value.trim() }).then(function (d) {
+        if (d.course) showDetail(d.course.id);
+        else res.innerHTML = '<div class="co-warn">' + esc(d.error || 'Import failed.') + '</div>';
+      }).catch(function () { res.innerHTML = '<div class="co-warn">Import failed.</div>'; });
+    }
+    root.querySelector('#co-url-go').addEventListener('click', go);
+    urlEl.addEventListener('keydown', function (e) { if (e.key === 'Enter') go(); });
+    urlEl.focus();
   }
 
   function doScan(path) {

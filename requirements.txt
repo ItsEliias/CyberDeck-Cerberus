@@ -10,3 +10,5 @@ pywebview>=3.4
 # Markdown>=3.5        # note rendering
 # cryptography>=42     # credential vault
 # weasyprint>=60       # report PDF export
+html2text>=2020.1.16
+certifi

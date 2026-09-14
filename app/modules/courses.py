@@ -10,13 +10,28 @@ Deliberately does no scraping/DRM work: it only reads files that already exist l
 """
 from __future__ import annotations
 
+import html as _htmllib
 import json
 import os
 import re
+import ssl
+import urllib.parse
+import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
 from flask import Blueprint, jsonify, request, send_file, abort
+
+# Optional deps for the URL importer. Guarded so the module still loads without
+# them (dev boxes / minimal installs) — the endpoint degrades gracefully.
+try:
+    import html2text as _html2text
+except Exception:
+    _html2text = None
+try:
+    import certifi as _certifi
+except Exception:
+    _certifi = None
 
 bp = Blueprint("courses", __name__, url_prefix="/api/courses")
 
@@ -138,6 +153,99 @@ def import_course():
         "categories": selected, "total": counts["total"],
         "counts": {c: b["count"] for c, b in counts["categories"].items()},
         "imported_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+    }
+    (COURSES_DIR / f"{cid}.json").write_text(json.dumps(rec, indent=2), "utf-8")
+    return jsonify(course=rec)
+
+
+# ── Import from URL ─────────────────────────────────────────────────────────────
+_TAG_NOISE = re.compile(r"(?is)<(script|style|nav|footer|header|form|svg|noscript|aside|iframe)[^>]*>.*?</\1>")
+_TITLE_RE = re.compile(r"(?is)<title[^>]*>(.*?)</title>")
+_H1_RE = re.compile(r"(?is)<h1[^>]*>(.*?)</h1>")
+
+
+def _fetch(url: str, timeout: int = 20):
+    ctx = ssl.create_default_context(cafile=_certifi.where()) if _certifi else ssl.create_default_context()
+    req = urllib.request.Request(url, headers={
+        "User-Agent": "CyberDeck/1.0 (+offline study importer)",
+        "Accept": "text/html,application/xhtml+xml,text/plain,*/*",
+    })
+    with urllib.request.urlopen(req, timeout=timeout, context=ctx) as r:
+        ctype = r.headers.get("Content-Type", "")
+        raw = r.read(6_000_000)  # 6 MB cap
+    charset = "utf-8"
+    m = re.search(r"charset=([\w-]+)", ctype)
+    if m:
+        charset = m.group(1)
+    return ctype, raw.decode(charset, errors="replace")
+
+
+def _to_markdown(text: str, ctype: str) -> str:
+    head = text[:2000].lower()
+    is_html = "html" in ctype.lower() or "<html" in head or "<body" in head or "<div" in head
+    if not is_html:
+        return text  # already text/markdown
+    cleaned = _TAG_NOISE.sub(" ", text)
+    if _html2text is not None:
+        h = _html2text.HTML2Text()
+        h.ignore_images = True
+        h.body_width = 0
+        return h.handle(cleaned).strip()
+    txt = re.sub(r"(?is)<[^>]+>", " ", cleaned)              # crude fallback
+    return re.sub(r"[ \t]*\n\s*\n\s*", "\n\n", txt).strip()
+
+
+def _clean_title(text: str, fallback: str) -> str:
+    for rx in (_TITLE_RE, _H1_RE):  # HTML pages
+        m = rx.search(text)
+        if m:
+            t = _htmllib.unescape(re.sub(r"(?is)<[^>]+>", "", m.group(1)))
+            t = re.sub(r"\s+", " ", t).strip()
+            if t:
+                return t[:120]
+    for line in text.splitlines():   # markdown / plain: first ATX heading
+        s = line.strip()
+        if s.startswith("# "):
+            return _htmllib.unescape(s[2:].strip())[:120]
+    return fallback
+
+
+@bp.route("/fetch-url", methods=["POST"])
+def fetch_url():
+    """Import a public web page as a course (fetch → markdown → index in place).
+
+    Only reads what the URL serves anonymously — no login/paywall/DRM bypass.
+    """
+    data = request.get_json(silent=True) or {}
+    url = (data.get("url") or "").strip()
+    if not re.match(r"^https?://", url, re.I):
+        return jsonify(error="enter a full http(s):// URL"), 400
+    try:
+        ctype, text = _fetch(url)
+    except Exception as e:
+        return jsonify(error=f"fetch failed: {e}"), 502
+
+    title = (data.get("title") or "").strip() or _clean_title(text, urllib.parse.urlparse(url).netloc)
+    md = _to_markdown(text, ctype)
+    if not md.strip():
+        return jsonify(error="nothing readable found at that URL"), 422
+
+    COURSES_DIR.mkdir(parents=True, exist_ok=True)
+    cid = base = _slug(title)
+    i = 2
+    while (COURSES_DIR / f"{cid}.json").exists():
+        cid = f"{base}-{i}"; i += 1
+    web_dir = COURSES_DIR / "_web" / cid
+    web_dir.mkdir(parents=True, exist_ok=True)
+    stamp = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    (web_dir / "index.md").write_text(f"# {title}\n\n> Imported from {url}\n> {stamp}\n\n{md}\n", "utf-8")
+
+    counts = scan_folder(web_dir, {"notes"})
+    rec = {
+        "id": cid, "title": title, "source": str(web_dir.resolve()),
+        "categories": ["notes"], "total": counts["total"],
+        "counts": {c: b["count"] for c, b in counts["categories"].items()},
+        "imported_at": stamp, "url": url, "kind": "web",
     }
     (COURSES_DIR / f"{cid}.json").write_text(json.dumps(rec, indent=2), "utf-8")
     return jsonify(course=rec)
