@@ -26,6 +26,83 @@ STORE = Path(os.environ.get(
 ))
 
 
+# Starter deck seeded on first run (deck, front, back). Concise, exam-accurate.
+_SEED_CARDS = [
+    # ── Security+ Core ──
+    ("Security+ Core", "What is the CIA triad?", "Confidentiality, Integrity, Availability — the three core security goals."),
+    ("Security+ Core", "Confidentiality", "Data is only accessible to authorized parties (encryption, access control)."),
+    ("Security+ Core", "Integrity", "Data is accurate and unaltered (hashing, digital signatures)."),
+    ("Security+ Core", "Availability", "Systems and data are accessible when needed (redundancy, backups, DR)."),
+    ("Security+ Core", "Non-repudiation", "A party cannot deny an action — provided by digital signatures + logging."),
+    ("Security+ Core", "What does AAA stand for?", "Authentication, Authorization, Accounting."),
+    ("Security+ Core", "Threat vs Vulnerability vs Risk", "Threat = potential danger; Vulnerability = a weakness; Risk = likelihood × impact."),
+    ("Security+ Core", "Principle of least privilege", "Give users/processes only the minimum access needed to do their job."),
+    ("Security+ Core", "Defense in depth", "Layered, overlapping controls so no single failure is fatal."),
+    ("Security+ Core", "Zero Trust", "Never trust, always verify — no implicit trust based on network location."),
+    ("Security+ Core", "The three MFA factor types", "Something you know, something you have, something you are."),
+    ("Security+ Core", "Control categories (Security+)", "Technical, Managerial, Operational, Physical."),
+    ("Security+ Core", "Control functions", "Preventive, Detective, Corrective, Deterrent, Compensating, Directive."),
+    ("Security+ Core", "Phishing vs Spear phishing vs Whaling", "Phishing = mass; Spear = targeted individual; Whaling = targets executives."),
+    ("Security+ Core", "Ransomware", "Malware that encrypts data and demands payment for the decryption key."),
+    ("Security+ Core", "Trojan", "Malware disguised as legitimate software to trick the user into running it."),
+    ("Security+ Core", "Rootkit", "Malware that hides its presence with deep/privileged system access."),
+    # ── Common Ports ──
+    ("Common Ports", "Port 22", "SSH — secure remote shell (also SCP/SFTP)."),
+    ("Common Ports", "Ports 20/21", "FTP — file transfer (21 control, 20 data)."),
+    ("Common Ports", "Port 23", "Telnet — remote access, cleartext (insecure)."),
+    ("Common Ports", "Port 25", "SMTP — sending email."),
+    ("Common Ports", "Port 53", "DNS — name resolution (TCP + UDP)."),
+    ("Common Ports", "Ports 67/68", "DHCP — dynamic IP assignment."),
+    ("Common Ports", "Port 80", "HTTP — web (cleartext)."),
+    ("Common Ports", "Port 443", "HTTPS — HTTP over TLS."),
+    ("Common Ports", "Port 445", "SMB — Windows file sharing."),
+    ("Common Ports", "Port 3389", "RDP — Remote Desktop Protocol."),
+    ("Common Ports", "Ports 161/162", "SNMP — network device management."),
+    ("Common Ports", "Port 389 / 636", "LDAP / LDAPS (secure) — directory services."),
+    ("Common Ports", "Port 110 / 143", "POP3 / IMAP — retrieving email."),
+    ("Common Ports", "Port 3306 / 1433", "MySQL / Microsoft SQL Server."),
+    # ── OWASP Top 10 (2021) ──
+    ("OWASP Top 10", "A01:2021", "Broken Access Control — enforcing user permission boundaries (IDOR, forced browsing)."),
+    ("OWASP Top 10", "A02:2021", "Cryptographic Failures — weak/missing crypto exposing sensitive data."),
+    ("OWASP Top 10", "A03:2021", "Injection — untrusted input interpreted as code (SQLi, XSS, command)."),
+    ("OWASP Top 10", "A04:2021", "Insecure Design — flaws in the design/architecture, not just the code."),
+    ("OWASP Top 10", "A05:2021", "Security Misconfiguration — defaults, verbose errors, missing hardening."),
+    ("OWASP Top 10", "A06:2021", "Vulnerable and Outdated Components — using libraries with known CVEs."),
+    ("OWASP Top 10", "A07:2021", "Identification and Authentication Failures — weak auth/session handling."),
+    ("OWASP Top 10", "A08:2021", "Software and Data Integrity Failures — unverified updates/deserialization."),
+    ("OWASP Top 10", "A09:2021", "Security Logging and Monitoring Failures — can't detect/respond to breaches."),
+    ("OWASP Top 10", "A10:2021", "Server-Side Request Forgery (SSRF) — server fetches an attacker-controlled URL."),
+    # ── Networking ──
+    ("Networking", "The 7 OSI layers", "Physical, Data Link, Network, Transport, Session, Presentation, Application."),
+    ("Networking", "TCP vs UDP", "TCP = reliable, connection-oriented, ordered; UDP = fast, connectionless, best-effort."),
+    ("Networking", "TCP three-way handshake", "SYN → SYN-ACK → ACK."),
+    ("Networking", "Private IPv4 ranges", "10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16."),
+    ("Networking", "What is ARP?", "Resolves an IP address to a MAC address on the local network."),
+    ("Networking", "DHCP DORA process", "Discover, Offer, Request, Acknowledge."),
+    ("Networking", "DNS record: A vs CNAME vs MX", "A = name→IPv4; CNAME = alias→name; MX = mail server for a domain."),
+    ("Networking", "What does NAT do?", "Translates private IPs to a public IP (and back) at the gateway."),
+    # ── Tools of the Trade ──
+    ("Tools", "Nmap", "Network discovery + port/service scanner."),
+    ("Tools", "Wireshark", "Packet capture and protocol analysis."),
+    ("Tools", "Burp Suite", "Intercepting proxy for web application testing."),
+    ("Tools", "Metasploit", "Exploitation framework (modules, payloads, post-ex)."),
+    ("Tools", "Hydra", "Online (network) password brute-forcing."),
+    ("Tools", "John the Ripper / Hashcat", "Offline password/hash cracking (Hashcat is GPU-accelerated)."),
+    ("Tools", "gobuster / ffuf", "Directory, file, and vhost/content brute-forcing."),
+    ("Tools", "sqlmap", "Automated SQL injection detection and exploitation."),
+    ("Tools", "BloodHound", "Maps Active Directory attack paths to Domain Admin."),
+    ("Tools", "Responder", "Poisons LLMNR/NBT-NS to capture NetNTLM hashes."),
+    # ── Cryptography ──
+    ("Cryptography", "Symmetric vs asymmetric encryption", "Symmetric = one shared key (AES, fast); Asymmetric = public/private key pair (RSA/ECC)."),
+    ("Cryptography", "Hashing", "One-way, fixed-length digest for integrity — not reversible (SHA-256)."),
+    ("Cryptography", "Encoding vs Encryption vs Hashing", "Encoding = reversible format (Base64); Encryption = reversible with a key; Hashing = one-way."),
+    ("Cryptography", "What is a salt?", "Random per-password value added before hashing to defeat rainbow tables."),
+    ("Cryptography", "Digital signature", "Hash of data encrypted with a private key — gives integrity, authenticity, non-repudiation."),
+    ("Cryptography", "What is PKI?", "Public Key Infrastructure — CAs, certificates, and keys binding identities to public keys."),
+    ("Cryptography", "Password hashing algorithms", "bcrypt, scrypt, Argon2 — slow + salted by design (not MD5/SHA-1)."),
+]
+
+
 def _today():
     return datetime.now(timezone.utc).date()
 
@@ -36,12 +113,28 @@ def _load() -> dict:
             return json.loads(STORE.read_text("utf-8"))
         except Exception:
             pass
-    return {"cards": []}
+    # First run: seed a starter deck so review has content out of the box.
+    # Once the file exists it's never re-seeded, so user deletions stick.
+    d = _seed_deck()
+    _save(d)
+    return d
 
 
 def _save(d: dict):
     STORE.parent.mkdir(parents=True, exist_ok=True)
     STORE.write_text(json.dumps(d, indent=2), "utf-8")
+
+
+def _seed_deck() -> dict:
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    cards = []
+    for deck, front, back in _SEED_CARDS:
+        cards.append({
+            "id": secrets.token_hex(6), "front": front, "back": back, "deck": deck,
+            "ease": 2.5, "reps": 0, "interval": 0, "lapses": 0,
+            "due": now, "created": now,
+        })
+    return {"cards": cards}
 
 
 def _is_due(card) -> bool:
