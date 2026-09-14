@@ -15,6 +15,7 @@ import json
 import os
 import re
 import ssl
+import time
 import urllib.parse
 import urllib.request
 from datetime import datetime, timezone
@@ -210,6 +211,63 @@ def _clean_title(text: str, fallback: str) -> str:
     return fallback
 
 
+# ── Bounded same-section crawl (multi-page import) ──────────────────────────────
+_HREF = re.compile(r'href\s*=\s*["\']([^"\']+)', re.I)
+_ASSET = re.compile(r"\.(png|jpe?g|gif|svg|css|js|ico|woff2?|ttf|zip|gz|mp4|webm|pdf|xml|json)($|\?)", re.I)
+
+
+def _norm(u: str) -> str:
+    return u.split("#")[0].rstrip("/")
+
+
+def _in_scope(seed: str, url: str) -> bool:
+    """Same host, and the seed page itself or anything nested beneath its path —
+    e.g. seed /web-security/sql-injection keeps /web-security/sql-injection/... but
+    excludes sibling sections like /web-security/http-request-smuggling. Point the
+    crawl at a section's index page to pull that whole section."""
+    s, u = urllib.parse.urlparse(seed), urllib.parse.urlparse(url)
+    if u.scheme not in ("http", "https") or u.netloc != s.netloc:
+        return False
+    sp = s.path.rstrip("/")
+    return u.path == sp or u.path.startswith(sp + "/")
+
+
+def _extract_links(html: str, base: str):
+    out = []
+    for m in _HREF.finditer(html):
+        href = m.group(1).strip()
+        if not href or href[0] == "#" or href.startswith(("mailto:", "javascript:", "tel:", "data:")):
+            continue
+        full = _norm(urllib.parse.urljoin(base, href))
+        if not _ASSET.search(full):
+            out.append(full)
+    return out
+
+
+def _crawl(seed: str, max_pages):
+    """BFS the seed's section, bounded by page count + a wall-clock budget."""
+    max_pages = max(1, min(int(max_pages or 20), 40))
+    seed = _norm(seed)
+    seen, queue, pages = set(), [seed], []
+    deadline = time.monotonic() + 90.0
+    while queue and len(pages) < max_pages and time.monotonic() < deadline:
+        url = queue.pop(0)
+        if url in seen:
+            continue
+        seen.add(url)
+        try:
+            ctype, text = _fetch(url, timeout=15)
+        except Exception:
+            continue
+        md = _to_markdown(text, ctype)
+        if md.strip():
+            pages.append((url, _clean_title(text, url), md))
+        for link in _extract_links(text, url):
+            if link not in seen and link not in queue and _in_scope(seed, link) and len(queue) < max_pages * 4:
+                queue.append(link)
+    return pages
+
+
 @bp.route("/fetch-url", methods=["POST"])
 def fetch_url():
     """Import a public web page as a course (fetch → markdown → index in place).
@@ -238,7 +296,14 @@ def fetch_url():
     web_dir = COURSES_DIR / "_web" / cid
     web_dir.mkdir(parents=True, exist_ok=True)
     stamp = datetime.now(timezone.utc).isoformat(timespec="seconds")
-    (web_dir / "index.md").write_text(f"# {title}\n\n> Imported from {url}\n> {stamp}\n\n{md}\n", "utf-8")
+
+    if data.get("crawl"):
+        pages = _crawl(url, data.get("max_pages")) or [(url, title, md)]
+        for n, (purl, ptitle, pmd) in enumerate(pages, 1):
+            fname = f"{n:02d}-{_slug(ptitle)[:40] or 'page'}.md"
+            (web_dir / fname).write_text(f"# {ptitle}\n\n> {purl}\n> {stamp}\n\n{pmd}\n", "utf-8")
+    else:
+        (web_dir / "index.md").write_text(f"# {title}\n\n> Imported from {url}\n> {stamp}\n\n{md}\n", "utf-8")
 
     counts = scan_folder(web_dir, {"notes"})
     rec = {

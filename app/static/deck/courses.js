@@ -89,8 +89,9 @@
       '<input id="co-url" class="co-input" placeholder="https://portswigger.net/web-security/sql-injection" />' +
       '<label class="co-label" style="margin-top:10px;">Title (optional)</label>' +
       '<input id="co-url-title" class="co-input" placeholder="Auto-detected from the page" />' +
+      '<label class="co-check" style="margin-top:10px;"><input type="checkbox" id="co-crawl"> Crawl linked pages in the same section (whole guide, up to 40 pages)</label>' +
       '<div class="co-row" style="margin-top:12px;"><button class="co-btn co-btn--primary" id="co-url-go">Fetch &amp; import</button></div>' +
-      '<div class="co-muted">Fetches a freely-accessible page (article, lesson, cheat sheet) and saves it as a markdown course. Pages behind a login or paywall won\'t work.</div>' +
+      '<div class="co-muted">Fetches a freely-accessible page (article, lesson, cheat sheet) and saves it as a markdown course. With crawl on, it follows same-section links to pull a whole multi-page guide. Pages behind a login or paywall won\'t work.</div>' +
       '<div id="co-url-res"></div>' +
       '<div class="co-rec"><div class="co-rec-head"><span>Recommended — OWASP Cheat Sheets (free, CC-BY-SA)</span>' +
       '<button class="co-btn" id="co-rec-all">Import all</button></div>' + rows + '</div>' +
@@ -102,8 +103,9 @@
     function go() {
       var url = urlEl.value.trim();
       if (!/^https?:\/\//i.test(url)) { res.innerHTML = '<div class="co-warn">Enter a full http(s):// URL.</div>'; return; }
-      res.innerHTML = '<div class="kb-loading">Fetching…</div>';
-      post('/api/courses/fetch-url', { url: url, title: titleEl.value.trim() }).then(function (d) {
+      var crawl = root.querySelector('#co-crawl').checked;
+      res.innerHTML = '<div class="kb-loading">' + (crawl ? 'Crawling the section (this can take a minute)…' : 'Fetching…') + '</div>';
+      post('/api/courses/fetch-url', { url: url, title: titleEl.value.trim(), crawl: crawl }).then(function (d) {
         if (d.course) showDetail(d.course.id);
         else res.innerHTML = '<div class="co-warn">' + esc(d.error || 'Import failed.') + '</div>';
       }).catch(function () { res.innerHTML = '<div class="co-warn">Import failed.</div>'; });

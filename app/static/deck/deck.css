@@ -516,3 +516,5 @@ body.deck-reduce-motion *, body.deck-reduce-motion *::before, body.deck-reduce-m
 .co-rec-title { font-size: 13px; }
 .co-rec-btn { flex-shrink: 0; min-width: 96px; }
 .co-rec-done { color: var(--deck-accent); border-color: var(--deck-accent); opacity: .85; cursor: default; }
+.co-check { display: flex; align-items: center; gap: 8px; font-size: 12px; opacity: .82; cursor: pointer; }
+.co-check input { accent-color: var(--deck-accent); }
