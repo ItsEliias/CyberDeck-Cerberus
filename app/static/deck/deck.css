@@ -448,3 +448,18 @@
 .icon-rail-btn.active { color: var(--red); }
 .list-item.active { color: var(--red); }
 .list-item.active .sidebar-action-icon { opacity: 1 !important; }
+
+/* Sidebar collapse toggle — pinned in the icon-rail's reserved top gutter.
+   The rail itself is always visible, so collapsing the text sidebar never
+   strands the user without navigation. */
+.rail-toggle {
+  position: absolute;
+  top: 9px; left: 50%; transform: translateX(-50%);
+  width: 34px; height: 34px;
+  display: flex; align-items: center; justify-content: center;
+  border: none; border-radius: 8px;
+  background: transparent; color: var(--fg);
+  opacity: .55; cursor: pointer; transition: opacity .12s, color .12s, background .12s;
+}
+.rail-toggle:hover { opacity: 1; color: var(--deck-accent); background: color-mix(in srgb, var(--deck-accent) 12%, transparent); }
+.rail-toggle.active { opacity: 1; color: var(--deck-accent); }
