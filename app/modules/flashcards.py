@@ -100,6 +100,67 @@ _SEED_CARDS = [
     ("Cryptography", "Digital signature", "Hash of data encrypted with a private key — gives integrity, authenticity, non-repudiation."),
     ("Cryptography", "What is PKI?", "Public Key Infrastructure — CAs, certificates, and keys binding identities to public keys."),
     ("Cryptography", "Password hashing algorithms", "bcrypt, scrypt, Argon2 — slow + salted by design (not MD5/SHA-1)."),
+    # ── Linux Commands ──
+    ("Linux Commands", "sudo -l", "List which commands the current user may run via sudo (privesc recon)."),
+    ("Linux Commands", "find / -perm -4000 2>/dev/null", "Find SUID binaries — a classic privilege-escalation vector."),
+    ("Linux Commands", "chmod 755 (rwxr-xr-x)", "Owner: read/write/execute; group + others: read/execute."),
+    ("Linux Commands", "ss -tulpn / netstat -tulpn", "List listening TCP/UDP ports and the owning processes."),
+    ("Linux Commands", "ps aux", "Show all running processes with users and command lines."),
+    ("Linux Commands", "grep -r 'pattern' .", "Recursively search files under the current directory for text."),
+    ("Linux Commands", "/etc/passwd vs /etc/shadow", "passwd = account list (world-readable); shadow = password hashes (root only)."),
+    ("Linux Commands", "crontab -l", "List the current user's scheduled cron jobs."),
+    ("Linux Commands", "getcap -r / 2>/dev/null", "Find files with Linux capabilities set — another privesc path."),
+    ("Linux Commands", "ssh -i key user@host", "Connect over SSH authenticating with a private key file."),
+    ("Linux Commands", "chmod +x file", "Add the execute permission to a file."),
+    ("Linux Commands", "history", "Show the shell command history (often leaks secrets)."),
+    # ── Windows & AD ──
+    ("Windows & AD", "NTLM", "Challenge-response auth; the hash can be relayed or cracked (pass-the-hash)."),
+    ("Windows & AD", "Kerberos", "Ticket-based authentication — client gets a TGT from the KDC/DC."),
+    ("Windows & AD", "Kerberoasting", "Request service tickets (SPNs) and crack them offline for service creds."),
+    ("Windows & AD", "Pass-the-Hash", "Authenticate using an NTLM hash directly — no plaintext password needed."),
+    ("Windows & AD", "LSASS", "Process that caches credentials in memory; Mimikatz dumps it."),
+    ("Windows & AD", "Mimikatz", "Tool to extract plaintext creds, hashes, and Kerberos tickets from memory."),
+    ("Windows & AD", "SID", "Security Identifier — unique ID for a user, group, or computer."),
+    ("Windows & AD", "GPO", "Group Policy Object — centrally managed configuration/policy in AD."),
+    ("Windows & AD", "DCSync", "Abuse replication rights to pull password hashes (incl. krbtgt) from a DC."),
+    ("Windows & AD", "Golden Ticket", "Forged TGT signed with the krbtgt hash — near-unlimited domain access."),
+    ("Windows & AD", "SAM", "Local Windows database of account password hashes."),
+    ("Windows & AD", "BloodHound", "Graphs AD objects/ACLs to find attack paths to Domain Admin."),
+    # ── Web Vulns ──
+    ("Web Vulns", "Reflected vs Stored vs DOM XSS", "Reflected = echoed from request; Stored = saved server-side; DOM = client-side sink."),
+    ("Web Vulns", "CSRF", "Tricks an authenticated user's browser into sending an unwanted state-changing request."),
+    ("Web Vulns", "SSRF", "Makes the server send attacker-controlled requests (e.g. to internal/cloud metadata)."),
+    ("Web Vulns", "SSTI", "Server-Side Template Injection — injected template syntax → often RCE."),
+    ("Web Vulns", "IDOR", "Insecure Direct Object Reference — access others' objects by changing an ID."),
+    ("Web Vulns", "LFI vs RFI", "Local File Inclusion (files on server) vs Remote File Inclusion (attacker-hosted)."),
+    ("Web Vulns", "XXE", "XML External Entity — abuse XML parsing to read files or trigger SSRF."),
+    ("Web Vulns", "Blind SQL injection", "SQLi with no direct output — infer data via boolean/time-based responses."),
+    ("Web Vulns", "Insecure deserialization", "Untrusted serialized data deserialized into objects → RCE/logic abuse."),
+    ("Web Vulns", "Command injection", "User input passed to a shell → arbitrary OS command execution."),
+    ("Web Vulns", "Open redirect", "App redirects to an attacker-supplied URL — aids phishing/token theft."),
+    ("Web Vulns", "Clickjacking", "Transparent iframe tricks a user into clicking hidden UI (defend with X-Frame-Options/CSP)."),
+    # ── Nmap & Scanning ──
+    ("Nmap & Scanning", "nmap -sS", "TCP SYN 'stealth' scan — half-open, doesn't complete the handshake."),
+    ("Nmap & Scanning", "nmap -sV", "Probe open ports to determine service/version."),
+    ("Nmap & Scanning", "nmap -sC", "Run the default set of NSE scripts."),
+    ("Nmap & Scanning", "nmap -A", "Aggressive: OS detection + version + default scripts + traceroute."),
+    ("Nmap & Scanning", "nmap -p-", "Scan all 65535 TCP ports."),
+    ("Nmap & Scanning", "nmap -Pn", "Skip host discovery — treat the host as up (bypasses ping blocks)."),
+    ("Nmap & Scanning", "nmap -sU", "UDP scan (slower; DNS/SNMP/DHCP live here)."),
+    ("Nmap & Scanning", "nmap -T4", "Faster timing template (T0 slowest … T5 insane)."),
+    ("Nmap & Scanning", "nmap -oA base", "Output in all three formats (normal, XML, grepable)."),
+    ("Nmap & Scanning", "nmap --script <name>", "Run a specific NSE script or category against the target."),
+    # ── Blue Team / IR ──
+    ("Blue Team / IR", "IOC", "Indicator of Compromise — an artifact (hash, IP, domain) signalling a breach."),
+    ("Blue Team / IR", "SIEM", "Aggregates + correlates logs for detection/alerting (Splunk, Elastic)."),
+    ("Blue Team / IR", "EDR", "Endpoint Detection and Response — monitors + responds on endpoints."),
+    ("Blue Team / IR", "MITRE ATT&CK", "Knowledge base of real-world adversary tactics and techniques (TTPs)."),
+    ("Blue Team / IR", "Cyber Kill Chain", "Recon → Weaponize → Deliver → Exploit → Install → C2 → Actions on objectives."),
+    ("Blue Team / IR", "False positive vs false negative", "FP = benign flagged as malicious; FN = malicious missed."),
+    ("Blue Team / IR", "SOAR", "Security Orchestration, Automation and Response — automates playbook actions."),
+    ("Blue Team / IR", "Threat hunting", "Proactively searching for threats that evaded automated detection."),
+    ("Blue Team / IR", "Chain of custody", "Documented handling of evidence to keep it admissible/trustworthy."),
+    ("Blue Team / IR", "TTP", "Tactics, Techniques, and Procedures — how an adversary operates."),
 ]
 
 
@@ -108,16 +169,13 @@ def _today():
 
 
 def _load() -> dict:
+    d = {"cards": []}
     if STORE.exists():
         try:
-            return json.loads(STORE.read_text("utf-8"))
+            d = json.loads(STORE.read_text("utf-8"))
         except Exception:
-            pass
-    # First run: seed a starter deck so review has content out of the box.
-    # Once the file exists it's never re-seeded, so user deletions stick.
-    d = _seed_deck()
-    _save(d)
-    return d
+            d = {"cards": []}
+    return _topup_seeds(d)
 
 
 def _save(d: dict):
@@ -125,16 +183,25 @@ def _save(d: dict):
     STORE.write_text(json.dumps(d, indent=2), "utf-8")
 
 
-def _seed_deck() -> dict:
+def _seed_card(deck: str, front: str, back: str) -> dict:
     now = datetime.now(timezone.utc).isoformat(timespec="seconds")
-    cards = []
+    return {"id": secrets.token_hex(6), "front": front, "back": back, "deck": deck,
+            "ease": 2.5, "reps": 0, "interval": 0, "lapses": 0, "due": now, "created": now}
+
+
+def _topup_seeds(d: dict) -> dict:
+    """Add any seed card not already present (keyed by deck+front) so new default
+    cards reach existing stores without duplicating. A deleted default reappears
+    on next load — same trade-off as the playbook seeds."""
+    have = {(c.get("deck", ""), c.get("front", "")) for c in d.get("cards", [])}
+    changed = False
     for deck, front, back in _SEED_CARDS:
-        cards.append({
-            "id": secrets.token_hex(6), "front": front, "back": back, "deck": deck,
-            "ease": 2.5, "reps": 0, "interval": 0, "lapses": 0,
-            "due": now, "created": now,
-        })
-    return {"cards": cards}
+        if (deck, front) not in have:
+            d.setdefault("cards", []).append(_seed_card(deck, front, back))
+            changed = True
+    if changed:
+        _save(d)
+    return d
 
 
 def _is_due(card) -> bool:

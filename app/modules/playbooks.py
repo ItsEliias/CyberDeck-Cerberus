@@ -204,6 +204,40 @@ Follows the SANS PICERL lifecycle.
 - [ ] Write the report: root cause, timeline, IOCs
 - [ ] Feed detections + fixes back into preparation
 """,
+    "osint-recon.md": """# OSINT Reconnaissance
+
+Passive intel gathering — no packets to the target where possible.
+
+## Footprint
+- [ ] Enumerate domains, subdomains, IP ranges (crt.sh, amass, subfinder)
+- [ ] Identify employees + email format (LinkedIn, hunter.io)
+- [ ] Check breach dumps for the org's credentials (HIBP, dehashed)
+
+## Public exposure
+- [ ] Google dorking for exposed files, panels, and errors
+- [ ] Shodan / Censys for internet-facing services + banners
+- [ ] GitHub/GitLab search for leaked secrets, keys, and configs
+
+## Wrap
+- [ ] Map the external attack surface + likely entry points
+- [ ] Record every source for the report
+""",
+    "password-attacks.md": """# Password Attacks
+
+## Obtain
+- [ ] Capture hashes (Responder, /etc/shadow, SAM/LSASS, DB dumps)
+- [ ] Identify the hash type (hashid / hash-identifier)
+
+## Crack (offline)
+- [ ] Wordlist attack (hashcat/john + rockyou + rules)
+- [ ] Mask/rule attacks shaped to the password policy
+- [ ] Escalate wordlists (SecLists) if the fast pass fails
+
+## Use (online — mind lockouts)
+- [ ] Password spraying: one common password across many users
+- [ ] Targeted brute-force (hydra) only where allowed
+- [ ] Reuse working creds laterally; document what succeeded
+""",
 }
 
 
