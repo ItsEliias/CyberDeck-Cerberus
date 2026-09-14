@@ -310,6 +310,9 @@
     if (pill) pill.addEventListener('click', function () { if (window.DeckCmd) DeckCmd.open(); });
     route('home');
   }
+  // Minimal theme API for the onboarding wizard (welcome.js) to reuse.
+  window.DeckTheme = { THEMES: THEMES, apply: applyTheme, current: currentTheme };
+
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
 })();

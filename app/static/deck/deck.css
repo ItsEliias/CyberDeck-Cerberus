@@ -503,3 +503,7 @@ body.deck-reduce-motion *, body.deck-reduce-motion *::before, body.deck-reduce-m
   animation-duration: .001ms !important; animation-iteration-count: 1 !important;
   transition-duration: .001ms !important; scroll-behavior: auto !important;
 }
+
+/* Onboarding theme step — keep the 22-swatch grid inside the card. */
+.dw-themes { max-height: 230px; overflow-y: auto; margin: 4px 0 2px; padding-right: 4px; }
+#dw-card .deck-swatches { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
