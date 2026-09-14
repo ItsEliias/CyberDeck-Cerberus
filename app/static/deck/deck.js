@@ -32,7 +32,8 @@
     terminal: '<rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 9l3 3-3 3"/><line x1="12" y1="15" x2="16" y2="15"/>',
     settings: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
     panel: '<rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/>',
-    resources: '<path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>'
+    resources: '<path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>',
+    toolkit: '<path d="M14.7 6.3a4 4 0 0 0-5.4 5.3L3 18v3h3l6.4-6.3a4 4 0 0 0 5.3-5.4l-2.6 2.6-2-2z"/>'
   };
   function svg(key, size) {
     size = size || 16;
@@ -57,6 +58,7 @@
     { id: 'reports', label: 'Reports', blurb: 'Draft + export' },
     { id: 'credentials', label: 'Credentials', blurb: 'Encrypted vault' },
     { id: 'snippets', label: 'Snippets', blurb: 'Payloads + commands' },
+    { id: 'toolkit', label: 'Toolkit', blurb: 'Encoders, hashes, subnet' },
     { id: 'resources', label: 'Resources', blurb: 'Bookmarked links' },
     { id: 'feeds', label: 'Feeds', blurb: 'Security news' },
     { id: 'terminal', label: 'Terminal', blurb: 'Shell' }
@@ -163,7 +165,7 @@
     html += '</div><div class="section"><div class="section-header-flex"><span class="section-title">Engagement</span></div>';
     ['sessions', 'netlab', 'targets', 'board', 'scan', 'topology', 'reports', 'credentials'].forEach(function (id) { html += navItem(id); });
     html += '</div><div class="section"><div class="section-header-flex"><span class="section-title">Feeds &amp; tools</span></div>';
-    ['snippets', 'resources', 'feeds', 'terminal'].forEach(function (id) { html += navItem(id); });
+    ['snippets', 'toolkit', 'resources', 'feeds', 'terminal'].forEach(function (id) { html += navItem(id); });
     html += '</div>';
     inner.innerHTML = html;
   }
