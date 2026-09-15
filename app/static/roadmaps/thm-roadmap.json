@@ -1,0 +1,2239 @@
+{
+  "source": "https://github.com/Hunterdii/TryHackMe-Roadmap",
+  "license": "CC0-1.0",
+  "note": "Curated by Hunterdii; imported into CyberDeck as Learning Paths.",
+  "paths": [
+    {
+      "id": "thm-intro-rooms",
+      "title": "Intro Rooms",
+      "source": "thm",
+      "steps": [
+        {
+          "text": "Hosted Hypervisors",
+          "url": "https://tryhackme.com/room/hostedhypervisors"
+        },
+        {
+          "text": "Enumeration & Brute Force",
+          "url": "https://tryhackme.com/room/enumerationbruteforce"
+        },
+        {
+          "text": "Introduction to CryptOps",
+          "url": "https://tryhackme.com/room/introductiontocryptops"
+        },
+        {
+          "text": "Linux File System Analysis",
+          "url": "https://tryhackme.com/room/linuxfilesystemanalysis"
+        },
+        {
+          "text": "Threat Hunting: Foothold",
+          "url": "https://tryhackme.com/room/threathuntingfoothold"
+        },
+        {
+          "text": "Threat Hunting: Introduction",
+          "url": "https://tryhackme.com/room/introductiontothreathunting"
+        },
+        {
+          "text": "Preparation",
+          "url": "https://tryhackme.com/room/preparation"
+        },
+        {
+          "text": "Intro to Logs",
+          "url": "https://tryhackme.com/room/introtologs"
+        },
+        {
+          "text": "Intro to Threat Emulation",
+          "url": "https://tryhackme.com/room/threatemulationintro"
+        },
+        {
+          "text": "Security Engineer Intro",
+          "url": "https://tryhackme.com/room/securityengineerintro"
+        },
+        {
+          "text": "Intro to Docker",
+          "url": "https://tryhackme.com/room/introtodockerk8pdqk"
+        },
+        {
+          "text": "SDLC",
+          "url": "https://tryhackme.com/room/sdlc"
+        },
+        {
+          "text": "Welcome",
+          "url": "https://tryhackme.com/room/hello"
+        },
+        {
+          "text": "How to use TryHackMe",
+          "url": "https://tryhackme.com/room/howtousetryhackme"
+        },
+        {
+          "text": "Tutorial",
+          "url": "https://tryhackme.com/room/tutorial"
+        },
+        {
+          "text": "OpenVPN",
+          "url": "https://tryhackme.com/room/openvpn"
+        },
+        {
+          "text": "Learning Cyber Security",
+          "url": "https://tryhackme.com/room/beginnerpathintro"
+        },
+        {
+          "text": "Starting Out In Cyber Sec",
+          "url": "https://tryhackme.com/room/startingoutincybersec"
+        },
+        {
+          "text": "Introductory Researching",
+          "url": "https://tryhackme.com/room/introtoresearch"
+        },
+        {
+          "text": "Regular expressions",
+          "url": "https://tryhackme.com/room/catregex"
+        },
+        {
+          "text": "Careers in Cyber",
+          "url": "https://tryhackme.com/room/careersincyber"
+        },
+        {
+          "text": "Junior Security Analyst Intro",
+          "url": "https://tryhackme.com/room/jrsecanalystintrouxo"
+        }
+      ],
+      "blurb": "22 free TryHackMe rooms · Intro Rooms"
+    },
+    {
+      "id": "thm-linux-fundamentals",
+      "title": "Linux Fundamentals",
+      "source": "thm",
+      "steps": [
+        {
+          "text": "Linux Modules",
+          "url": "https://tryhackme.com/room/linuxmodules"
+        },
+        {
+          "text": "Linux Fundamentals Part 1",
+          "url": "https://tryhackme.com/room/linuxfundamentalspart1"
+        },
+        {
+          "text": "Linux Fundamentals Part 2",
+          "url": "https://tryhackme.com/room/linuxfundamentalspart2"
+        },
+        {
+          "text": "Linux Fundamentals Part 3",
+          "url": "https://tryhackme.com/room/linuxfundamentalspart3"
+        }
+      ],
+      "blurb": "4 free TryHackMe rooms · Linux Fundamentals"
+    },
+    {
+      "id": "thm-windows-fundamentals",
+      "title": "Windows Fundamentals",
+      "source": "thm",
+      "steps": [
+        {
+          "text": "Windows Fundamentals 1",
+          "url": "https://tryhackme.com/room/windowsfundamentals1xbx"
+        },
+        {
+          "text": "Windows Fundamentals 2",
+          "url": "https://tryhackme.com/room/windowsfundamentals2x0x"
+        },
+        {
+          "text": "Windows Fundamentals 3",
+          "url": "https://tryhackme.com/room/windowsfundamentals3xzx"
+        }
+      ],
+      "blurb": "3 free TryHackMe rooms · Windows Fundamentals"
+    },
+    {
+      "id": "thm-basics-rooms",
+      "title": "Basics Rooms",
+      "source": "thm",
+      "steps": [
+        {
+          "text": "Hypervisor Internals",
+          "url": "https://tryhackme.com/room/hypervisorinternals"
+        },
+        {
+          "text": "Splunk: Exploring SPL",
+          "url": "https://tryhackme.com/room/splunkexploringspl"
+        },
+        {
+          "text": "ParrotPost: Phishing Analysis",
+          "url": "https://tryhackme.com/room/parrotpost"
+        },
+        {
+          "text": "x86 Architecture Overview",
+          "url": "https://tryhackme.com/room/x8664arch"
+        },
+        {
+          "text": "Threat Intelligence for SOC",
+          "url": "https://tryhackme.com/room/threatintelligenceforsoc"
+        },
+        {
+          "text": "Basic Pentesting",
+          "url": "https://tryhackme.com/room/basicpentestingjt"
+        },
+        {
+          "text": "Pentesting Fundamentals",
+          "url": "https://tryhackme.com/room/pentestingfundamentals"
+        },
+        {
+          "text": "Principles of Security",
+          "url": "https://tryhackme.com/room/principlesofsecurity"
+        },
+        {
+          "text": "The Hacker Methodology",
+          "url": "https://tryhackme.com/room/hackermethodology"
+        },
+        {
+          "text": "Physical Security Intro",
+          "url": "https://tryhackme.com/room/physicalsecurityintro"
+        },
+        {
+          "text": "Linux Strength Training",
+          "url": "https://tryhackme.com/room/linuxstrengthtraining"
+        },
+        {
+          "text": "OpenVAS",
+          "url": "https://tryhackme.com/room/openvas"
+        },
+        {
+          "text": "ISO27001",
+          "url": "https://tryhackme.com/room/iso27001"
+        },
+        {
+          "text": "UltraTech",
+          "url": "https://tryhackme.com/room/ultratech1"
+        }
+      ],
+      "blurb": "14 free TryHackMe rooms · Basics Rooms"
+    },
+    {
+      "id": "thm-recon",
+      "title": "Recon",
+      "source": "thm",
+      "steps": [
+        {
+          "text": "Passive Reconnaissance",
+          "url": "https://tryhackme.com/room/passiverecon"
+        },
+        {
+          "text": "Active Reconnaissance",
+          "url": "https://tryhackme.com/room/activerecon"
+        },
+        {
+          "text": "Content Discovery",
+          "url": "https://tryhackme.com/room/contentdiscovery"
+        },
+        {
+          "text": "OhSINT",
+          "url": "https://tryhackme.com/room/ohsint"
+        },
+        {
+          "text": "Shodan.io",
+          "url": "https://tryhackme.com/room/shodan"
+        },
+        {
+          "text": "Google Dorking",
+          "url": "https://tryhackme.com/room/googledorking"
+        },
+        {
+          "text": "WebOSINT",
+          "url": "https://tryhackme.com/room/webosint"
+        },
+        {
+          "text": "Sakura Room",
+          "url": "https://tryhackme.com/room/sakura"
+        },
+        {
+          "text": "Red Team Recon",
+          "url": "https://tryhackme.com/room/redteamrecon"
+        },
+        {
+          "text": "Searchlight - IMINT",
+          "url": "https://tryhackme.com/room/searchlightosint"
+        }
+      ],
+      "blurb": "10 free TryHackMe rooms · Recon"
+    },
+    {
+      "id": "thm-scripting",
+      "title": "Scripting",
+      "source": "thm",
+      "steps": [
+        {
+          "text": "Python Basics",
+          "url": "https://tryhackme.com/room/pythonbasics"
+        },
+        {
+          "text": "Python Playground",
+          "url": "https://tryhackme.com/room/pythonplayground"
+        },
+        {
+          "text": "Intro PoC Scripting",
+          "url": "https://tryhackme.com/room/intropocscripting"
+        },
+        {
+          "text": "Peak Hill",
+          "url": "https://tryhackme.com/room/peakhill"
+        },
+        {
+          "text": "JavaScript Basics",
+          "url": "https://tryhackme.com/room/javascriptbasics"
+        },
+        {
+          "text": "Bash Scripting",
+          "url": "https://tryhackme.com/room/bashscripting"
+        },
+        {
+          "text": "Learn Rust",
+          "url": "https://tryhackme.com/room/rust"
+        }
+      ],
+      "blurb": "7 free TryHackMe rooms · Scripting"
+    },
+    {
+      "id": "thm-networking",
+      "title": "Networking",
+      "source": "thm",
+      "steps": [
+        {
+          "text": "Introductory Networking",
+          "url": "https://tryhackme.com/room/introtonetworking"
+        },
+        {
+          "text": "What is Networking?",
+          "url": "https://tryhackme.com/room/whatisnetworking"
+        },
+        {
+          "text": "Networking",
+          "url": "https://tryhackme.com/room/bpnetworking"
+        },
+        {
+          "text": "Intro to LAN",
+          "url": "https://tryhackme.com/room/introtolan"
+        },
+        {
+          "text": "HTTP in detail",
+          "url": "https://tryhackme.com/room/httpindetail"
+        },
+        {
+          "text": "DNS in detail",
+          "url": "https://tryhackme.com/room/dnsindetail"
+        },
+        {
+          "text": "Dumping Router Firmware",
+          "url": "https://tryhackme.com/room/rfirmware"
+        }
+      ],
+      "blurb": "7 free TryHackMe rooms · Networking"
+    },
+    {
+      "id": "thm-tooling",
+      "title": "Tooling",
+      "source": "thm",
+      "steps": [
+        {
+          "text": "Snyk Open Source",
+          "url": "https://tryhackme.com/room/snykopensource"
+        },
+        {
+          "text": "Snyk Code",
+          "url": "https://tryhackme.com/room/snykcode"
+        },
+        {
+          "text": "Intro to IaC",
+          "url": "https://tryhackme.com/room/introtoiac"
+        },
+        {
+          "text": "Metasploit: Introduction",
+          "url": "https://tryhackme.com/room/metasploitintro"
+        },
+        {
+          "text": "tmux",
+          "url": "https://tryhackme.com/room/rptmux"
+        },
+        {
+          "text": "REmux The Tmux",
+          "url": "https://tryhackme.com/room/tmuxremux"
+        },
+        {
+          "text": "Hydra",
+          "url": "https://tryhackme.com/room/hydra"
+        },
+        {
+          "text": "Toolbox: Vim",
+          "url": "https://tryhackme.com/room/toolboxvim"
+        },
+        {
+          "text": "Introduction to OWASP ZAP",
+          "url": "https://tryhackme.com/room/learnowaspzap"
+        },
+        {
+          "text": "Phishing: HiddenEye",
+          "url": "https://tryhackme.com/room/phishinghiddeneye"
+        },
+        {
+          "text": "RustScan",
+          "url": "https://tryhackme.com/room/rustscan"
+        },
+        {
+          "text": "Nessus",
+          "url": "https://tryhackme.com/room/rpnessusredux"
+        },
+        {
+          "text": "Nmap Live Host Discovery",
+          "url": "https://tryhackme.com/room/nmap01"
+        },
+        {
+          "text": "Nmap",
+          "url": "https://tryhackme.com/room/furthernmap"
+        },
+        {
+          "text": "TShark",
+          "url": "https://tryhackme.com/room/tshark"
+        },
+        {
+          "text": "ffuf",
+          "url": "https://tryhackme.com/room/ffuf"
+        },
+        {
+          "text": "Burp Suite: The Basics",
+          "url": "https://tryhackme.com/room/burpsuitebasics"
+        },
+        {
+          "text": "Burp Suite: Repeater",
+          "url": "https://tryhackme.com/room/burpsuiterepeater"
+        }
+      ],
+      "blurb": "18 free TryHackMe rooms · Tooling"
+    },
+    {
+      "id": "thm-container-security",
+      "title": "Container Security",
+      "source": "thm",
+      "steps": [
+        {
+          "text": "K8s Runtime Security",
+          "url": "https://tryhackme.com/room/k8sruntimesecurity"
+        },
+        {
+          "text": "K8s Best Security Practices",
+          "url": "https://tryhackme.com/room/k8sbestsecuritypractices"
+        },
+        {
+          "text": "Cluster Hardening",
+          "url": "https://tryhackme.com/room/clusterhardening"
+        }
+      ],
+      "blurb": "3 free TryHackMe rooms · Container Security"
+    },
+    {
+      "id": "thm-cryptography-hashes",
+      "title": "Cryptography & Hashes",
+      "source": "thm",
+      "steps": [
+        {
+          "text": "Breaking RSA",
+          "url": "https://tryhackme.com/room/breakrsa"
+        },
+        {
+          "text": "Cryptography for Dummies",
+          "url": "https://tryhackme.com/room/cryptographyfordummies"
+        },
+        {
+          "text": "Crack the hash",
+          "url": "https://tryhackme.com/room/crackthehash"
+        },
+        {
+          "text": "Crack The Hash Level 2",
+          "url": "https://tryhackme.com/room/crackthehashlevel2"
+        },
+        {
+          "text": "Agent Sudo",
+          "url": "https://tryhackme.com/room/agentsudoctf"
+        },
+        {
+          "text": "Brute It",
+          "url": "https://tryhackme.com/room/bruteit"
+        },
+        {
+          "text": "Introduction to Cryptography",
+          "url": "https://tryhackme.com/room/cryptographyintro"
+        }
+      ],
+      "blurb": "7 free TryHackMe rooms · Cryptography & Hashes"
+    },
+    {
+      "id": "thm-steganography",
+      "title": "Steganography",
+      "source": "thm",
+      "steps": [
+        {
+          "text": "CC: Steganography",
+          "url": "https://tryhackme.com/room/ccstego"
+        },
+        {
+          "text": "Cicada-3301 Vol:1",
+          "url": "https://tryhackme.com/room/cicada3301vol1"
+        },
+        {
+          "text": "Musical Stego",
+          "url": "https://tryhackme.com/room/musicalstego"
+        },
+        {
+          "text": "Madness",
+          "url": "https://tryhackme.com/room/madness"
+        },
+        {
+          "text": "Psycho Break",
+          "url": "https://tryhackme.com/room/psychobreak"
+        },
+        {
+          "text": "Unstable Twin",
+          "url": "https://tryhackme.com/room/unstabletwin"
+        }
+      ],
+      "blurb": "6 free TryHackMe rooms · Steganography"
+    },
+    {
+      "id": "thm-web",
+      "title": "Web",
+      "source": "thm",
+      "steps": [
+        {
+          "text": "Microservices Architectures",
+          "url": "https://tryhackme.com/room/microservicearchitectures"
+        },
+        {
+          "text": "NoSQL Injection",
+          "url": "https://tryhackme.com/room/nosqlinjectiontutorial"
+        },
+        {
+          "text": "Advanced SQL Injection",
+          "url": "https://tryhackme.com/room/advancedsqlinjection"
+        },
+        {
+          "text": "XSS",
+          "url": "https://tryhackme.com/room/axss"
+        },
+        {
+          "text": "CSRF",
+          "url": "https://tryhackme.com/room/csrfV2"
+        },
+        {
+          "text": "File Inclusion, Path Traversal",
+          "url": "https://tryhackme.com/room/filepathtraversal"
+        },
+        {
+          "text": "HTTP Request Smuggling",
+          "url": "https://tryhackme.com/room/httprequestsmuggling"
+        },
+        {
+          "text": "HTTP/2 Request Smuggling",
+          "url": "https://tryhackme.com/room/http2requestsmuggling"
+        },
+        {
+          "text": "SSRF",
+          "url": "https://tryhackme.com/room/ssrfhr"
+        },
+        {
+          "text": "OWASP Broken Access Control",
+          "url": "https://tryhackme.com/room/owaspbrokenaccesscontrol"
+        },
+        {
+          "text": "HTTP in detail",
+          "url": "https://tryhackme.com/room/webfundamentals"
+        },
+        {
+          "text": "Vulnerabilities 101",
+          "url": "https://tryhackme.com/room/vulnerabilities101"
+        },
+        {
+          "text": "Walking An Application",
+          "url": "https://tryhackme.com/room/walkinganapplication"
+        },
+        {
+          "text": "OWASP Top 10 - 2021",
+          "url": "https://tryhackme.com/room/owasptop102021"
+        },
+        {
+          "text": "OWASP Top 10",
+          "url": "https://tryhackme.com/room/owasptop10"
+        },
+        {
+          "text": "OWASP Juice Shop",
+          "url": "https://tryhackme.com/room/owaspjuiceshop"
+        },
+        {
+          "text": "OWASP Mutillidae II",
+          "url": "https://tryhackme.com/room/owaspmutillidae"
+        },
+        {
+          "text": "WebGOAT",
+          "url": "https://tryhackme.com/room/webgoat"
+        },
+        {
+          "text": "Web Application Security",
+          "url": "https://tryhackme.com/room/introwebapplicationsecurity"
+        },
+        {
+          "text": "DVWA",
+          "url": "https://tryhackme.com/room/dvwa"
+        },
+        {
+          "text": "VulnNet",
+          "url": "https://tryhackme.com/room/vulnnet1"
+        },
+        {
+          "text": "Juicy Details",
+          "url": "https://tryhackme.com/room/juicydetails"
+        },
+        {
+          "text": "Vulnversity",
+          "url": "https://tryhackme.com/room/vulnversity"
+        },
+        {
+          "text": "SQL Injection Lab",
+          "url": "https://tryhackme.com/room/sqlilab"
+        },
+        {
+          "text": "SSTI",
+          "url": "https://tryhackme.com/room/learnssti"
+        },
+        {
+          "text": "SQL Injection",
+          "url": "https://tryhackme.com/room/sqlinjectionlm"
+        },
+        {
+          "text": "Basic Pentesting",
+          "url": "https://tryhackme.com/room/basicpentestingjt"
+        },
+        {
+          "text": "Ignite",
+          "url": "https://tryhackme.com/room/ignite"
+        },
+        {
+          "text": "Overpass",
+          "url": "https://tryhackme.com/room/overpass"
+        },
+        {
+          "text": "Year of the Rabbit",
+          "url": "https://tryhackme.com/room/yearoftherabbit"
+        },
+        {
+          "text": "Develpy",
+          "url": "https://tryhackme.com/room/bsidesgtdevelpy"
+        },
+        {
+          "text": "Jack-of-All-Trades",
+          "url": "https://tryhackme.com/room/jackofalltrades"
+        },
+        {
+          "text": "Bolt",
+          "url": "https://tryhackme.com/room/bolt"
+        }
+      ],
+      "blurb": "33 free TryHackMe rooms · Web"
+    },
+    {
+      "id": "thm-android",
+      "title": "Android",
+      "source": "thm",
+      "steps": [
+        {
+          "text": "Android Hacking 101",
+          "url": "https://tryhackme.com/room/androidhacking101"
+        }
+      ],
+      "blurb": "1 free TryHackMe room · Android"
+    },
+    {
+      "id": "thm-forensics",
+      "title": "Forensics",
+      "source": "thm",
+      "steps": [
+        {
+          "text": "Linux Incident Surface",
+          "url": "https://tryhackme.com/room/linuxincidentsurface"
+        },
+        {
+          "text": "IR Playbooks",
+          "url": "https://tryhackme.com/room/irplaybooks"
+        },
+        {
+          "text": "Intro to Cold System Forensics",
+          "url": "https://tryhackme.com/room/introtocoldsystemforensics"
+        },
+        {
+          "text": "Unified Kill Chain",
+          "url": "https://tryhackme.com/room/unifiedkillchain"
+        },
+        {
+          "text": "Forensic Imaging",
+          "url": "https://tryhackme.com/room/forensicimaging"
+        },
+        {
+          "text": "IR Philosophy and Ethics",
+          "url": "https://tryhackme.com/room/irphilosophyethics"
+        },
+        {
+          "text": "Windows Applications Forensics",
+          "url": "https://tryhackme.com/room/windowsapplications"
+        },
+        {
+          "text": "Legal Considerations in DFIR",
+          "url": "https://tryhackme.com/room/dfirprocesslegalconsiderations"
+        },
+        {
+          "text": "Servidae: Log Analysis in ELK",
+          "url": "https://tryhackme.com/room/servidae"
+        },
+        {
+          "text": "Cyber Kill Chain",
+          "url": "https://tryhackme.com/room/cyberkillchainzmt"
+        },
+        {
+          "text": "Identification & Scoping",
+          "url": "https://tryhackme.com/room/identificationandscoping"
+        },
+        {
+          "text": "Digital Forensics Case B4DM755",
+          "url": "https://tryhackme.com/room/caseb4dm755"
+        },
+        {
+          "text": "Linux Server Forensics",
+          "url": "https://tryhackme.com/room/linuxserverforensics"
+        },
+        {
+          "text": "Forensics",
+          "url": "https://tryhackme.com/room/forensics"
+        },
+        {
+          "text": "Memory Forensics",
+          "url": "https://tryhackme.com/room/memoryforensics"
+        },
+        {
+          "text": "Volatility",
+          "url": "https://tryhackme.com/room/bpvolatility"
+        },
+        {
+          "text": "Disk Analysis &amp; Autopsy",
+          "url": "https://tryhackme.com/room/autopsy2ze0"
+        }
+      ],
+      "blurb": "17 free TryHackMe rooms · Forensics"
+    },
+    {
+      "id": "thm-wi-fi-hacking",
+      "title": "Wi-Fi Hacking",
+      "source": "thm",
+      "steps": [
+        {
+          "text": "Wifi Hacking 101",
+          "url": "https://tryhackme.com/room/wifihacking101"
+        }
+      ],
+      "blurb": "1 free TryHackMe room · Wi-Fi Hacking"
+    },
+    {
+      "id": "thm-reverse-engineering",
+      "title": "Reverse Engineering",
+      "source": "thm",
+      "steps": [
+        {
+          "text": "Windows x64 Assembly",
+          "url": "https://tryhackme.com/room/win64assembly"
+        },
+        {
+          "text": "Reversing ELF",
+          "url": "https://tryhackme.com/room/reverselfiles"
+        },
+        {
+          "text": "Windows Reversing Intro",
+          "url": "https://tryhackme.com/room/windowsreversingintro"
+        },
+        {
+          "text": "JVM Reverse Engineering",
+          "url": "https://tryhackme.com/room/jvmreverseengineering"
+        },
+        {
+          "text": "CC: Radare2",
+          "url": "https://tryhackme.com/room/ccradare2"
+        },
+        {
+          "text": "CC: Ghidra",
+          "url": "https://tryhackme.com/room/ccghidra"
+        },
+        {
+          "text": "Aster",
+          "url": "https://tryhackme.com/room/aster"
+        },
+        {
+          "text": "Classic Passwd",
+          "url": "https://tryhackme.com/room/classicpasswd"
+        },
+        {
+          "text": "REloaded",
+          "url": "https://tryhackme.com/room/reloaded"
+        }
+      ],
+      "blurb": "9 free TryHackMe rooms · Reverse Engineering"
+    },
+    {
+      "id": "thm-malware-analysis",
+      "title": "Malware Analysis",
+      "source": "thm",
+      "steps": [
+        {
+          "text": "Intro to Detection Engineering",
+          "url": "https://tryhackme.com/room/introtodetectionengineering"
+        },
+        {
+          "text": "History of Malware",
+          "url": "https://tryhackme.com/room/historyofmalware"
+        },
+        {
+          "text": "MAL: Malware Introductory",
+          "url": "https://tryhackme.com/room/malmalintroductory"
+        },
+        {
+          "text": "Basic Malware RE",
+          "url": "https://tryhackme.com/room/basicmalwarere"
+        },
+        {
+          "text": "MAL: Researching",
+          "url": "https://tryhackme.com/room/malresearching"
+        },
+        {
+          "text": "Mobile Malware Analysis",
+          "url": "https://tryhackme.com/room/mma"
+        },
+        {
+          "text": "Carnage",
+          "url": "https://tryhackme.com/room/c2carnage"
+        },
+        {
+          "text": "Dunkle Materie",
+          "url": "https://tryhackme.com/room/dunklematerieptxc9"
+        }
+      ],
+      "blurb": "8 free TryHackMe rooms · Malware Analysis"
+    },
+    {
+      "id": "thm-privesc",
+      "title": "PrivEsc",
+      "source": "thm",
+      "steps": [
+        {
+          "text": "Linux Privilege Escalation",
+          "url": "https://tryhackme.com/room/linprivesc"
+        },
+        {
+          "text": "Linux PrivEsc",
+          "url": "https://tryhackme.com/room/linuxprivesc"
+        },
+        {
+          "text": "Linux PrivEsc Arena",
+          "url": "https://tryhackme.com/room/linuxprivescarena"
+        },
+        {
+          "text": "Windows PrivEsc",
+          "url": "https://tryhackme.com/room/windows10privesc"
+        },
+        {
+          "text": "Windows PrivEsc Arena",
+          "url": "https://tryhackme.com/room/windowsprivescarena"
+        },
+        {
+          "text": "Linux Agency",
+          "url": "https://tryhackme.com/room/linuxagency"
+        },
+        {
+          "text": "Sudo Security Bypass",
+          "url": "https://tryhackme.com/room/sudovulnsbypass"
+        },
+        {
+          "text": "Sudo Buffer Overflow",
+          "url": "https://tryhackme.com/room/sudovulnsbof"
+        },
+        {
+          "text": "Blaster",
+          "url": "https://tryhackme.com/room/blaster"
+        },
+        {
+          "text": "Ignite",
+          "url": "https://tryhackme.com/room/ignite"
+        },
+        {
+          "text": "Kenobi",
+          "url": "https://tryhackme.com/room/kenobi"
+        },
+        {
+          "text": "c4ptur3-th3-fl4g",
+          "url": "https://tryhackme.com/room/c4ptur3th3fl4g"
+        },
+        {
+          "text": "Pickle Rick",
+          "url": "https://tryhackme.com/room/picklerick"
+        }
+      ],
+      "blurb": "13 free TryHackMe rooms · PrivEsc"
+    },
+    {
+      "id": "thm-windows",
+      "title": "Windows",
+      "source": "thm",
+      "steps": [
+        {
+          "text": "Windows Incident Surface",
+          "url": "https://tryhackme.com/room/winincidentsurface"
+        },
+        {
+          "text": "Registry Persistence Detection",
+          "url": "https://tryhackme.com/room/registrypersistencedetection"
+        },
+        {
+          "text": "Investigating Windows",
+          "url": "https://tryhackme.com/room/investigatingwindows"
+        },
+        {
+          "text": "Investigating Windows 2.0",
+          "url": "https://tryhackme.com/room/investigatingwindows2"
+        },
+        {
+          "text": "Investigating Windows 3.x",
+          "url": "https://tryhackme.com/room/investigatingwindows3"
+        },
+        {
+          "text": "Blueprint",
+          "url": "https://tryhackme.com/room/blueprint"
+        },
+        {
+          "text": "VulnNet: Active",
+          "url": "https://tryhackme.com/room/vulnnetactive"
+        },
+        {
+          "text": "Anthem",
+          "url": "https://tryhackme.com/room/anthem"
+        },
+        {
+          "text": "Blue",
+          "url": "https://tryhackme.com/room/blue"
+        }
+      ],
+      "blurb": "9 free TryHackMe rooms · Windows"
+    },
+    {
+      "id": "thm-active-directory",
+      "title": "Active Directory",
+      "source": "thm",
+      "steps": [
+        {
+          "text": "Active Directory Hardening",
+          "url": "https://tryhackme.com/room/activedirectoryening"
+        },
+        {
+          "text": "Active Directory Basics",
+          "url": "https://tryhackme.com/room/winadbasics"
+        },
+        {
+          "text": "Breaching Active Directory",
+          "url": "https://tryhackme.com/room/breachingad"
+        },
+        {
+          "text": "Attacktive Directory",
+          "url": "https://tryhackme.com/room/attacktivedirectory"
+        },
+        {
+          "text": "Post-Exploitation Basics",
+          "url": "https://tryhackme.com/room/postexploit"
+        },
+        {
+          "text": "USTOUN",
+          "url": "https://tryhackme.com/room/ustoun"
+        },
+        {
+          "text": "Enterprise",
+          "url": "https://tryhackme.com/room/enterprise"
+        },
+        {
+          "text": "RazorBlack",
+          "url": "https://tryhackme.com/room/raz0rblack"
+        }
+      ],
+      "blurb": "8 free TryHackMe rooms · Active Directory"
+    },
+    {
+      "id": "thm-pcap-analysis",
+      "title": "PCAP Analysis",
+      "source": "thm",
+      "steps": [
+        {
+          "text": "h4cked",
+          "url": "https://tryhackme.com/room/h4cked"
+        },
+        {
+          "text": "Carnage",
+          "url": "https://tryhackme.com/room/c2carnage"
+        },
+        {
+          "text": "CCT2019",
+          "url": "https://tryhackme.com/room/cct2019"
+        },
+        {
+          "text": "Overpass 2 - Hacked",
+          "url": "https://tryhackme.com/room/overpass2hacked"
+        }
+      ],
+      "blurb": "4 free TryHackMe rooms · PCAP Analysis"
+    },
+    {
+      "id": "thm-bufferoverflow",
+      "title": "BufferOverflow",
+      "source": "thm",
+      "steps": [
+        {
+          "text": "Buffer Overflow Prep",
+          "url": "https://tryhackme.com/room/bufferoverflowprep"
+        },
+        {
+          "text": "Gatekeeper",
+          "url": "https://tryhackme.com/room/gatekeeper"
+        },
+        {
+          "text": "Chronicle",
+          "url": "https://tryhackme.com/room/chronicle"
+        },
+        {
+          "text": "Intro To Pwntools",
+          "url": "https://tryhackme.com/room/introtopwntools"
+        }
+      ],
+      "blurb": "4 free TryHackMe rooms · BufferOverflow"
+    },
+    {
+      "id": "thm-easy-ctf",
+      "title": "Easy CTF",
+      "source": "thm",
+      "steps": [
+        {
+          "text": "Offensive Security Intro",
+          "url": "https://tryhackme.com/room/offensivesecurityintro"
+        },
+        {
+          "text": "Defensive Security Intro",
+          "url": "https://tryhackme.com/room/defensivesecurityintro"
+        },
+        {
+          "text": "Pyrat",
+          "url": "https://tryhackme.com/room/pyrat"
+        },
+        {
+          "text": "Cheese CTF",
+          "url": "https://tryhackme.com/room/cheesectfv10"
+        },
+        {
+          "text": "U.A. High School",
+          "url": "https://tryhackme.com/room/yueiua"
+        },
+        {
+          "text": "Joomify",
+          "url": "https://tryhackme.com/room/joomify"
+        },
+        {
+          "text": "Critical",
+          "url": "https://tryhackme.com/room/critical"
+        },
+        {
+          "text": "Publisher",
+          "url": "https://tryhackme.com/room/publisher"
+        },
+        {
+          "text": "Eviction",
+          "url": "https://tryhackme.com/room/eviction"
+        },
+        {
+          "text": "Become a Hacker",
+          "url": "https://tryhackme.com/room/becomeahackeroa"
+        },
+        {
+          "text": "W1seGuy",
+          "url": "https://tryhackme.com/room/w1seguy"
+        },
+        {
+          "text": "mKingdom",
+          "url": "https://tryhackme.com/room/mkingdom"
+        },
+        {
+          "text": "How Websites Work",
+          "url": "https://tryhackme.com/room/howwebsiteswork"
+        },
+        {
+          "text": "Linux Process Analysis",
+          "url": "https://tryhackme.com/room/linuxprocessanalysis"
+        },
+        {
+          "text": "CyberLens",
+          "url": "https://tryhackme.com/room/cyberlensp6"
+        },
+        {
+          "text": "Security Principles",
+          "url": "https://tryhackme.com/room/securityprinciples"
+        },
+        {
+          "text": "TryHack3M: Bricks Heist",
+          "url": "https://tryhackme.com/room/tryhack3mbricksheist"
+        },
+        {
+          "text": "Creative",
+          "url": "https://tryhackme.com/room/creative"
+        },
+        {
+          "text": "Eviction",
+          "url": "https://tryhackme.com/room/eviction"
+        },
+        {
+          "text": "Putting it all together",
+          "url": "https://tryhackme.com/room/puttingitalltogether"
+        },
+        {
+          "text": "Probe",
+          "url": "https://tryhackme.com/room/probe"
+        },
+        {
+          "text": "Dreaming",
+          "url": "https://tryhackme.com/room/dreaming"
+        },
+        {
+          "text": "Pyramid Of Pain",
+          "url": "https://tryhackme.com/room/pyramidofpainax"
+        },
+        {
+          "text": "The Witch's Cauldron",
+          "url": "https://tryhackme.com/room/cauldron"
+        },
+        {
+          "text": "Bulletproof Penguin",
+          "url": "https://tryhackme.com/room/bppenguin"
+        },
+        {
+          "text": "Hijack",
+          "url": "https://tryhackme.com/room/hijack"
+        },
+        {
+          "text": "Compiled",
+          "url": "https://tryhackme.com/room/compiled"
+        },
+        {
+          "text": "Super Secret TIp",
+          "url": "https://tryhackme.com/room/supersecrettip"
+        },
+        {
+          "text": "Lesson Learned?",
+          "url": "https://tryhackme.com/room/lessonlearned"
+        },
+        {
+          "text": "Grep",
+          "url": "https://tryhackme.com/room/greprtp"
+        },
+        {
+          "text": "Red",
+          "url": "https://tryhackme.com/room/redisl33t"
+        },
+        {
+          "text": "Snapped \"Phish\"-ing Line",
+          "url": "https://tryhackme.com/room/snappedphishingline"
+        },
+        {
+          "text": "Cat Pictures 2",
+          "url": "https://tryhackme.com/room/catpictures2"
+        },
+        {
+          "text": "Flip",
+          "url": "https://tryhackme.com/room/flip"
+        },
+        {
+          "text": "Valley!",
+          "url": "https://tryhackme.com/room/valleype"
+        },
+        {
+          "text": "Capture!",
+          "url": "https://tryhackme.com/room/capture"
+        },
+        {
+          "text": "Opacity",
+          "url": "https://tryhackme.com/room/opacity"
+        },
+        {
+          "text": "LookBack",
+          "url": "https://tryhackme.com/room/lookback"
+        },
+        {
+          "text": "Bugged",
+          "url": "https://tryhackme.com/room/bugged"
+        },
+        {
+          "text": "GamingServer",
+          "url": "https://tryhackme.com/room/gamingserver"
+        },
+        {
+          "text": "Confidential",
+          "url": "https://tryhackme.com/room/confidential"
+        },
+        {
+          "text": "OverlayFS - CVE-2021-3493",
+          "url": "https://tryhackme.com/room/overlayfs"
+        },
+        {
+          "text": "Psycho Break",
+          "url": "https://tryhackme.com/room/psychobreak"
+        },
+        {
+          "text": "Bounty Hacker",
+          "url": "https://tryhackme.com/room/cowboyhacker"
+        },
+        {
+          "text": "Fowsniff CTF",
+          "url": "https://tryhackme.com/room/ctf"
+        },
+        {
+          "text": "RootMe",
+          "url": "https://tryhackme.com/room/rrootme"
+        },
+        {
+          "text": "AttackerKB",
+          "url": "https://tryhackme.com/room/attackerkb"
+        },
+        {
+          "text": "Pickle Rick",
+          "url": "https://tryhackme.com/room/picklerick"
+        },
+        {
+          "text": "c4ptur3-th3-fl4g",
+          "url": "https://tryhackme.com/room/c4ptur3th3fl4g"
+        },
+        {
+          "text": "Library",
+          "url": "https://tryhackme.com/room/bsidesgtlibrary"
+        },
+        {
+          "text": "Thompson",
+          "url": "https://tryhackme.com/room/bsidesgtthompson"
+        },
+        {
+          "text": "Simple CTF",
+          "url": "https://tryhackme.com/room/easyctf"
+        },
+        {
+          "text": "LazyAdmin",
+          "url": "https://tryhackme.com/room/lazyadmin"
+        },
+        {
+          "text": "Anonforce",
+          "url": "https://tryhackme.com/room/bsidesgtanonforce"
+        },
+        {
+          "text": "Ignite",
+          "url": "https://tryhackme.com/room/ignite"
+        },
+        {
+          "text": "Wgel CTF",
+          "url": "https://tryhackme.com/room/wgelctf"
+        },
+        {
+          "text": "Kenobi",
+          "url": "https://tryhackme.com/room/kenobi"
+        },
+        {
+          "text": "Dav",
+          "url": "https://tryhackme.com/room/bsidesgtdav"
+        },
+        {
+          "text": "Ninja Skills",
+          "url": "https://tryhackme.com/room/ninjaskills"
+        },
+        {
+          "text": "Ice",
+          "url": "https://tryhackme.com/room/ice"
+        },
+        {
+          "text": "Lian_Yu",
+          "url": "https://tryhackme.com/room/lianyu"
+        },
+        {
+          "text": "The Cod Caper",
+          "url": "https://tryhackme.com/room/thecodcaper"
+        },
+        {
+          "text": "Blaster",
+          "url": "https://tryhackme.com/room/blaster"
+        },
+        {
+          "text": "Encryption - Crypto 101",
+          "url": "https://tryhackme.com/room/encryptioncrypto101"
+        },
+        {
+          "text": "Brooklyn Nine Nine",
+          "url": "https://tryhackme.com/room/brooklynninenine"
+        },
+        {
+          "text": "Year of the Rabbit",
+          "url": "https://tryhackme.com/room/yearoftherabbit"
+        },
+        {
+          "text": "Jack-of-All-Trades",
+          "url": "https://tryhackme.com/room/jackofalltrades"
+        },
+        {
+          "text": "Madness",
+          "url": "https://tryhackme.com/room/madness"
+        },
+        {
+          "text": "KoTH Food CTF",
+          "url": "https://tryhackme.com/room/kothfoodctf"
+        },
+        {
+          "text": "Easy Peasy",
+          "url": "https://tryhackme.com/room/easypeasyctf"
+        },
+        {
+          "text": "Tony the Tiger",
+          "url": "https://tryhackme.com/room/tonythetiger"
+        },
+        {
+          "text": "CTF collection Vol.1",
+          "url": "https://tryhackme.com/room/ctfcollectionvol1"
+        },
+        {
+          "text": "Smag Grotto",
+          "url": "https://tryhackme.com/room/smaggrotto"
+        },
+        {
+          "text": "Couch",
+          "url": "https://tryhackme.com/room/couch"
+        },
+        {
+          "text": "Source",
+          "url": "https://tryhackme.com/room/source"
+        },
+        {
+          "text": "Overpass",
+          "url": "https://tryhackme.com/room/overpass"
+        },
+        {
+          "text": "Gotta Catch&#39;em All!",
+          "url": "https://tryhackme.com/room/pokemon"
+        },
+        {
+          "text": "Bolt",
+          "url": "https://tryhackme.com/room/bolt"
+        },
+        {
+          "text": "Overpass 2 - Hacked",
+          "url": "https://tryhackme.com/room/overpass2hacked"
+        },
+        {
+          "text": "kiba",
+          "url": "https://tryhackme.com/room/kiba"
+        },
+        {
+          "text": "Poster",
+          "url": "https://tryhackme.com/room/poster"
+        },
+        {
+          "text": "Chocolate Factory",
+          "url": "https://tryhackme.com/room/chocolatefactory"
+        },
+        {
+          "text": "Startup",
+          "url": "https://tryhackme.com/room/startup"
+        },
+        {
+          "text": "Chill Hack",
+          "url": "https://tryhackme.com/room/chillhack"
+        },
+        {
+          "text": "ColddBox: Easy",
+          "url": "https://tryhackme.com/room/colddboxeasy"
+        },
+        {
+          "text": "GLITCH",
+          "url": "https://tryhackme.com/room/glitch"
+        },
+        {
+          "text": "All in One",
+          "url": "https://tryhackme.com/room/allinonemj"
+        },
+        {
+          "text": "Archangel",
+          "url": "https://tryhackme.com/room/archangel"
+        },
+        {
+          "text": "Cyborg",
+          "url": "https://tryhackme.com/room/cyborgt8"
+        },
+        {
+          "text": "Lunizz CTF",
+          "url": "https://tryhackme.com/room/lunizzctfnd"
+        },
+        {
+          "text": "Badbyte",
+          "url": "https://tryhackme.com/room/badbyte"
+        },
+        {
+          "text": "Team",
+          "url": "https://tryhackme.com/room/teamcw"
+        },
+        {
+          "text": "VulnNet: Node",
+          "url": "https://tryhackme.com/room/vulnnetnode"
+        },
+        {
+          "text": "VulnNet: Internal",
+          "url": "https://tryhackme.com/room/vulnnetinternal"
+        },
+        {
+          "text": "Atlas",
+          "url": "https://tryhackme.com/room/atlas"
+        },
+        {
+          "text": "VulnNet: Roasted",
+          "url": "https://tryhackme.com/room/vulnnetroasted"
+        },
+        {
+          "text": "Cat Pictures",
+          "url": "https://tryhackme.com/room/catpictures"
+        },
+        {
+          "text": "Mustacchio",
+          "url": "https://tryhackme.com/room/mustacchio"
+        }
+      ],
+      "blurb": "98 free TryHackMe rooms · Easy CTF"
+    },
+    {
+      "id": "thm-medium-ctf",
+      "title": "Medium CTF",
+      "source": "thm",
+      "steps": [
+        {
+          "text": "Backtrack",
+          "url": "https://tryhackme.com/room/backtrack"
+        },
+        {
+          "text": "Extracted",
+          "url": "https://tryhackme.com/room/extractedroom"
+        },
+        {
+          "text": "The London Bridge",
+          "url": "https://tryhackme.com/room/thelondonbridge"
+        },
+        {
+          "text": "Breakme",
+          "url": "https://tryhackme.com/room/breakmenu"
+        },
+        {
+          "text": "Block",
+          "url": "https://tryhackme.com/room/blockroom"
+        },
+        {
+          "text": "APIWizards Breach",
+          "url": "https://tryhackme.com/room/apiwizardsbreach"
+        },
+        {
+          "text": "New York Flankees",
+          "url": "https://tryhackme.com/room/thenewyorkflankees"
+        },
+        {
+          "text": "Airplane",
+          "url": "https://tryhackme.com/room/airplane"
+        },
+        {
+          "text": "Profiles",
+          "url": "https://tryhackme.com/room/profilesroom"
+        },
+        {
+          "text": "Clocky",
+          "url": "https://tryhackme.com/room/clocky"
+        },
+        {
+          "text": "Hack Smarter Security",
+          "url": "https://tryhackme.com/room/hacksmartersecurity"
+        },
+        {
+          "text": "Kitty",
+          "url": "https://tryhackme.com/room/kitty"
+        },
+        {
+          "text": "Umbrella",
+          "url": "https://tryhackme.com/room/umbrella"
+        },
+        {
+          "text": "AVenger",
+          "url": "https://tryhackme.com/room/avenger"
+        },
+        {
+          "text": "WhyHackMe",
+          "url": "https://tryhackme.com/room/whyhackme"
+        },
+        {
+          "text": "Stealth",
+          "url": "https://tryhackme.com/room/stealth"
+        },
+        {
+          "text": "Hunt Me I: Payment Collectors",
+          "url": "https://tryhackme.com/room/paymentcollectors"
+        },
+        {
+          "text": "Hunt Me II: Typo Squatters",
+          "url": "https://tryhackme.com/room/typosquatters"
+        },
+        {
+          "text": "Athena",
+          "url": "https://tryhackme.com/room/4th3n4"
+        },
+        {
+          "text": "Crylo",
+          "url": "https://tryhackme.com/room/crylo4a"
+        },
+        {
+          "text": "Forgotten Implant",
+          "url": "https://tryhackme.com/room/forgottenimplant"
+        },
+        {
+          "text": "Race Conditions",
+          "url": "https://tryhackme.com/room/raceconditions"
+        },
+        {
+          "text": "Weasel",
+          "url": "https://tryhackme.com/room/weasel"
+        },
+        {
+          "text": "Prioritise",
+          "url": "https://tryhackme.com/room/prioritise"
+        },
+        {
+          "text": "Boogeyman 1",
+          "url": "https://tryhackme.com/room/boogeyman1"
+        },
+        {
+          "text": "Mr Robot CTF",
+          "url": "https://tryhackme.com/room/mrrobot"
+        },
+        {
+          "text": "Unattended",
+          "url": "https://tryhackme.com/room/unattended"
+        },
+        {
+          "text": "GoldenEye",
+          "url": "https://tryhackme.com/room/goldeneye"
+        },
+        {
+          "text": "StuxCTF",
+          "url": "https://tryhackme.com/room/stuxctf"
+        },
+        {
+          "text": "Boiler CTF",
+          "url": "https://tryhackme.com/room/boilerctf2"
+        },
+        {
+          "text": "HA Joker CTF",
+          "url": "https://tryhackme.com/room/jokerctf"
+        },
+        {
+          "text": "Biohazard",
+          "url": "https://tryhackme.com/room/biohazard"
+        },
+        {
+          "text": "Break it",
+          "url": "https://tryhackme.com/room/breakit"
+        },
+        {
+          "text": "Willow",
+          "url": "https://tryhackme.com/room/willow"
+        },
+        {
+          "text": "The Marketplace",
+          "url": "https://tryhackme.com/room/marketplace"
+        },
+        {
+          "text": "Nax",
+          "url": "https://tryhackme.com/room/nax"
+        },
+        {
+          "text": "Mindgames",
+          "url": "https://tryhackme.com/room/mindgames"
+        },
+        {
+          "text": "Anonymous",
+          "url": "https://tryhackme.com/room/anonymous"
+        },
+        {
+          "text": "Blog",
+          "url": "https://tryhackme.com/room/blog"
+        },
+        {
+          "text": "Wonderland",
+          "url": "https://tryhackme.com/room/wonderland"
+        },
+        {
+          "text": "0day",
+          "url": "https://tryhackme.com/room/0day"
+        },
+        {
+          "text": "Develpy",
+          "url": "https://tryhackme.com/room/bsidesgtdevelpy"
+        },
+        {
+          "text": "CTF collection Vol.2",
+          "url": "https://tryhackme.com/room/ctfcollectionvol2"
+        },
+        {
+          "text": "CMesS",
+          "url": "https://tryhackme.com/room/cmess"
+        },
+        {
+          "text": "Deja Vu",
+          "url": "https://tryhackme.com/room/dejavu"
+        },
+        {
+          "text": "hackerNote",
+          "url": "https://tryhackme.com/room/hackernote"
+        },
+        {
+          "text": "dogcat",
+          "url": "https://tryhackme.com/room/dogcat"
+        },
+        {
+          "text": "ConvertMyVideo",
+          "url": "https://tryhackme.com/room/convertmyvideo"
+        },
+        {
+          "text": "KoTH Hackers",
+          "url": "https://tryhackme.com/room/kothhackers"
+        },
+        {
+          "text": "Revenge",
+          "url": "https://tryhackme.com/room/revenge"
+        },
+        {
+          "text": "harder",
+          "url": "https://tryhackme.com/room/harder"
+        },
+        {
+          "text": "HaskHell",
+          "url": "https://tryhackme.com/room/haskhell"
+        },
+        {
+          "text": "Undiscovered",
+          "url": "https://tryhackme.com/room/undiscoveredup"
+        },
+        {
+          "text": "Break Out The Cage",
+          "url": "https://tryhackme.com/room/breakoutthecage1"
+        },
+        {
+          "text": "The Impossible Challenge",
+          "url": "https://tryhackme.com/room/theimpossiblechallenge"
+        },
+        {
+          "text": "Looking Glass",
+          "url": "https://tryhackme.com/room/lookingglass"
+        },
+        {
+          "text": "Recovery",
+          "url": "https://tryhackme.com/room/recovery"
+        },
+        {
+          "text": "Relevant",
+          "url": "https://tryhackme.com/room/relevant"
+        },
+        {
+          "text": "Ghizer",
+          "url": "https://tryhackme.com/room/ghizerctf"
+        },
+        {
+          "text": "Mnemonic",
+          "url": "https://tryhackme.com/room/mnemonic"
+        },
+        {
+          "text": "WWBuddy",
+          "url": "https://tryhackme.com/room/wwbuddy"
+        },
+        {
+          "text": "The Blob Blog",
+          "url": "https://tryhackme.com/room/theblobblog"
+        },
+        {
+          "text": "Cooctus Stories",
+          "url": "https://tryhackme.com/room/cooctusadventures"
+        },
+        {
+          "text": "One Piece",
+          "url": "https://tryhackme.com/room/ctfonepiece65"
+        },
+        {
+          "text": "toc2",
+          "url": "https://tryhackme.com/room/toc2"
+        },
+        {
+          "text": "NerdHerd",
+          "url": "https://tryhackme.com/room/nerdherd"
+        },
+        {
+          "text": "Kubernetes Chall TDI 2020",
+          "url": "https://tryhackme.com/room/kuberneteschalltdi2020"
+        },
+        {
+          "text": "The Server From Hell",
+          "url": "https://tryhackme.com/room/theserverfromhell"
+        },
+        {
+          "text": "Jacob the Boss",
+          "url": "https://tryhackme.com/room/jacobtheboss"
+        },
+        {
+          "text": "Unbaked Pie",
+          "url": "https://tryhackme.com/room/unbakedpie"
+        },
+        {
+          "text": "Bookstore",
+          "url": "https://tryhackme.com/room/bookstoreoc"
+        },
+        {
+          "text": "Overpass 3 - Hosting",
+          "url": "https://tryhackme.com/room/overpass3hosting"
+        },
+        {
+          "text": "battery",
+          "url": "https://tryhackme.com/room/battery"
+        },
+        {
+          "text": "Madeye&#39;s Castle",
+          "url": "https://tryhackme.com/room/madeyescastle"
+        },
+        {
+          "text": "En-pass",
+          "url": "https://tryhackme.com/room/enpass"
+        },
+        {
+          "text": "Sustah",
+          "url": "https://tryhackme.com/room/sustah"
+        },
+        {
+          "text": "KaffeeSec - SoMeSINT",
+          "url": "https://tryhackme.com/room/somesint"
+        },
+        {
+          "text": "Tokyo Ghoul",
+          "url": "https://tryhackme.com/room/tokyoghoul666"
+        },
+        {
+          "text": "Watcher",
+          "url": "https://tryhackme.com/room/watcher"
+        },
+        {
+          "text": "broker",
+          "url": "https://tryhackme.com/room/broker"
+        },
+        {
+          "text": "Inferno",
+          "url": "https://tryhackme.com/room/inferno"
+        },
+        {
+          "text": "VulnNet: dotpy",
+          "url": "https://tryhackme.com/room/vulnnetdotpy"
+        },
+        {
+          "text": "Wekor",
+          "url": "https://tryhackme.com/room/wekorra"
+        },
+        {
+          "text": "pyLon",
+          "url": "https://tryhackme.com/room/pylonzf"
+        },
+        {
+          "text": "The Great Escape",
+          "url": "https://tryhackme.com/room/thegreatescape"
+        },
+        {
+          "text": "SafeZone",
+          "url": "https://tryhackme.com/room/safezone"
+        },
+        {
+          "text": "NahamStore",
+          "url": "https://tryhackme.com/room/nahamstore"
+        },
+        {
+          "text": "Sweettooth Inc.",
+          "url": "https://tryhackme.com/room/sweettoothinc"
+        },
+        {
+          "text": "Red Team OPSEC",
+          "url": "https://tryhackme.com/room/opsec"
+        },
+        {
+          "text": "CMSpit",
+          "url": "https://tryhackme.com/room/cmspit"
+        },
+        {
+          "text": "Super-Spam",
+          "url": "https://tryhackme.com/room/superspamr"
+        },
+        {
+          "text": "That&#39;s The Ticket",
+          "url": "https://tryhackme.com/room/thatstheticket"
+        },
+        {
+          "text": "Debug",
+          "url": "https://tryhackme.com/room/debug"
+        },
+        {
+          "text": "Red Stone One Carat",
+          "url": "https://tryhackme.com/room/redstoneonecarat"
+        },
+        {
+          "text": "Cold VVars",
+          "url": "https://tryhackme.com/room/coldvvars"
+        },
+        {
+          "text": "Metamorphosis",
+          "url": "https://tryhackme.com/room/metamorphosis"
+        },
+        {
+          "text": "SQHell",
+          "url": "https://tryhackme.com/room/sqhell"
+        },
+        {
+          "text": "Fortress",
+          "url": "https://tryhackme.com/room/fortress"
+        },
+        {
+          "text": "CyberCrafted",
+          "url": "https://tryhackme.com/room/cybercrafted"
+        },
+        {
+          "text": "Road",
+          "url": "https://tryhackme.com/room/road"
+        }
+      ],
+      "blurb": "100 free TryHackMe rooms · Medium CTF"
+    },
+    {
+      "id": "thm-hard-ctf",
+      "title": "Hard CTF",
+      "source": "thm",
+      "steps": [
+        {
+          "text": "CERTain Doom",
+          "url": "https://tryhackme.com/room/certaindoom"
+        },
+        {
+          "text": "Capture Returns",
+          "url": "https://tryhackme.com/room/capturereturns"
+        },
+        {
+          "text": "Chrome",
+          "url": "https://tryhackme.com/room/chrome"
+        },
+        {
+          "text": "Reset",
+          "url": "https://tryhackme.com/room/resetui"
+        },
+        {
+          "text": "Motunui",
+          "url": "https://tryhackme.com/room/motunui"
+        },
+        {
+          "text": "Spring",
+          "url": "https://tryhackme.com/room/spring"
+        },
+        {
+          "text": "Brainpan 1",
+          "url": "https://tryhackme.com/room/brainpan"
+        },
+        {
+          "text": "Borderlands",
+          "url": "https://tryhackme.com/room/borderlands"
+        },
+        {
+          "text": "hc0n Christmas CTF",
+          "url": "https://tryhackme.com/room/hc0nchristmasctf"
+        },
+        {
+          "text": "Daily Bugle",
+          "url": "https://tryhackme.com/room/dailybugle"
+        },
+        {
+          "text": "Retro",
+          "url": "https://tryhackme.com/room/retro"
+        },
+        {
+          "text": "Jeff",
+          "url": "https://tryhackme.com/room/jeff"
+        },
+        {
+          "text": "Racetrack Bank",
+          "url": "https://tryhackme.com/room/racetrackbank"
+        },
+        {
+          "text": "Dave&#39;s Blog",
+          "url": "https://tryhackme.com/room/davesblog"
+        },
+        {
+          "text": "CherryBlossom",
+          "url": "https://tryhackme.com/room/cherryblossom"
+        },
+        {
+          "text": "CCT2019",
+          "url": "https://tryhackme.com/room/cct2019"
+        },
+        {
+          "text": "Iron Corp",
+          "url": "https://tryhackme.com/room/ironcorp"
+        },
+        {
+          "text": "Carpe Diem 1",
+          "url": "https://tryhackme.com/room/carpediem1"
+        },
+        {
+          "text": "Ra",
+          "url": "https://tryhackme.com/room/ra"
+        },
+        {
+          "text": "Year of the Fox",
+          "url": "https://tryhackme.com/room/yotf"
+        },
+        {
+          "text": "For Business Reasons",
+          "url": "https://tryhackme.com/room/forbusinessreasons"
+        },
+        {
+          "text": "Anonymous Playground",
+          "url": "https://tryhackme.com/room/anonymousplayground"
+        },
+        {
+          "text": "Misguided Ghosts",
+          "url": "https://tryhackme.com/room/misguidedghosts"
+        },
+        {
+          "text": "Theseus",
+          "url": "https://tryhackme.com/room/theseus"
+        },
+        {
+          "text": "Internal",
+          "url": "https://tryhackme.com/room/internal"
+        },
+        {
+          "text": "Year of the Dog",
+          "url": "https://tryhackme.com/room/yearofthedog"
+        },
+        {
+          "text": "You&#39;re in a cave",
+          "url": "https://tryhackme.com/room/inacave"
+        },
+        {
+          "text": "Year of the Owl",
+          "url": "https://tryhackme.com/room/yearoftheowl"
+        },
+        {
+          "text": "Year of the Pig",
+          "url": "https://tryhackme.com/room/yearofthepig"
+        },
+        {
+          "text": "envizon",
+          "url": "https://tryhackme.com/room/envizon"
+        },
+        {
+          "text": "GameBuzz",
+          "url": "https://tryhackme.com/room/gamebuzz"
+        },
+        {
+          "text": "Fusion Corp",
+          "url": "https://tryhackme.com/room/fusioncorp"
+        },
+        {
+          "text": "Crocc Crew",
+          "url": "https://tryhackme.com/room/crocccrew"
+        },
+        {
+          "text": "Uranium CTF",
+          "url": "https://tryhackme.com/room/uranium"
+        },
+        {
+          "text": "Year of the Jellyfish",
+          "url": "https://tryhackme.com/room/yearofthejellyfish"
+        },
+        {
+          "text": "Rocket",
+          "url": "https://tryhackme.com/room/rocket"
+        },
+        {
+          "text": "Squid Game",
+          "url": "https://tryhackme.com/room/squidgameroom"
+        },
+        {
+          "text": "EnterPrize",
+          "url": "https://tryhackme.com/room/enterprize"
+        },
+        {
+          "text": "Different CTF",
+          "url": "https://tryhackme.com/room/adana"
+        },
+        {
+          "text": "VulnNet: dotjar",
+          "url": "https://tryhackme.com/room/vulnnetdotjar"
+        },
+        {
+          "text": "M4tr1x: Exit Denied",
+          "url": "https://tryhackme.com/room/m4tr1xexitdenied"
+        },
+        {
+          "text": "Shaker",
+          "url": "https://tryhackme.com/room/shaker"
+        }
+      ],
+      "blurb": "42 free TryHackMe rooms · Hard CTF"
+    },
+    {
+      "id": "thm-insane-ctf",
+      "title": "Insane CTF",
+      "source": "thm",
+      "steps": [
+        {
+          "text": "Frosteau Busy with Vim",
+          "url": "https://tryhackme.com/room/busyvimfrosteau"
+        }
+      ],
+      "blurb": "1 free TryHackMe room · Insane CTF"
+    },
+    {
+      "id": "thm-misc",
+      "title": "Misc",
+      "source": "thm",
+      "steps": [
+        {
+          "text": "PaperCut: CVE-2023-27350",
+          "url": "https://tryhackme.com/room/papercut"
+        },
+        {
+          "text": "Moniker Link (CVE-2024-21413)",
+          "url": "https://tryhackme.com/room/monikerlink"
+        },
+        {
+          "text": "Confluence CVE-2023-22515",
+          "url": "https://tryhackme.com/room/confluence202322515"
+        },
+        {
+          "text": "GitLab CVE-2023-7028",
+          "url": "https://tryhackme.com/room/gitlabcve20237028"
+        },
+        {
+          "text": "Cactus",
+          "url": "https://tryhackme.com/room/cactus"
+        },
+        {
+          "text": "Looney Tunables",
+          "url": "https://tryhackme.com/room/looneytunes"
+        },
+        {
+          "text": "Threat Intel & Containment",
+          "url": "https://tryhackme.com/room/intelcreationandcontainment"
+        },
+        {
+          "text": "CVE-2023-38408",
+          "url": "https://tryhackme.com/room/cve202338408"
+        },
+        {
+          "text": "Introduction to Django",
+          "url": "https://tryhackme.com/room/django"
+        },
+        {
+          "text": "Git Happens",
+          "url": "https://tryhackme.com/room/githappens"
+        },
+        {
+          "text": "Meltdown Explained",
+          "url": "https://tryhackme.com/room/meltdownexplained"
+        },
+        {
+          "text": "Splunk",
+          "url": "https://tryhackme.com/room/bpsplunk"
+        },
+        {
+          "text": "Linux Backdoors",
+          "url": "https://tryhackme.com/room/linuxbackdoors"
+        },
+        {
+          "text": "Jupyter 101",
+          "url": "https://tryhackme.com/room/jupyter101"
+        },
+        {
+          "text": "Geolocating Images",
+          "url": "https://tryhackme.com/room/geolocatingimages"
+        },
+        {
+          "text": "Tor",
+          "url": "https://tryhackme.com/room/torforbeginners"
+        },
+        {
+          "text": "tomghost",
+          "url": "https://tryhackme.com/room/tomghost"
+        },
+        {
+          "text": "DLL HIJACKING",
+          "url": "https://tryhackme.com/room/dllhijacking"
+        },
+        {
+          "text": "Intro to IoT Pentesting",
+          "url": "https://tryhackme.com/room/iotintro"
+        },
+        {
+          "text": "Attacking ICS Plant #1",
+          "url": "https://tryhackme.com/room/attackingics1"
+        },
+        {
+          "text": "Attacking ICS Plant #2",
+          "url": "https://tryhackme.com/room/attackingics2"
+        },
+        {
+          "text": "Printer Hacking 101",
+          "url": "https://tryhackme.com/room/printerhacking101"
+        },
+        {
+          "text": "DNS Manipulation",
+          "url": "https://tryhackme.com/room/dnsmanipulation"
+        },
+        {
+          "text": "Introduction to Flask",
+          "url": "https://tryhackme.com/room/flask"
+        },
+        {
+          "text": "MITRE",
+          "url": "https://tryhackme.com/room/mitre"
+        },
+        {
+          "text": "magician",
+          "url": "https://tryhackme.com/room/magician"
+        },
+        {
+          "text": "JPGChat",
+          "url": "https://tryhackme.com/room/jpgchat"
+        },
+        {
+          "text": "Baron Samedit",
+          "url": "https://tryhackme.com/room/sudovulnssamedit"
+        },
+        {
+          "text": "CVE-2021-41773/42013",
+          "url": "https://tryhackme.com/room/cve202141773"
+        },
+        {
+          "text": "Binary Heaven",
+          "url": "https://tryhackme.com/room/binaryheaven"
+        },
+        {
+          "text": "Git and Crumpets",
+          "url": "https://tryhackme.com/room/gitandcrumpets"
+        },
+        {
+          "text": "Polkit: CVE-2021-3560",
+          "url": "https://tryhackme.com/room/polkit"
+        },
+        {
+          "text": "Hip Flask",
+          "url": "https://tryhackme.com/room/hipflask"
+        },
+        {
+          "text": "Bypass Disable Functions",
+          "url": "https://tryhackme.com/room/bypassdisablefunctions"
+        },
+        {
+          "text": "Wordpress: CVE-2021-29447",
+          "url": "https://tryhackme.com/room/wordpresscve202129447"
+        },
+        {
+          "text": "Linux Function Hooking",
+          "url": "https://tryhackme.com/room/linuxfunctionhooking"
+        },
+        {
+          "text": "REvil Corp",
+          "url": "https://tryhackme.com/room/revilcorp"
+        },
+        {
+          "text": "Sudo Buffer Overflow",
+          "url": "https://tryhackme.com/room/sudovulnsbof"
+        },
+        {
+          "text": "Sudo Security Bypass",
+          "url": "https://tryhackme.com/room/sudovulnsbypass"
+        },
+        {
+          "text": "Solar, exploiting log4j",
+          "url": "https://tryhackme.com/room/solar"
+        },
+        {
+          "text": "Conti",
+          "url": "https://tryhackme.com/room/contiransomwarehgh"
+        },
+        {
+          "text": "Dirty Pipe: CVE-2022-0847",
+          "url": "https://tryhackme.com/room/dirtypipe"
+        },
+        {
+          "text": "The find command",
+          "url": "https://tryhackme.com/room/thefindcommand"
+        }
+      ],
+      "blurb": "43 free TryHackMe rooms · Misc"
+    },
+    {
+      "id": "thm-special-events",
+      "title": "Special Events",
+      "source": "thm",
+      "steps": [
+        {
+          "text": "25 Days of Cyber Security",
+          "url": "https://tryhackme.com/room/learncyberin25days"
+        },
+        {
+          "text": "Advent of Cyber 3 (2021)",
+          "url": "https://tryhackme.com/room/adventofcyber3"
+        },
+        {
+          "text": "Advent of Cyber 2022",
+          "url": "https://tryhackme.com/room/adventofcyber4"
+        },
+        {
+          "text": "Advent of Cyber 2023",
+          "url": "https://tryhackme.com/room/adventofcyber2023"
+        },
+        {
+          "text": "Advent of Cyber 2024",
+          "url": "https://tryhackme.com/room/adventofcyber2024"
+        },
+        {
+          "text": "Advent of Cyber '23 Side Quest",
+          "url": "https://tryhackme.com/room/adventofcyber23sidequest"
+        },
+        {
+          "text": "Cyber Scotland 2021",
+          "url": "https://tryhackme.com/room/cyberweek2021"
+        },
+        {
+          "text": "Hacker of the Hill #1",
+          "url": "https://tryhackme.com/room/hackerofthehill"
+        },
+        {
+          "text": "Learn and win prizes",
+          "url": "https://tryhackme.com/room/tickets1"
+        },
+        {
+          "text": "Learn and win prizes #2",
+          "url": "https://tryhackme.com/room/tickets2"
+        }
+      ],
+      "blurb": "10 free TryHackMe rooms · Special Events"
+    }
+  ]
+}

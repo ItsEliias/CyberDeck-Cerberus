@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 from pathlib import Path
 
 from flask import Blueprint, jsonify, request
@@ -16,6 +17,27 @@ STORE = Path(os.environ.get(
     "CYBERDECK_PATHS",
     str(Path(__file__).resolve().parents[2] / "data" / "paths.json"),
 ))
+
+
+def _load_bundled(rel: str) -> dict:
+    """Read a JSON asset bundled under app/static (works frozen + in dev)."""
+    candidates = [Path(__file__).resolve().parents[1] / "static" / rel]
+    meipass = getattr(sys, "_MEIPASS", None)
+    if meipass:
+        candidates.append(Path(meipass) / "static" / rel)
+    for c in candidates:
+        try:
+            if c.exists():
+                return json.loads(c.read_text("utf-8"))
+        except Exception:
+            break
+    return {}
+
+
+# Extra paths imported from the TryHackMe roadmap (CC0, Hunterdii/TryHackMe-Roadmap).
+_THM = _load_bundled("roadmaps/thm-roadmap.json")
+THM_PATHS = _THM.get("paths", [])
+THM_SOURCE = _THM.get("source", "")
 
 PATHS = [
     {"id": "web-pentest", "title": "Web App Pentester",
@@ -45,6 +67,9 @@ PATHS = [
      ]},
 ]
 
+# Curated paths first, then the TryHackMe roadmap topics.
+PATHS = PATHS + THM_PATHS
+
 
 def _runs() -> dict:
     if STORE.exists():
@@ -68,8 +93,8 @@ def list_paths():
         st = runs.get(p["id"], {})
         done = sum(1 for i in range(len(p["steps"])) if st.get(str(i)))
         out.append({"id": p["id"], "title": p["title"], "blurb": p["blurb"],
-                    "total": len(p["steps"]), "done": done})
-    return jsonify(paths=out)
+                    "total": len(p["steps"]), "done": done, "source": p.get("source", "core")})
+    return jsonify(paths=out, thm_source=THM_SOURCE)
 
 
 @bp.route("/<pid>")
@@ -78,9 +103,11 @@ def detail(pid):
     if not p:
         return jsonify(error="not found"), 404
     st = _runs().get(pid, {})
-    steps = [{"i": i, "text": s["text"], "nav": s.get("nav"), "done": bool(st.get(str(i)))}
+    steps = [{"i": i, "text": s["text"], "nav": s.get("nav"), "url": s.get("url"),
+              "done": bool(st.get(str(i)))}
              for i, s in enumerate(p["steps"])]
     return jsonify(id=pid, title=p["title"], blurb=p["blurb"], steps=steps,
+                   source=p.get("source", "core"),
                    total=len(steps), done=sum(1 for s in steps if s["done"]))
 
 

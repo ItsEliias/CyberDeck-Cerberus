@@ -735,7 +735,18 @@ body.deck-reduce-motion *, body.deck-reduce-motion *::before, body.deck-reduce-m
 .lp-step--done .lp-check { background: color-mix(in srgb, var(--deck-accent) 20%, transparent); border-color: var(--deck-accent); }
 .lp-step-text { flex: 1; font-size: 13px; }
 .lp-step--done .lp-step-text { text-decoration: line-through; opacity: .6; }
-.lp-go { flex-shrink: 0; font-size: 11px; }
+.lp-step-link { color: var(--fg); text-decoration: none; }
+.lp-step-link:hover { color: var(--deck-accent); text-decoration: underline; }
+.lp-go { flex-shrink: 0; font-size: 11px; text-decoration: none; }
+
+/* TryHackMe roadmap group in the paths list */
+.lp-group { margin: 22px 0 12px; padding-top: 16px; border-top: 1px solid var(--border); }
+.lp-group-t { display: block; font-family: 'Fira Code', monospace; font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--deck-accent); text-shadow: 0 0 12px color-mix(in srgb, var(--deck-accent) 40%, transparent); }
+.lp-group-sub { display: block; font-size: 12px; opacity: .6; margin-top: 4px; }
+.lp-src { color: var(--deck-accent); text-decoration: none; }
+.lp-src:hover { text-decoration: underline; }
+.lp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; }
+.lp-grid .lp-card { margin-bottom: 0; }
 
 /* Journal */
 .jn-entry { border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; margin-bottom: 10px; background: var(--panel); }
