@@ -14,11 +14,13 @@
   function showDecks() {
     session = null;
     root.innerHTML = '<div class="co-head"><span class="co-title">Flashcards</span>' +
-      '<button class="co-btn" id="fc-gen" style="margin-left:auto;">Generate from note</button>' +
+      '<button class="co-btn" id="fc-anki" style="margin-left:auto;">Anki ⇄</button>' +
+      '<button class="co-btn" id="fc-gen" style="margin-left:8px;">Generate from note</button>' +
       '<button class="co-btn co-btn--primary" id="fc-add" style="margin-left:8px;">+ Card</button></div>' +
       '<div class="co-body"><div id="fc-decks"><div class="kb-loading">Loading…</div></div></div>';
     root.querySelector('#fc-add').addEventListener('click', function () { addCardModal(); });
     root.querySelector('#fc-gen').addEventListener('click', genModal);
+    root.querySelector('#fc-anki').addEventListener('click', showAnki);
     get('/api/flashcards/decks').then(function (d) {
       var box = root.querySelector('#fc-decks');
       var due = d.decks.reduce(function (a, x) { return a + x.due; }, 0);
@@ -33,6 +35,27 @@
       box.addEventListener('click', function (e) {
         var r = e.target.closest('.fc-review, .fc-reviewall'); if (r) startReview(r.getAttribute('data-deck'));
       });
+    });
+  }
+
+  function showAnki() {
+    root.innerHTML = '<div class="co-head"><button class="co-btn" id="fc-anki-back">← Decks</button><span class="co-title" style="margin-left:10px;">Anki import / export</span></div>' +
+      '<div class="co-body"><div class="deck-panel-title" style="margin:4px 0 8px;">Export</div>' +
+      '<p class="co-muted">Copy this, save as a <code>.txt</code>, then in Anki: File → Import (fields separated by Tab).</p>' +
+      '<div class="co-row" style="margin-bottom:8px;"><button class="co-btn co-btn--primary" id="fc-exp">Load export</button><span id="fc-exp-msg" class="co-muted" style="margin-left:8px;"></span></div>' +
+      '<pre class="md-fallback" id="fc-exp-out" style="max-height:180px;overflow:auto;"></pre>' +
+      '<div class="deck-panel-title" style="margin:22px 0 8px;">Import</div>' +
+      '<p class="co-muted">Paste tab- or comma-separated <code>front⇥back</code> lines (one per card) — or an Anki text export.</p>' +
+      '<label class="co-label">Deck name</label><input id="fc-imp-deck" class="co-input" value="Imported" />' +
+      '<textarea id="fc-imp" class="tk-in" style="margin-top:8px;" placeholder="What is XSS?&#9;Cross-site scripting"></textarea>' +
+      '<div class="co-row" style="margin-top:10px;"><button class="co-btn co-btn--primary" id="fc-imp-go">Import</button><span id="fc-imp-msg" class="co-muted" style="margin-left:8px;"></span></div></div>';
+    root.querySelector('#fc-anki-back').addEventListener('click', showDecks);
+    root.querySelector('#fc-exp').addEventListener('click', function () {
+      get('/api/flashcards/export').then(function (d) { root.querySelector('#fc-exp-out').textContent = d.tsv; root.querySelector('#fc-exp-msg').textContent = d.count + ' cards'; });
+    });
+    root.querySelector('#fc-imp-go').addEventListener('click', function () {
+      post('/api/flashcards/import', { text: root.querySelector('#fc-imp').value, deck: root.querySelector('#fc-imp-deck').value.trim() })
+        .then(function (d) { root.querySelector('#fc-imp-msg').textContent = 'Added ' + (d.added || 0) + ' cards ✓'; });
     });
   }
 

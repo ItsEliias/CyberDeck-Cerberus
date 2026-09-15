@@ -12,3 +12,5 @@ pywebview>=3.4
 # weasyprint>=60       # report PDF export
 html2text>=2020.1.16
 certifi
+pypdf
+youtube-transcript-api

@@ -48,6 +48,7 @@ def _persist_data_env() -> None:
         "CYBERDECK_SNIPPETS": "snippets.json", "CYBERDECK_REPORTS": "reports",
         "CYBERDECK_COURSES": "courses", "CYBERDECK_RESOURCES": "resources.json",
         "CYBERDECK_RATINGS": "ratings.json", "CYBERDECK_PATHS": "paths.json",
+        "CYBERDECK_JOURNAL": "journal.json",
     }
     for var, sub in mapping.items():
         os.environ.setdefault(var, str(root / sub))

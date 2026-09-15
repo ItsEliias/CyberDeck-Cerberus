@@ -92,7 +92,7 @@
       '<input id="co-url-title" class="co-input" placeholder="Auto-detected from the page" />' +
       '<label class="co-check" style="margin-top:10px;"><input type="checkbox" id="co-crawl"> Crawl linked pages in the same section (whole guide, up to 40 pages)</label>' +
       '<div class="co-row" style="margin-top:12px;"><button class="co-btn co-btn--primary" id="co-url-go">Fetch &amp; import</button></div>' +
-      '<div class="co-muted">Fetches a freely-accessible page (article, lesson, cheat sheet) and saves it as a markdown course. With crawl on, it follows same-section links to pull a whole multi-page guide. Pages behind a login or paywall won\'t work.</div>' +
+      '<div class="co-muted">Fetches a freely-accessible page (article, lesson, cheat sheet) and saves it as a markdown course. A <b>YouTube</b> link imports the video transcript. With crawl on, it follows same-section links to pull a whole multi-page guide. Pages behind a login or paywall won\'t work.</div>' +
       '<div id="co-url-res"></div>' +
       '<div class="co-rec"><div class="co-rec-head"><span>Recommended — OWASP Cheat Sheets (free, CC-BY-SA)</span>' +
       '<button class="co-btn" id="co-rec-all">Import all</button></div>' + rows + '</div>' +
@@ -104,9 +104,10 @@
     function go() {
       var url = urlEl.value.trim();
       if (!/^https?:\/\//i.test(url)) { res.innerHTML = '<div class="co-warn">Enter a full http(s):// URL.</div>'; return; }
-      var crawl = root.querySelector('#co-crawl').checked;
-      res.innerHTML = '<div class="kb-loading">' + (crawl ? 'Crawling the section (this can take a minute)…' : 'Fetching…') + '</div>';
-      post('/api/courses/fetch-url', { url: url, title: titleEl.value.trim(), crawl: crawl }).then(function (d) {
+      var yt = /youtube\.com|youtu\.be/i.test(url);
+      var crawl = !yt && root.querySelector('#co-crawl').checked;
+      res.innerHTML = '<div class="kb-loading">' + (yt ? 'Fetching transcript…' : crawl ? 'Crawling the section (this can take a minute)…' : 'Fetching…') + '</div>';
+      post(yt ? '/api/courses/youtube' : '/api/courses/fetch-url', { url: url, title: titleEl.value.trim(), crawl: crawl }).then(function (d) {
         if (d.course) showDetail(d.course.id);
         else res.innerHTML = '<div class="co-warn">' + esc(d.error || 'Import failed.') + '</div>';
       }).catch(function () { res.innerHTML = '<div class="co-warn">Import failed.</div>'; });
@@ -208,7 +209,27 @@
     if (cat === 'video') { pane.innerHTML = head + '<video class="co-media" src="' + url + '" controls></video>'; return; }
     if (cat === 'audio') { pane.innerHTML = head + '<audio class="co-media" src="' + url + '" controls></audio>'; return; }
     if (cat === 'images') { pane.innerHTML = head + '<img class="co-media" src="' + url + '">'; return; }
-    if (/\.pdf$/i.test(name)) { pane.innerHTML = head + '<iframe class="co-frame" src="' + url + '"></iframe>'; return; }
+    if (/\.pdf$/i.test(name)) {
+      pane.innerHTML = head + '<div class="co-fc-bar"><button class="co-btn" id="co-pdf-fc">⚡ Make flashcards</button><span id="co-pdf-msg" class="co-muted"></span></div>' +
+        '<iframe class="co-frame" src="' + url + '"></iframe>';
+      var pmsg = pane.querySelector('#co-pdf-msg');
+      pane.querySelector('#co-pdf-fc').addEventListener('click', function () {
+        pmsg.textContent = 'Extracting text…';
+        fetch('/api/courses/pdf-text/' + encodeURIComponent(cid) + '?path=' + encodeURIComponent(path)).then(function (r) { return r.json(); }).then(function (pd) {
+          if (pd.error || !pd.text) { pmsg.textContent = pd.error || 'No selectable text (scanned PDF?)'; return; }
+          post('/api/flashcards/generate', { text: pd.text, deck: curCourseTitle || name }).then(function (g) {
+            var cards = g.proposed || [];
+            if (!cards.length) { pmsg.textContent = 'No clear Q&A found in this PDF.'; return; }
+            pmsg.innerHTML = 'Proposed ' + cards.length + ' — <button class="co-btn co-btn--primary" id="co-pdf-save">Save to “' + esc(g.deck) + '”</button>';
+            pane.querySelector('#co-pdf-save').addEventListener('click', function () {
+              var saved = 0;
+              cards.reduce(function (ch, cd) { return ch.then(function () { return post('/api/flashcards/card', { front: cd.front, back: cd.back, deck: g.deck }).then(function () { saved++; }); }); }, Promise.resolve()).then(function () { pmsg.textContent = 'Saved ' + saved + ' ✓'; });
+            });
+          });
+        }).catch(function () { pmsg.textContent = 'Extraction failed.'; });
+      });
+      return;
+    }
     if (cat === 'notes' || cat === 'code' || /\.(txt|srt|vtt|csv)$/i.test(name)) {
       pane.innerHTML = head + '<div class="kb-loading">Loading…</div>';
       fetch(url).then(function (r) { return r.text(); }).then(function (t) {

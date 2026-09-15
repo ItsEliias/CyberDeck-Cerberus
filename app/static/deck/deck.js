@@ -35,7 +35,8 @@
     resources: '<path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>',
     toolkit: '<path d="M14.7 6.3a4 4 0 0 0-5.4 5.3L3 18v3h3l6.4-6.3a4 4 0 0 0 5.3-5.4l-2.6 2.6-2-2z"/>',
     quiz: '<circle cx="12" cy="12" r="9"/><path d="M9.1 9.5a3 3 0 0 1 5.6 1.2c0 1.8-2.7 2.3-2.7 3.8"/><line x1="12" y1="17.5" x2="12" y2="17.5"/>',
-    paths: '<circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h6a4 4 0 0 0 0-8H10a4 4 0 0 1 0-8h6"/>'
+    paths: '<circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h6a4 4 0 0 0 0-8H10a4 4 0 0 1 0-8h6"/>',
+    journal: '<path d="M4 4a2 2 0 0 1 2-2h12v18H6a2 2 0 0 0-2 2z"/><line x1="8" y1="7" x2="15" y2="7"/><line x1="8" y1="11" x2="15" y2="11"/>'
   };
   function svg(key, size) {
     size = size || 16;
@@ -58,6 +59,7 @@
     { id: 'board', label: 'Attack Board', blurb: 'Kanban of attack progress' },
     { id: 'scan', label: 'Scan Import', blurb: 'Parse nmap/gobuster → targets' },
     { id: 'sessions', label: 'Sessions', blurb: 'CTF/box tracker + timer' },
+    { id: 'journal', label: 'Journal', blurb: 'Lab log + write-ups' },
     { id: 'topology', label: 'Topology', blurb: 'Host graph' },
     { id: 'reports', label: 'Reports', blurb: 'Draft + export' },
     { id: 'credentials', label: 'Credentials', blurb: 'Encrypted vault' },
@@ -167,7 +169,7 @@
     var html = '<div class="section"><div class="section-header-flex"><span class="section-title">Study</span></div>';
     ['home', 'courses', 'paths', 'knowledge', 'playbooks', 'flashcards', 'quiz', 'progress'].forEach(function (id) { html += navItem(id); });
     html += '</div><div class="section"><div class="section-header-flex"><span class="section-title">Engagement</span></div>';
-    ['sessions', 'netlab', 'targets', 'board', 'scan', 'topology', 'reports', 'credentials'].forEach(function (id) { html += navItem(id); });
+    ['sessions', 'journal', 'netlab', 'targets', 'board', 'scan', 'topology', 'reports', 'credentials'].forEach(function (id) { html += navItem(id); });
     html += '</div><div class="section"><div class="section-header-flex"><span class="section-title">Feeds &amp; tools</span></div>';
     ['snippets', 'toolkit', 'resources', 'feeds', 'terminal'].forEach(function (id) { html += navItem(id); });
     html += '</div>';

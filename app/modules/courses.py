@@ -349,3 +349,70 @@ def serve_file(cid):
     if not target.is_file():
         abort(404)
     return send_file(str(target))
+
+
+@bp.route("/pdf-text/<cid>")
+def pdf_text(cid):
+    """Extract text from a PDF in a course's folder (for → flashcards)."""
+    rec = _record(cid)
+    if not rec:
+        return jsonify(error="not found"), 404
+    root = Path(rec["source"]).resolve()
+    rel = (request.args.get("path") or "").lstrip("/\\")
+    target = (root / rel).resolve()
+    if target != root and root not in target.parents:
+        return jsonify(error="forbidden"), 403
+    if not target.is_file() or target.suffix.lower() != ".pdf":
+        return jsonify(error="not a pdf"), 400
+    try:
+        import pypdf
+        reader = pypdf.PdfReader(str(target))
+        pages = []
+        for i, pg in enumerate(reader.pages):
+            if i >= 80:
+                break
+            pages.append(pg.extract_text() or "")
+        text = "\n\n".join(pages).strip()
+    except Exception as e:
+        return jsonify(error=f"could not read pdf: {e}"), 500
+    return jsonify(text=text, chars=len(text))
+
+
+_YT_RE = re.compile(r"(?:youtube\.com/watch\?v=|youtu\.be/|youtube\.com/embed/|youtube\.com/shorts/)([\w-]{11})")
+
+
+@bp.route("/youtube", methods=["POST"])
+def youtube():
+    """Import a YouTube video's transcript as a course (online)."""
+    data = request.get_json(silent=True) or {}
+    url = (data.get("url") or "").strip()
+    m = _YT_RE.search(url)
+    if not m:
+        return jsonify(error="not a recognised YouTube URL"), 400
+    vid = m.group(1)
+    try:
+        from youtube_transcript_api import YouTubeTranscriptApi
+        fetched = YouTubeTranscriptApi().fetch(vid)
+        rows = fetched.to_raw_data() if hasattr(fetched, "to_raw_data") else list(fetched)
+        text = " ".join((r.get("text") if isinstance(r, dict) else getattr(r, "text", "")) for r in rows).strip()
+    except Exception as e:
+        return jsonify(error=f"transcript unavailable: {e}"), 502
+    if not text:
+        return jsonify(error="no transcript found for this video"), 422
+
+    title = (data.get("title") or "").strip() or ("YouTube " + vid)
+    COURSES_DIR.mkdir(parents=True, exist_ok=True)
+    cid = base = _slug(title)
+    i = 2
+    while (COURSES_DIR / f"{cid}.json").exists():
+        cid = f"{base}-{i}"; i += 1
+    web_dir = COURSES_DIR / "_web" / cid
+    web_dir.mkdir(parents=True, exist_ok=True)
+    stamp = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    (web_dir / "transcript.md").write_text(f"# {title}\n\n> Transcript of {url}\n> {stamp}\n\n{text}\n", "utf-8")
+    counts = scan_folder(web_dir, {"notes"})
+    rec = {"id": cid, "title": title, "source": str(web_dir.resolve()), "categories": ["notes"],
+           "total": counts["total"], "counts": {c: b["count"] for c, b in counts["categories"].items()},
+           "imported_at": stamp, "url": url, "kind": "youtube"}
+    (COURSES_DIR / f"{cid}.json").write_text(json.dumps(rec, indent=2), "utf-8")
+    return jsonify(course=rec)

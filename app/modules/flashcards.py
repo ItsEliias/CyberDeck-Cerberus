@@ -353,6 +353,44 @@ def quiz_history():
     return jsonify(history=list(reversed(_load().get("quizzes", [])))[:8])
 
 
+# ── Anki interop (tab-separated, which Anki imports/exports natively) ──────────
+@bp.route("/export")
+def export_tsv():
+    deck = request.args.get("deck")
+    d = _load()
+    rows = [c for c in d["cards"] if not deck or c.get("deck") == deck]
+
+    def clean(s):
+        return str(s or "").replace("\t", " ").replace("\r", " ").replace("\n", "<br>")
+
+    tsv = "\n".join(clean(c.get("front")) + "\t" + clean(c.get("back")) for c in rows)
+    return jsonify(tsv=tsv, count=len(rows))
+
+
+@bp.route("/import", methods=["POST"])
+def import_tsv():
+    data = request.get_json(silent=True) or {}
+    text = data.get("text") or ""
+    deck = (data.get("deck") or "Imported").strip() or "Imported"
+    d = _load()
+    added = 0
+    for line in text.splitlines():
+        line = line.rstrip("\n")
+        if not line.strip():
+            continue
+        parts = line.split("\t") if "\t" in line else line.split(",", 1)
+        if len(parts) < 2:
+            continue
+        front = parts[0].strip().replace("<br>", "\n")
+        back = parts[1].strip().replace("<br>", "\n")
+        if front and back:
+            d["cards"].append(_seed_card(deck, front, back))
+            added += 1
+    if added:
+        _save(d)
+    return jsonify(ok=True, added=added)
+
+
 # ── Generator (#4) ─────────────────────────────────────────────────────────────
 _DEF = re.compile(r"^\s*[-*]?\s*\*\*(.+?)\*\*\s*[—:\-]\s*(.+?)\s*$")
 _DEF2 = re.compile(r"^\s*[-*]\s+([A-Z][\w /()+-]{2,40}?):\s+(.+?)\s*$")

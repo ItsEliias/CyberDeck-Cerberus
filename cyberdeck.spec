@@ -8,7 +8,8 @@ datas = [("app/static", "static"), ("app/templates", "templates")]
 hiddenimports = (
     collect_submodules("webview")   # native webview backends (cocoa / winforms / gtk)
     + collect_submodules("modules")  # every Flask blueprint
-    + ["flask", "jinja2", "markdown", "cryptography", "html2text", "certifi"]
+    + ["flask", "jinja2", "markdown", "cryptography", "html2text", "certifi", "pypdf"]
+    + collect_submodules("youtube_transcript_api")
 )
 
 a = Analysis(

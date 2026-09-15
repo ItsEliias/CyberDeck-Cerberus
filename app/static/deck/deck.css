@@ -625,3 +625,11 @@ body.deck-reduce-motion *, body.deck-reduce-motion *::before, body.deck-reduce-m
 .lp-step-text { flex: 1; font-size: 13px; }
 .lp-step--done .lp-step-text { text-decoration: line-through; opacity: .6; }
 .lp-go { flex-shrink: 0; font-size: 11px; }
+
+/* Journal */
+.jn-entry { border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; margin-bottom: 10px; background: var(--panel); }
+.jn-top { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.jn-target { font-family: 'Fira Code', monospace; font-size: 11px; color: var(--deck-accent); background: color-mix(in srgb, var(--deck-accent) 12%, transparent); padding: 2px 8px; border-radius: 5px; }
+.jn-title { font-weight: 600; font-size: 13px; }
+.jn-time { margin-left: auto; font-size: 11px; opacity: .5; font-family: 'Fira Code', monospace; }
+.jn-body { font-size: 13px; white-space: pre-wrap; line-height: 1.5; opacity: .9; }
