@@ -36,7 +36,10 @@
     toolkit: '<path d="M14.7 6.3a4 4 0 0 0-5.4 5.3L3 18v3h3l6.4-6.3a4 4 0 0 0 5.3-5.4l-2.6 2.6-2-2z"/>',
     quiz: '<circle cx="12" cy="12" r="9"/><path d="M9.1 9.5a3 3 0 0 1 5.6 1.2c0 1.8-2.7 2.3-2.7 3.8"/><line x1="12" y1="17.5" x2="12" y2="17.5"/>',
     paths: '<circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h6a4 4 0 0 0 0-8H10a4 4 0 0 1 0-8h6"/>',
-    journal: '<path d="M4 4a2 2 0 0 1 2-2h12v18H6a2 2 0 0 0-2 2z"/><line x1="8" y1="7" x2="15" y2="7"/><line x1="8" y1="11" x2="15" y2="11"/>'
+    journal: '<path d="M4 4a2 2 0 0 1 2-2h12v18H6a2 2 0 0 0-2 2z"/><line x1="8" y1="7" x2="15" y2="7"/><line x1="8" y1="11" x2="15" y2="11"/>',
+    glossary: '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><line x1="8" y1="7" x2="16" y2="7"/>',
+    map: '<circle cx="5" cy="6" r="2.5"/><circle cx="19" cy="9" r="2.5"/><circle cx="9" cy="18" r="2.5"/><path d="M7.2 7.2l9.6 1.6M7.6 16.1l9.8-6.6"/>',
+    cheatsheets: '<rect x="4" y="3" width="16" height="18" rx="2"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="13" y2="16"/>'
   };
   function svg(key, size) {
     size = size || 16;
@@ -50,6 +53,8 @@
     { id: 'courses', label: 'Courses', blurb: 'Structured study' },
     { id: 'paths', label: 'Learning Paths', blurb: 'Guided roadmaps' },
     { id: 'knowledge', label: 'Knowledge', blurb: 'Your vault, Obsidian-style' },
+    { id: 'glossary', label: 'Glossary', blurb: 'Auto term bank' },
+    { id: 'map', label: 'Map', blurb: 'Note link graph' },
     { id: 'playbooks', label: 'Playbooks', blurb: 'Repeatable procedures' },
     { id: 'flashcards', label: 'Flashcards', blurb: 'Spaced-repetition review' },
     { id: 'quiz', label: 'Quiz', blurb: 'Test yourself (MCQ)' },
@@ -66,6 +71,7 @@
     { id: 'snippets', label: 'Snippets', blurb: 'Payloads + commands' },
     { id: 'toolkit', label: 'Toolkit', blurb: 'Encoders, hashes, subnet' },
     { id: 'resources', label: 'Resources', blurb: 'Bookmarked links' },
+    { id: 'cheatsheets', label: 'Cheat Sheets', blurb: 'Your quick-refs' },
     { id: 'feeds', label: 'Feeds', blurb: 'Security news' },
     { id: 'terminal', label: 'Terminal', blurb: 'Shell' }
   ];
@@ -167,11 +173,11 @@
   function renderSidebar() {
     var inner = document.getElementById('sidebar-inner');
     var html = '<div class="section"><div class="section-header-flex"><span class="section-title">Study</span></div>';
-    ['home', 'courses', 'paths', 'knowledge', 'playbooks', 'flashcards', 'quiz', 'progress'].forEach(function (id) { html += navItem(id); });
+    ['home', 'courses', 'paths', 'knowledge', 'glossary', 'map', 'playbooks', 'flashcards', 'quiz', 'progress'].forEach(function (id) { html += navItem(id); });
     html += '</div><div class="section"><div class="section-header-flex"><span class="section-title">Engagement</span></div>';
     ['sessions', 'journal', 'netlab', 'targets', 'board', 'scan', 'topology', 'reports', 'credentials'].forEach(function (id) { html += navItem(id); });
     html += '</div><div class="section"><div class="section-header-flex"><span class="section-title">Feeds &amp; tools</span></div>';
-    ['snippets', 'toolkit', 'resources', 'feeds', 'terminal'].forEach(function (id) { html += navItem(id); });
+    ['snippets', 'toolkit', 'resources', 'cheatsheets', 'feeds', 'terminal'].forEach(function (id) { html += navItem(id); });
     html += '</div>';
     inner.innerHTML = html;
   }
