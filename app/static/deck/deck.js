@@ -200,6 +200,29 @@
       '</div>';
   }
 
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+
+  function profilePanel() {
+    var W = window.DeckWelcome;
+    if (!W || !W.getProfile) return '';
+    var p = W.getProfile() || {}, socials = p.socials || {};
+    var socInputs = (W.SOCIALS || []).map(function (s) {
+      return setRow(s.label, '', '<input class="co-input deck-social" data-soc="' + s.key + '" style="min-width:230px;" placeholder="https://…" value="' + esc(socials[s.key] || '') + '">');
+    }).join('');
+    var avPrev = (p.avatar && p.avatar.type === 'img')
+      ? '<span class="deck-av-prev" style="background-image:url(' + p.avatar.value + ')"></span>'
+      : '<span class="deck-av-prev deck-av-empty"></span>';
+    return '<div class="deck-panel"><div class="deck-panel-title">' + svg('settings', 18) + '<span>Profile</span></div>' +
+      setRow('Operator name', 'Shown in the sidebar.', '<input class="co-input" id="pf-name" style="min-width:200px;" value="' + esc(p.name || '') + '">') +
+      setRow('Handle', '', '<input class="co-input" id="pf-handle" style="min-width:200px;" value="' + esc(p.handle || '') + '">') +
+      setRow('Logo / avatar', 'Upload your own — PNG or JPG.', avPrev +
+        '<label class="co-btn" for="pf-file" style="margin-left:8px;">Upload</label><input id="pf-file" type="file" accept="image/*" hidden>' +
+        '<button class="co-btn" id="pf-av-clear" style="margin-left:6px;">Remove</button>') +
+      '<div class="deck-set-label" style="margin:16px 0 2px;">Social links</div>' + socInputs +
+      '<div class="co-row" style="margin-top:14px;"><button class="co-btn co-btn--primary" id="pf-save">Save profile</button>' +
+      '<span id="pf-msg" class="deck-muted" style="margin-left:10px;"></span></div></div>';
+  }
+
   function settingsView() {
     var cur = currentTheme();
     var swatches = Object.keys(THEMES).map(function (name) {
@@ -211,7 +234,8 @@
         '<span style="background:' + c.panel + '"></span></span>' +
         '<span class="deck-swatch-name">' + name + '</span></button>';
     }).join('');
-    return '<div class="deck-panel"><div class="deck-panel-title">' + svg('settings', 18) + '<span>Theme</span></div>' +
+    return profilePanel() +
+      '<div class="deck-panel"><div class="deck-panel-title">' + svg('settings', 18) + '<span>Theme</span></div>' +
         '<p class="deck-muted">Cerberus\'s 22 palettes. Click to apply — saved on this machine.</p>' +
         '<div class="deck-swatches">' + swatches + '</div></div>' +
       '<div class="deck-panel"><div class="deck-panel-title">' + svg('panel', 18) + '<span>Appearance</span></div>' +
@@ -263,6 +287,38 @@
 
   function wireSettings() {
     var root = document.getElementById('deck-view');
+    // ── Profile section (name / handle / avatar / socials) ──
+    var W = window.DeckWelcome;
+    if (W && root.querySelector('#pf-save')) {
+      var pendingAvatar, avCleared = false;
+      var pfFile = root.querySelector('#pf-file');
+      if (pfFile) pfFile.addEventListener('change', function (e) {
+        var f = e.target.files && e.target.files[0]; if (!f) return;
+        var r = new FileReader();
+        r.onload = function () {
+          pendingAvatar = { type: 'img', value: String(r.result || '') }; avCleared = false;
+          Array.prototype.forEach.call(root.querySelectorAll('.deck-av-prev'), function (el) { el.classList.remove('deck-av-empty'); el.style.backgroundImage = 'url(' + pendingAvatar.value + ')'; });
+        };
+        r.readAsDataURL(f);
+      });
+      var pfClear = root.querySelector('#pf-av-clear');
+      if (pfClear) pfClear.addEventListener('click', function () {
+        pendingAvatar = null; avCleared = true;
+        Array.prototype.forEach.call(root.querySelectorAll('.deck-av-prev'), function (el) { el.classList.add('deck-av-empty'); el.style.backgroundImage = ''; });
+      });
+      root.querySelector('#pf-save').addEventListener('click', function () {
+        var p = W.getProfile() || {};
+        p.name = root.querySelector('#pf-name').value.trim();
+        p.handle = root.querySelector('#pf-handle').value.trim();
+        p.socials = p.socials || {};
+        Array.prototype.forEach.call(root.querySelectorAll('.deck-social'), function (inp) { p.socials[inp.getAttribute('data-soc')] = inp.value.trim(); });
+        if (pendingAvatar) p.avatar = pendingAvatar;
+        else if (avCleared) p.avatar = null;
+        p.onboarded = true;
+        W.setProfile(p);
+        root.querySelector('#pf-msg').textContent = 'Saved ✓';
+      });
+    }
     // Theme swatches — re-layer prefs so an accent override survives the switch.
     Array.prototype.forEach.call(root.querySelectorAll('[data-theme]'), function (btn) {
       btn.addEventListener('click', function () { applyTheme(btn.getAttribute('data-theme')); applyPrefs(); route('settings'); });

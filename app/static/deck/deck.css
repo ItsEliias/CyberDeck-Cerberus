@@ -484,6 +484,12 @@
 .deck-toggle-knob { position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%; background: var(--fg); opacity: .7; transition: left .15s, background .15s; }
 .deck-toggle--on { background: color-mix(in srgb, var(--deck-accent) 30%, transparent); border-color: var(--deck-accent); }
 .deck-toggle--on .deck-toggle-knob { left: 20px; background: var(--deck-accent); opacity: 1; }
+.deck-av-prev { display: inline-block; width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border); background-size: cover; background-position: center; vertical-align: middle; }
+.deck-av-empty { background: color-mix(in srgb, var(--fg) 8%, transparent); }
+.deck-social { }
+.ub-socials { display: flex; gap: 9px; margin-top: 5px; }
+.ub-social { color: var(--fg); opacity: .5; display: inline-flex; align-items: center; }
+.ub-social:hover { opacity: 1; color: var(--deck-accent); }
 
 /* ── Preference hooks (density / sidebar side / frost / motion) ──────────────── */
 :root.density-compact  .co-head    { padding: 10px 16px; }

@@ -13,7 +13,13 @@
 (function () {
   var PROFILE_KEY = 'deck-profile';
   var FOCI = ['Offensive', 'Defensive', 'Web', 'Network', 'Cloud', 'Forensics', 'Malware', 'OSINT', 'Reversing', 'Certs'];
-  var EMOJI = ['🛡', '⚡', '🎯', '🧠', '🔭', '🐉', '🦊', '🦉', '👾', '💀'];
+  var SOCIALS = [
+    { key: 'github', label: 'GitHub', svg: '<svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M12 2A10 10 0 0 0 8.84 21.5c.5.08.66-.22.66-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.15-1.1-1.46-1.1-1.46-.9-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.52 2.34 1.08 2.9.83.1-.65.35-1.08.64-1.33-2.22-.26-4.55-1.11-4.55-4.94 0-1.1.39-1.99 1.03-2.69-.1-.26-.45-1.28.1-2.66 0 0 .84-.27 2.75 1.03a9.4 9.4 0 0 1 5 0c1.9-1.3 2.74-1.03 2.74-1.03.56 1.38.21 2.4.11 2.66.64.7 1.03 1.59 1.03 2.69 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85v2.74c0 .27.16.57.67.48A10 10 0 0 0 12 2z"/></svg>' },
+    { key: 'x', label: 'X', svg: '<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M18.9 2H22l-7.3 8.3L23 22h-6.6l-5.2-6.7L5.3 22H2.1l7.8-8.9L1.7 2h6.8l4.7 6.2L18.9 2zm-2.3 18h1.8L7.5 3.9H5.6L16.6 20z"/></svg>' },
+    { key: 'linkedin', label: 'LinkedIn', svg: '<svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM3 9h4v12H3V9zm6 0h3.8v1.7h.1c.5-1 1.8-2 3.7-2 4 0 4.7 2.6 4.7 6V21h-4v-5.3c0-1.3 0-2.9-1.8-2.9s-2 1.4-2 2.8V21H9V9z"/></svg>' },
+    { key: 'instagram', label: 'Instagram', svg: '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>' },
+    { key: 'facebook', label: 'Facebook', svg: '<svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.4h-1.2c-1.2 0-1.6.8-1.6 1.6V12h2.7l-.4 2.9h-2.3v7A10 10 0 0 0 22 12z"/></svg>' }
+  ];
   var WORDMARK = '<div class="ob-wordmark" aria-hidden="true"><span class="ob-bracket">[</span><span class="ob-lead">C</span>YBERDECK<span class="ob-bracket">]</span></div>';
 
   function load() { try { return JSON.parse(localStorage.getItem(PROFILE_KEY)) || {}; } catch (e) { return {}; } }
@@ -27,16 +33,23 @@
     var st = document.querySelector('.sidebar-user-status');
     if (st && p.handle) st.innerHTML = '&#9679; @' + esc(p.handle);
     var av = document.getElementById('user-bar-avatar');
-    if (av && p.avatar) {
-      if (p.avatar.type === 'img') {
-        av.style.backgroundImage = 'url(' + p.avatar.value + ')';
-        av.style.backgroundSize = 'cover'; av.style.backgroundPosition = 'center';
-        av.textContent = '';
-      } else if (p.avatar.type === 'emoji') {
-        av.textContent = p.avatar.value;
-        av.style.display = 'flex'; av.style.alignItems = 'center';
-        av.style.justifyContent = 'center'; av.style.fontSize = '16px';
-      }
+    if (av && p.avatar && p.avatar.type === 'img') {
+      av.style.backgroundImage = 'url(' + p.avatar.value + ')';
+      av.style.backgroundSize = 'cover'; av.style.backgroundPosition = 'center';
+      av.textContent = '';
+    }
+    // Social links → clickable icons in the user bar (open in the system browser
+    // via deck.js's external-link interceptor).
+    var col = nameEl ? nameEl.parentElement : null;
+    if (col) {
+      var socials = p.socials || {};
+      var chosen = SOCIALS.filter(function (s) { return (socials[s.key] || '').trim(); });
+      var row = col.querySelector('.ub-socials');
+      if (!chosen.length) { if (row) row.remove(); return; }
+      if (!row) { row = document.createElement('div'); row.className = 'ub-socials'; col.appendChild(row); }
+      row.innerHTML = chosen.map(function (s) {
+        return '<a class="ub-social" href="' + esc(socials[s.key].trim()) + '" title="' + s.label + '" target="_blank" rel="noopener">' + s.svg + '</a>';
+      }).join('');
     }
   }
 
@@ -119,18 +132,14 @@
     var preview = (S.avatar && S.avatar.type === 'img')
       ? '<img src="' + esc(S.avatar.value) + '" alt="Avatar preview">'
       : '<span class="ob-avatar-emoji">' + esc((S.avatar && S.avatar.type === 'emoji') ? S.avatar.value : '◆') + '</span>';
-    var row = EMOJI.map(function (e) {
-      var on = (S.avatar && S.avatar.type === 'emoji' && S.avatar.value === e) ? ' ob-emoji--active' : '';
-      return '<button class="ob-emoji' + on + '" data-action="emoji" data-emoji="' + esc(e) + '">' + esc(e) + '</button>';
-    }).join('');
     return '<div class="ob-tag">// OPERATOR SIGNATURE</div>' +
-      '<p class="ob-lead-copy">Upload an image or pick an emoji.</p>' +
+      '<p class="ob-lead-copy">Upload your own logo or photo — or skip.</p>' +
       '<div class="ob-avatar-preview" id="dw-preview">' + preview + '</div>' +
       '<div class="ob-field"><label class="ob-btn ob-btn--ghost" for="dw-file">Upload image</label>' +
-      '<input class="ob-file" id="dw-file" type="file" accept="image/*" hidden></div>' +
-      '<div class="ob-emoji-row">' + row + '</div>' +
+      '<input class="ob-file" id="dw-file" type="file" accept="image/*" hidden>' +
+      (S.avatar ? '<button class="ob-btn ob-btn--ghost" data-action="clear-av" style="margin-left:8px;">Remove</button>' : '') + '</div>' +
       '<div class="ob-actions"><button class="ob-btn ob-btn--ghost" data-action="back">[ BACK ]</button>' +
-      '<button class="ob-btn ob-btn--primary" data-action="next">[ NEXT ]</button></div>';
+      '<button class="ob-btn ob-btn--primary" data-action="next">' + (S.avatar ? '[ NEXT ]' : '[ SKIP ]') + '</button></div>';
   }
   function wTheme() {
     var T = (window.DeckTheme && window.DeckTheme.THEMES) || {};
@@ -170,7 +179,7 @@
       if (a === 'complete') el.addEventListener('click', complete);
       if (a === 'add') el.addEventListener('click', function () { addFocus(el.dataset.interest); });
       if (a === 'remove') el.addEventListener('click', function () { S.focus = S.focus.filter(function (x) { return x !== el.dataset.interest; }); render(); });
-      if (a === 'emoji') el.addEventListener('click', function () { S.avatar = { type: 'emoji', value: el.dataset.emoji }; render(); });
+      if (a === 'clear-av') el.addEventListener('click', function () { S.avatar = null; render(); });
       if (a === 'theme') el.addEventListener('click', function () {
         if (window.DeckTheme && window.DeckTheme.apply) window.DeckTheme.apply(el.dataset.theme);
         render();
@@ -209,5 +218,11 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
 
-  window.DeckWelcome = { reset: function () { try { localStorage.removeItem(PROFILE_KEY); } catch (e) {} } };
+  window.DeckWelcome = {
+    reset: function () { try { localStorage.removeItem(PROFILE_KEY); } catch (e) {} },
+    getProfile: load,
+    setProfile: function (p) { save(p); applyToSidebar(p); },
+    applyToSidebar: applyToSidebar,
+    SOCIALS: SOCIALS
+  };
 })();
