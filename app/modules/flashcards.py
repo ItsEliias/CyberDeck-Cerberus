@@ -322,13 +322,24 @@ def quiz():
         n = 10
     d = _load()
     pool = [c for c in d["cards"] if c.get("front") and c.get("back") and (not deck or c.get("deck") == deck)]
-    backs = list({c["back"] for c in d["cards"] if c.get("back")})
+    # Distractors come from the SAME deck so a "Ports" question gets other ports,
+    # not unrelated answers. Fall back to the global pool only if a deck is tiny.
+    by_deck = {}
+    for c in d["cards"]:
+        if c.get("back"):
+            by_deck.setdefault(c.get("deck", "General"), []).append(c["back"])
+    all_backs = list({c["back"] for c in d["cards"] if c.get("back")})
     random.shuffle(pool)
     qs = []
     for c in pool[:n]:
-        distractors = [b for b in backs if b != c["back"]]
-        random.shuffle(distractors)
-        choices = [c["back"]] + distractors[:3]
+        same = [b for b in by_deck.get(c.get("deck", "General"), []) if b != c["back"]]
+        random.shuffle(same)
+        distractors = same[:3]
+        if len(distractors) < 3:
+            extra = [b for b in all_backs if b != c["back"] and b not in distractors]
+            random.shuffle(extra)
+            distractors += extra[:3 - len(distractors)]
+        choices = [c["back"]] + distractors
         random.shuffle(choices)
         qs.append({"id": c["id"], "front": c["front"], "correct": c["back"],
                    "choices": choices, "deck": c.get("deck", "General")})

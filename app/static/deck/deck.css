@@ -570,10 +570,10 @@ body.deck-reduce-motion *, body.deck-reduce-motion *::before, body.deck-reduce-m
 .hm-today { display: flex; flex-direction: column; gap: 8px; }
 .hm-plan { display: flex; align-items: center; gap: 12px; text-align: left; width: 100%; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; color: var(--fg); cursor: pointer; transition: border-color .12s, background .12s; }
 .hm-plan:hover { border-color: color-mix(in srgb, var(--deck-accent) 45%, var(--border)); }
-.hm-plan-ico { font-size: 18px; flex-shrink: 0; }
-.hm-plan-main { flex: 1; font-size: 14px; display: flex; flex-direction: column; gap: 2px; }
+.hm-plan-ico { font-size: 18px; flex-shrink: 0; line-height: 1; }
+.hm-plan-main { flex: 1; min-width: 0; font-size: 14px; line-height: 1.35; }
 .hm-plan-main b { color: var(--deck-accent); }
-.hm-plan-sub { font-size: 11px; opacity: .55; font-weight: 400; }
+.hm-plan-sub { display: block; font-size: 11px; opacity: .55; font-weight: 400; margin-top: 2px; }
 .hm-plan-arrow { opacity: .4; flex-shrink: 0; }
 
 /* Quiz */
