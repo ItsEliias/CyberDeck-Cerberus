@@ -310,6 +310,22 @@
       var t = e.target.closest ? e.target.closest('[data-nav]') : null;
       if (t) route(t.getAttribute('data-nav'));
     });
+    // External links must NEVER navigate the app window (in the packaged
+    // webview that leaves you stranded with no back button). Intercept any
+    // http(s) anchor and hand it to the system browser — via the pywebview
+    // bridge when packaged, else a new tab in the dev browser.
+    document.addEventListener('click', function (e) {
+      var a = e.target.closest ? e.target.closest('a[href]') : null;
+      if (!a) return;
+      var href = a.getAttribute('href') || '';
+      if (!/^https?:\/\//i.test(href)) return;
+      e.preventDefault();
+      if (window.pywebview && window.pywebview.api && window.pywebview.api.open_external) {
+        window.pywebview.api.open_external(href);
+      } else {
+        window.open(href, '_blank', 'noopener');
+      }
+    }, true);
     document.getElementById('sidebar-brand-btn').addEventListener('click', function () { route('home'); });
     document.getElementById('btn-settings').addEventListener('click', function () { route('settings'); });
     var pill = document.getElementById('deck-search-pill');

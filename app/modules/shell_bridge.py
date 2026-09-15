@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import os
 import subprocess
+import webbrowser
 
 
 class ShellSession:
@@ -58,3 +59,16 @@ class DesktopApi:
 
     def term_cwd(self) -> str:
         return self._sh.cwd
+
+    def open_external(self, url: str) -> bool:
+        """Open a URL in the system browser — called when the user clicks an
+        external link in a note so it never navigates the app window away.
+        http/https only; anything else is ignored."""
+        u = (url or "").strip()
+        if u.startswith(("http://", "https://")):
+            try:
+                webbrowser.open(u)
+                return True
+            except Exception:
+                return False
+        return False
