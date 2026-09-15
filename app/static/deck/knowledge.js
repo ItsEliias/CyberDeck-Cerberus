@@ -59,7 +59,9 @@
         fetch('/api/activity/log', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ kind: 'read' }) });
         pane.innerHTML =
           '<div class="kb-note-head"><span>' + esc(d.title) + '</span>' +
+          '<button class="kb-edit-btn" id="kb-fc">⚡ Flashcards</button>' +
           '<button class="kb-edit-btn" id="kb-edit">Edit</button></div>' +
+          '<div id="kb-fc-bar"></div>' +
           '<div class="md-body">' + d.html + '</div>' +
           '<div id="kb-backlinks"></div>';
         pane.scrollTop = 0;
@@ -67,6 +69,24 @@
       })
       .catch(function () { pane.innerHTML = '<div class="kb-loading">Failed to load note.</div>'; });
     drawTree(rootEl);  // refresh active highlight
+  }
+
+  function makeFlashcards(rootEl) {
+    var bar = rootEl.querySelector('#kb-fc-bar');
+    if (!bar) return;
+    bar.innerHTML = '<div class="co-muted" style="padding:6px 0;">Generating…</div>';
+    fetch('/api/flashcards/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path: current }) })
+      .then(function (r) { return r.json(); }).then(function (g) {
+        var cards = g.proposed || [];
+        if (!cards.length) { bar.innerHTML = '<div class="co-muted" style="padding:6px 0;">No clear Q&amp;A found in this note.</div>'; return; }
+        bar.innerHTML = '<div class="co-fc-bar">Proposed ' + cards.length + ' — <button class="kb-edit-btn" id="kb-fc-save">Save to “' + esc(g.deck) + '”</button><span id="kb-fc-msg" class="co-muted"></span></div>';
+        bar.querySelector('#kb-fc-save').addEventListener('click', function () {
+          var saved = 0;
+          cards.reduce(function (ch, cd) {
+            return ch.then(function () { return fetch('/api/flashcards/card', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ front: cd.front, back: cd.back, deck: g.deck }) }).then(function () { saved++; }); });
+          }, Promise.resolve()).then(function () { bar.querySelector('#kb-fc-msg').textContent = ' Saved ' + saved + ' ✓'; });
+        });
+      }).catch(function () { bar.innerHTML = '<div class="co-warn">Generation failed.</div>'; });
   }
 
   function loadBacklinks(rootEl, path) {
@@ -142,6 +162,7 @@
       var wl = e.target.closest('.md-wikilink');
       if (wl) { resolveWiki(root, wl.getAttribute('data-target') || wl.textContent); return; }
       if (e.target.closest('#kb-edit')) { editNote(root); return; }
+      if (e.target.closest('#kb-fc')) { makeFlashcards(root); return; }
       if (e.target.closest('#kb-new')) { newNoteModal(root); return; }
       var bl = e.target.closest('.kb-bl');
       if (bl) { openNote(root, bl.getAttribute('data-file')); return; }
