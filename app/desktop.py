@@ -59,12 +59,29 @@ _persist_data_env()
 from app import app  # noqa: E402 — must follow _persist_data_env so modules read the env
 
 
+# A STABLE loopback port so the webview origin (and thus its localStorage — theme,
+# prefs, onboarding profile) is the same every launch. A random port made every
+# launch a new origin, which reset onboarding + theme each time. Falls back to a
+# free port only if this one is busy (rare; that launch won't see prior storage).
+_PREFERRED_PORT = 8137
+
+
 def _free_port() -> int:
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind(("127.0.0.1", 0))
     port = s.getsockname()[1]
     s.close()
     return port
+
+
+def _pick_port() -> int:
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.bind(("127.0.0.1", _PREFERRED_PORT))
+        s.close()
+        return _PREFERRED_PORT
+    except OSError:
+        return _free_port()
 
 
 def _serve(port: int):
@@ -82,7 +99,7 @@ def _wait_ready(port: int, tries: int = 60):
 
 
 def main():
-    port = _free_port()
+    port = _pick_port()
     threading.Thread(target=_serve, args=(port,), daemon=True).start()
     _wait_ready(port)
 
