@@ -75,7 +75,8 @@
       '<div class="ob-tag">// OFFLINE STUDY HUB</div>' +
       (p.name ? '<p class="ob-lead-copy">Welcome back, ' + esc(p.name) + '.</p>'
               : '<p class="ob-lead-copy">Ready when you are.</p>') +
-      '<div class="ob-actions"><button class="ob-btn ob-btn--primary" data-action="enter">[ ENTER ]</button></div>';
+      '<div class="ob-actions"><button class="ob-btn ob-btn--primary" data-action="enter">[ ENTER ]</button></div>' +
+      '<div class="ob-copyright">CyberDeck™ · © 2026 ItsEliias. All rights reserved.</div>';
     function enter() { document.removeEventListener('keydown', onKey); teardown(); }
     function onKey(e) { if (e.key === 'Enter') { e.preventDefault(); enter(); } }
     o.querySelector('[data-action="enter"]').addEventListener('click', enter);

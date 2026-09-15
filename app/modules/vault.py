@@ -7,7 +7,9 @@ vault root before it is ever read. Nothing outside the root is reachable through
 from __future__ import annotations
 
 import os
+import posixpath
 import re
+import urllib.parse
 from pathlib import Path
 
 # Vault root: override with CYBERDECK_VAULT, else default to the CyberBase vault
@@ -87,6 +89,53 @@ def _prep_wikilinks(text: str) -> str:
     return _WIKILINK.sub(repl, text)
 
 
+# Obsidian image embed ![[pic.png]] → standard markdown image (resolved to the asset API).
+_EMBED_IMG = re.compile(r'!\[\[([^\]|]+\.(?:png|jpe?g|gif|svg|webp))\s*(?:\|[^\]]*)?\]\]', re.I)
+# Obsidian callout header: > [!type] optional title
+_CALLOUT = re.compile(r"^\s*>\s*\[!(\w+)\][+-]?\s*(.*)$")
+
+
+def _callouts(text: str) -> str:
+    """Convert Obsidian callouts (> [!note] ...) to markdown admonitions (!!! note)."""
+    lines, out, i = text.split("\n"), [], 0
+    while i < len(lines):
+        m = _CALLOUT.match(lines[i])
+        if m:
+            ctype, title = m.group(1).lower(), m.group(2).strip()
+            out.append("!!! " + ctype + (f' "{title}"' if title else ""))
+            i += 1
+            while i < len(lines) and lines[i].lstrip().startswith(">"):
+                out.append("    " + re.sub(r"^\s*>\s?", "", lines[i]))
+                i += 1
+            out.append("")
+        else:
+            out.append(lines[i]); i += 1
+    return "\n".join(out)
+
+
+def _prep_note(text: str) -> str:
+    text = _EMBED_IMG.sub(lambda m: "![](" + m.group(1).strip() + ")", text)
+    text = _callouts(text)
+    return _prep_wikilinks(text)
+
+
+_IMG_SRC = re.compile(r'(<img\b[^>]*?\bsrc=")([^"]+)(")', re.I)
+
+
+def _rewrite_assets(html: str, relpath: str) -> str:
+    """Point note-relative image src at the vault asset endpoint."""
+    note_dir = posixpath.dirname(relpath)
+
+    def repl(m):
+        src = m.group(2)
+        if re.match(r"^(https?:|data:|/)", src, re.I):
+            return m.group(0)
+        rel = posixpath.normpath(posixpath.join(note_dir, urllib.parse.unquote(src)))
+        return m.group(1) + "/api/knowledge/asset?path=" + urllib.parse.quote(rel) + m.group(3)
+
+    return _IMG_SRC.sub(repl, html)
+
+
 def read_note(relpath: str) -> dict:
     """Return {path,title,html} for a vault .md file, or raise ValueError/FileNotFoundError."""
     target = _safe_resolve(relpath)
@@ -102,9 +151,18 @@ def read_note(relpath: str) -> dict:
     try:
         import markdown  # optional dep; graceful fallback if absent
         html = markdown.markdown(
-            _prep_wikilinks(raw),
-            extensions=["fenced_code", "tables", "toc", "sane_lists"],
+            _prep_note(raw),
+            extensions=[
+                "tables", "sane_lists", "toc", "attr_list", "admonition",
+                "pymdownx.tasklist", "pymdownx.superfences", "pymdownx.highlight",
+                "pymdownx.betterem", "pymdownx.tilde",
+            ],
+            extension_configs={
+                "pymdownx.tasklist": {"custom_checkbox": True},
+                "pymdownx.highlight": {"use_pygments": True, "guess_lang": False, "css_class": "codehl"},
+            },
         )
+        html = _rewrite_assets(html, relpath)
     except Exception:
         # Minimal fallback: escape + preserve line breaks so notes still read.
         from html import escape

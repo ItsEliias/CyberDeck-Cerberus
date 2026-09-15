@@ -5,7 +5,7 @@ import os
 import re
 from pathlib import Path
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, abort, jsonify, request, send_file
 
 from . import vault
 
@@ -66,6 +66,18 @@ def backlinks():
 @bp.route("/resolve")
 def resolve():
     return jsonify(path=vault.resolve_wikilink(request.args.get("target", "")))
+
+
+@bp.route("/asset")
+def asset():
+    """Serve an image (or other file) referenced from a note, contained to the vault."""
+    try:
+        target = vault._safe_resolve(request.args.get("path", ""))
+    except Exception:
+        abort(404)
+    if not target.is_file():
+        abort(404)
+    return send_file(str(target))
 
 
 @bp.route("/graph")

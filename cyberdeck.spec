@@ -10,6 +10,7 @@ hiddenimports = (
     + collect_submodules("modules")  # every Flask blueprint
     + ["flask", "jinja2", "markdown", "cryptography", "html2text", "certifi", "pypdf"]
     + collect_submodules("youtube_transcript_api")
+    + collect_submodules("pymdownx") + collect_submodules("pygments")
 )
 
 a = Analysis(

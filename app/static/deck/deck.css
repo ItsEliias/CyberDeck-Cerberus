@@ -491,6 +491,33 @@
 .ub-social { color: var(--fg); opacity: .5; display: inline-flex; align-items: center; }
 .ub-social:hover { opacity: 1; color: var(--deck-accent); }
 
+/* ── Rich markdown (Knowledge) ── */
+.md-body pre { background: #1c1e24; border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; overflow-x: auto; }
+.md-body pre code, .md-body .codehl { background: transparent; font-family: 'Fira Code', monospace; font-size: 12.5px; line-height: 1.5; }
+.md-body :not(pre) > code { background: color-mix(in srgb, var(--fg) 8%, transparent); padding: 1px 5px; border-radius: 4px; font-family: 'Fira Code', monospace; font-size: .9em; }
+.md-body table { border-collapse: collapse; margin: 12px 0; display: block; overflow-x: auto; max-width: 100%; }
+.md-body th, .md-body td { border: 1px solid var(--border); padding: 6px 12px; text-align: left; }
+.md-body th { background: color-mix(in srgb, var(--fg) 6%, transparent); }
+.md-body img { max-width: 100%; border-radius: 8px; margin: 8px 0; }
+.md-body ul.task-list { padding-left: 18px; }
+.md-body .task-list-item { list-style: none; }
+.md-body .task-list-item input[type=checkbox], .md-body .task-list-control { margin-right: 8px; accent-color: var(--deck-accent); }
+.md-body .admonition { border-left: 3px solid var(--deck-accent); background: color-mix(in srgb, var(--deck-accent) 8%, transparent); border-radius: 6px; padding: 10px 14px; margin: 12px 0; }
+.md-body .admonition-title { font-weight: 700; margin: 0 0 4px; text-transform: capitalize; }
+.md-body .admonition.warning, .md-body .admonition.caution { border-left-color: #e67e22; background: color-mix(in srgb, #e67e22 8%, transparent); }
+.md-body .admonition.danger, .md-body .admonition.bug, .md-body .admonition.error, .md-body .admonition.fail { border-left-color: var(--red); background: color-mix(in srgb, var(--red) 8%, transparent); }
+.md-body .admonition.tip, .md-body .admonition.success, .md-body .admonition.note, .md-body .admonition.info, .md-body .admonition.example { border-left-color: #2ecc71; background: color-mix(in srgb, #2ecc71 8%, transparent); }
+/* Pygments (monokai-ish) */
+.codehl .c, .codehl .c1, .codehl .cm, .codehl .ch, .codehl .cp, .codehl .cs { color: #959077; font-style: italic; }
+.codehl .k, .codehl .kc, .codehl .kd, .codehl .kn, .codehl .kp, .codehl .kr, .codehl .kt { color: #66d9ef; }
+.codehl .o, .codehl .ow { color: #ff4689; }
+.codehl .s, .codehl .s1, .codehl .s2, .codehl .se, .codehl .sb, .codehl .sd, .codehl .sr, .codehl .sh, .codehl .si, .codehl .ss, .codehl .dl, .codehl .sa { color: #e6db74; }
+.codehl .m, .codehl .mi, .codehl .mf, .codehl .mh, .codehl .mo, .codehl .il { color: #ae81ff; }
+.codehl .nf, .codehl .na, .codehl .nc, .codehl .nd, .codehl .nb, .codehl .bp, .codehl .nx, .codehl .fm { color: #a6e22e; }
+.codehl .nt, .codehl .kn { color: #ff4689; }
+.codehl .no, .codehl .nv, .codehl .nl { color: #f8f8f2; }
+.codehl .err { color: #f92672; }
+
 /* ── Preference hooks (density / sidebar side / frost / motion) ──────────────── */
 :root.density-compact  .co-head    { padding: 10px 16px; }
 :root.density-compact  .deck-panel { padding: 14px 16px; }
@@ -513,6 +540,7 @@ body.deck-reduce-motion *, body.deck-reduce-motion *::before, body.deck-reduce-m
 /* Onboarding theme step — keep the 22-swatch grid inside the card. */
 .dw-themes { max-height: 230px; overflow-y: auto; margin: 4px 0 2px; padding-right: 4px; }
 #dw-card .deck-swatches { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.ob-copyright { margin-top: 22px; font-size: 10px; opacity: .4; letter-spacing: .03em; }
 
 /* Courses — recommended one-click imports */
 .co-rec { margin-top: 20px; border-top: 1px solid var(--border); padding-top: 14px; }
