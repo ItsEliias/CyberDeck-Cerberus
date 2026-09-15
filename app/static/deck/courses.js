@@ -18,29 +18,93 @@
   function post(url, body) { return fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }).then(function (r) { return r.json(); }); }
 
   // ── List ──────────────────────────────────────────────────────────────────────
+  var listFilter = 'all';   // all | active | completed
+
+  var ST_LABEL = { planned: 'Planned', 'in-progress': 'In progress', completed: 'Completed' };
+  function statusOf(c) { return c.status || (c.kind === 'manual' ? 'completed' : 'in-progress'); }
+  function stBadge(c) {
+    var s = statusOf(c);
+    return '<span class="co-st co-st--' + s + '">' + (ST_LABEL[s] || s) + '</span>';
+  }
+
+  function courseCard(c) {
+    var chips = Object.keys(c.counts || {}).map(function (k) { return '<span class="co-chip">' + esc(catLabel(k)) + ' ' + c.counts[k] + '</span>'; }).join('');
+    var meta = [];
+    if (c.provider) meta.push(esc(c.provider));
+    meta.push(c.kind === 'manual' ? 'logged manually' : (c.total || 0) + ' items');
+    var pct = c.percent || 0;
+    var bar = pct > 0 && pct < 100 ? '<div class="co-cardbar"><div class="co-cardbar-f" style="width:' + pct + '%"></div></div>' : '';
+    return '<button class="co-card" data-course="' + esc(c.id) + '">' +
+      '<div class="co-card-title">' + esc(c.title) + stBadge(c) + '</div>' +
+      '<div class="co-card-meta">' + meta.join(' · ') + '</div>' + bar +
+      (chips ? '<div class="co-chips">' + chips + '</div>' : '') + '</button>';
+  }
+
   function showList() {
     scanCache = null;
     root.innerHTML = '<div class="co-head"><span class="co-title">Courses</span>' +
+      '<button class="co-btn" id="co-add-manual">+ Add manually</button>' +
       '<button class="co-btn" id="co-import-url">+ Import URL</button>' +
       '<button class="co-btn co-btn--primary" id="co-import">+ Import folder</button></div>' +
       '<div id="co-body" class="co-body"><div class="kb-loading">Loading…</div></div>';
     root.querySelector('#co-import').addEventListener('click', showImport);
     root.querySelector('#co-import-url').addEventListener('click', showUrlImport);
+    root.querySelector('#co-add-manual').addEventListener('click', showManual);
     get('/api/courses/list').then(function (d) {
       var body = root.querySelector('#co-body');
       var list = d.courses || [];
       if (!list.length) {
-        body.innerHTML = '<div class="co-empty">No courses yet.<br><b>Import folder</b> — index course material already on your disk (docs, notes, videos, code).<br><b>Import URL</b> — pull a free article, lesson, or cheat sheet from the web as a markdown course.</div>';
+        body.innerHTML = '<div class="co-empty">No courses yet.<br><b>Import folder</b> — index course material already on your disk (docs, notes, videos, code).<br><b>Import URL</b> — pull a free article, lesson, or cheat sheet from the web as a markdown course.<br><b>Add manually</b> — log a course you finished elsewhere (no files needed).</div>';
         return;
       }
-      body.innerHTML = '<div class="co-grid">' + list.map(function (c) {
-        var chips = Object.keys(c.counts || {}).map(function (k) { return '<span class="co-chip">' + esc(catLabel(k)) + ' ' + c.counts[k] + '</span>'; }).join('');
-        return '<button class="co-card" data-course="' + esc(c.id) + '"><div class="co-card-title">' + esc(c.title) + '</div>' +
-          '<div class="co-card-meta">' + (c.total || 0) + ' items</div><div class="co-chips">' + chips + '</div></button>';
-      }).join('') + '</div>';
-      Array.prototype.forEach.call(body.querySelectorAll('[data-course]'), function (el) {
-        el.addEventListener('click', function () { showDetail(el.getAttribute('data-course')); });
-      });
+      var done = list.filter(function (c) { return statusOf(c) === 'completed'; }).length;
+      function draw() {
+        var shown = list.filter(function (c) {
+          var s = statusOf(c);
+          return listFilter === 'all' || (listFilter === 'completed' ? s === 'completed' : s !== 'completed');
+        });
+        var tabs = ['all', 'active', 'completed'].map(function (f) {
+          var lbl = f === 'all' ? 'All (' + list.length + ')' : f === 'completed' ? 'Completed (' + done + ')' : 'Active (' + (list.length - done) + ')';
+          return '<button class="co-tab' + (listFilter === f ? ' co-tab--on' : '') + '" data-filter="' + f + '">' + lbl + '</button>';
+        }).join('');
+        body.innerHTML = '<div class="co-tabs">' + tabs + '</div>' +
+          (shown.length ? '<div class="co-grid">' + shown.map(courseCard).join('') + '</div>'
+            : '<div class="co-empty">Nothing here yet.</div>');
+        Array.prototype.forEach.call(body.querySelectorAll('[data-filter]'), function (t) {
+          t.addEventListener('click', function () { listFilter = t.getAttribute('data-filter'); draw(); });
+        });
+        Array.prototype.forEach.call(body.querySelectorAll('[data-course]'), function (el) {
+          el.addEventListener('click', function () { showDetail(el.getAttribute('data-course')); });
+        });
+      }
+      draw();
+    });
+  }
+
+  function showManual() {
+    Deck.modal({
+      title: 'Add a course manually', width: 500,
+      body: '<label class="co-label">Course title *</label><input id="cm-title" class="co-input" placeholder="e.g. TryHackMe — Jr Penetration Tester">' +
+        '<label class="co-label">Provider</label><input id="cm-prov" class="co-input" placeholder="TryHackMe, Udemy, Coursera…">' +
+        '<label class="co-label">Link (optional)</label><input id="cm-url" class="co-input" placeholder="https://…">' +
+        '<label class="co-label">Status</label><select id="cm-status" class="co-input"><option value="completed">Completed</option><option value="in-progress">In progress</option><option value="planned">Planned</option></select>' +
+        '<label class="co-label">Notes / what you learned</label><textarea id="cm-notes" class="co-input" rows="3" placeholder="Key takeaways, certificate ID, dates…"></textarea>',
+      footer: '<button class="co-btn" id="cm-cancel">Cancel</button><button class="co-btn co-btn--primary" id="cm-ok">Add course</button>',
+      onMount: function (m) {
+        m.querySelector('#cm-cancel').addEventListener('click', Deck.closeModal);
+        m.querySelector('#cm-ok').addEventListener('click', function () {
+          var title = m.querySelector('#cm-title').value.trim();
+          if (!title) { Deck.toast('Title is required', 'error'); return; }
+          post('/api/courses/manual', {
+            title: title, provider: m.querySelector('#cm-prov').value.trim(),
+            url: m.querySelector('#cm-url').value.trim(), status: m.querySelector('#cm-status').value,
+            notes: m.querySelector('#cm-notes').value.trim(),
+          }).then(function (d) {
+            if (d.error) { Deck.toast(d.error, 'error'); return; }
+            Deck.closeModal(); Deck.toast('Course added'); showDetail(d.course.id);
+          });
+        });
+      },
     });
   }
 
@@ -187,15 +251,147 @@
         }).join('');
         return '<div class="co-cat-group"><div class="co-cat-h">' + esc(catLabel(k)) + ' <span>' + b.count + '</span></div>' + items + '</div>';
       }).join('');
+      var manual = c.kind === 'manual' || !c.total;
+      var st = statusOf(c), pct = c.percent || 0;
+      var stBtns = ['planned', 'in-progress', 'completed'].map(function (s) {
+        return '<button class="co-stbtn' + (st === s ? ' co-stbtn--on co-stbtn--' + s : '') + '" data-st="' + s + '">' + ST_LABEL[s] + '</button>';
+      }).join('');
+      var statusbar = '<div class="co-statusbar">' +
+        '<div class="co-stbtns">' + stBtns + '</div>' +
+        '<div class="co-pctwrap"><input type="range" min="0" max="100" step="5" value="' + pct + '" id="co-pct"><span id="co-pctv" class="co-pctv">' + pct + '%</span></div>' +
+        (c.provider ? '<span class="co-provider">' + esc(c.provider) + '</span>' : '') +
+        (c.url ? '<a class="co-extlink" href="' + esc(c.url) + '" target="_blank" rel="noopener">Open ↗</a>' : '') +
+        (manual ? '' : '<button class="co-btn co-btn--primary" id="co-mkquiz" style="margin-left:auto;">⚡ Make quiz from course</button>') +
+        '</div>' +
+        '<div class="co-notesrow"><textarea id="co-notes" class="co-input" rows="2" placeholder="Notes / what you learned…">' + esc(c.notes || '') + '</textarea>' +
+        '<button class="co-btn" id="co-notes-save">Save notes</button><span id="co-notes-msg" class="co-muted"></span></div>' +
+        assignmentsSection(c) +
+        '<div id="co-quizbar"></div>';
+
+      var main = manual
+        ? '<div class="co-body co-manualbody">' + (c.notes ? '<div class="md-body"><p>' + esc(c.notes).replace(/\n/g, '<br>') + '</p></div>' : '<div class="co-muted">No files — this course was logged manually. Add notes above.</div>') + '</div>'
+        : '<div class="kb-wrap"><div class="kb-side"><div class="kb-side-head">' + c.total + ' items</div>' +
+          '<div class="co-itemlist">' + (listHtml || '<div class="kb-loading">Empty.</div>') + '</div></div>' +
+          '<div id="co-preview" class="kb-note"><div class="kb-loading">Select an item to preview.</div></div></div>';
+
       root.innerHTML = '<div class="co-head"><button class="co-btn" id="co-back">← Courses</button>' +
-        '<span class="co-title" style="margin-left:10px;">' + esc(c.title) + '</span></div>' +
-        '<div class="kb-wrap"><div class="kb-side"><div class="kb-side-head">' + c.total + ' items</div>' +
-        '<div class="co-itemlist">' + (listHtml || '<div class="kb-loading">Empty.</div>') + '</div></div>' +
-        '<div id="co-preview" class="kb-note"><div class="kb-loading">Select an item to preview.</div></div></div>';
+        '<span class="co-title" style="margin-left:10px;">' + esc(c.title) + '</span>' +
+        '<button class="co-btn co-btn--danger" id="co-del" style="margin-left:auto;">Delete</button></div>' +
+        statusbar + main;
+
       root.querySelector('#co-back').addEventListener('click', showList);
       Array.prototype.forEach.call(root.querySelectorAll('.co-item'), function (el) {
         el.addEventListener('click', function () { preview(cid, el.getAttribute('data-path'), el.getAttribute('data-cat'), el); });
       });
+      wireStatus(cid);
+      wireAssignments(cid);
+      var mq = root.querySelector('#co-mkquiz');
+      if (mq) mq.addEventListener('click', function () { makeQuizFromCourse(cid, c.title); });
+    });
+  }
+
+  // ── Assignments checklist (task #8) ──────────────────────────────────────────────
+  function assignmentsSection(c) {
+    var items = c.assignments || [];
+    var done = items.filter(function (a) { return a.done; }).length;
+    var rows = items.map(function (a) {
+      return '<div class="co-asg" data-aid="' + a.id + '">' +
+        '<label class="co-asg-lbl"><input type="checkbox" class="co-asg-cb"' + (a.done ? ' checked' : '') + '>' +
+        '<span class="co-asg-txt' + (a.done ? ' co-asg-txt--done' : '') + '">' + esc(a.text) + '</span></label>' +
+        '<button class="co-asg-del" title="Remove">×</button></div>';
+    }).join('');
+    return '<div class="co-asgwrap">' +
+      '<div class="co-asg-head">Assignments &amp; tasks' + (items.length ? ' <span class="co-muted">' + done + '/' + items.length + ' done</span>' : '') + '</div>' +
+      '<div class="co-asglist">' + (rows || '<div class="co-muted" style="margin:0 0 6px;">No tasks yet — add assignments, labs or milestones to track.</div>') + '</div>' +
+      '<div class="co-asg-add"><input class="co-input" id="co-asg-new" placeholder="Add an assignment or task…"><button class="co-btn" id="co-asg-addbtn">Add</button></div>' +
+      '</div>';
+  }
+
+  function wireAssignments(cid) {
+    function refresh() { showDetail(cid); }
+    function send(body) { return post('/api/courses/assignments/' + encodeURIComponent(cid), body); }
+    var addInput = root.querySelector('#co-asg-new');
+    function add() {
+      var t = addInput.value.trim(); if (!t) return;
+      send({ action: 'add', text: t }).then(refresh);
+    }
+    var addBtn = root.querySelector('#co-asg-addbtn');
+    if (addBtn) addBtn.addEventListener('click', add);
+    if (addInput) addInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') add(); });
+    Array.prototype.forEach.call(root.querySelectorAll('.co-asg'), function (row) {
+      var aid = +row.getAttribute('data-aid');
+      var cb = row.querySelector('.co-asg-cb');
+      if (cb) cb.addEventListener('change', function () { send({ action: 'toggle', id: aid }).then(refresh); });
+      var del = row.querySelector('.co-asg-del');
+      if (del) del.addEventListener('click', function () { send({ action: 'remove', id: aid }).then(refresh); });
+    });
+  }
+
+  function makeQuizFromCourse(cid, title) {
+    var bar = root.querySelector('#co-quizbar');
+    if (!bar) return;
+    bar.innerHTML = '<div class="co-quizbox"><span class="co-muted">Reading course material…</span></div>';
+    fetch('/api/courses/course-text/' + encodeURIComponent(cid)).then(function (r) { return r.json(); }).then(function (d) {
+      if (d.error || !d.text) { bar.innerHTML = '<div class="co-quizbox co-warn">No readable text found in this course.</div>'; return; }
+      bar.innerHTML = '<div class="co-quizbox"><span class="co-muted">Building questions from ' + d.files + ' file' + (d.files === 1 ? '' : 's') + '…</span></div>';
+      post('/api/flashcards/generate', { text: d.text, deck: title }).then(function (g) {
+        var cards = g.proposed || [];
+        if (!cards.length) { bar.innerHTML = '<div class="co-quizbox co-warn">Couldn’t find clear Q&amp;A in this course’s text.</div>'; return; }
+        bar.innerHTML = '<div class="co-quizbox">Proposed <b>' + cards.length + '</b> questions — ' +
+          '<button class="co-btn co-btn--primary" id="co-quiz-save">Save to “' + esc(g.deck) + '” deck</button>' +
+          '<span id="co-quiz-msg" class="co-muted"></span></div>';
+        root.querySelector('#co-quiz-save').addEventListener('click', function () {
+          var saved = 0;
+          cards.reduce(function (ch, cd) {
+            return ch.then(function () { return post('/api/flashcards/card', { front: cd.front, back: cd.back, deck: g.deck }).then(function () { saved++; }); });
+          }, Promise.resolve()).then(function () {
+            root.querySelector('#co-quiz-msg').innerHTML = ' Saved ' + saved + ' ✓ — quiz them in <b>Quiz</b> or <b>Flashcards</b>.';
+          });
+        });
+      }).catch(function () { bar.innerHTML = '<div class="co-quizbox co-warn">Generation failed.</div>'; });
+    }).catch(function () { bar.innerHTML = '<div class="co-quizbox co-warn">Could not read course.</div>'; });
+  }
+
+  function wireStatus(cid) {
+    function patch(body, then) {
+      post('/api/courses/status/' + encodeURIComponent(cid), body).then(function (d) {
+        if (d.error) { Deck.toast(d.error, 'error'); return; }
+        if (then) then(d.course);
+      });
+    }
+    Array.prototype.forEach.call(root.querySelectorAll('.co-stbtn'), function (b) {
+      b.addEventListener('click', function () {
+        patch({ status: b.getAttribute('data-st') }, function () { showDetail(cid); });
+      });
+    });
+    var pct = root.querySelector('#co-pct'), pctv = root.querySelector('#co-pctv');
+    if (pct) {
+      pct.addEventListener('input', function () { pctv.textContent = pct.value + '%'; });
+      pct.addEventListener('change', function () { patch({ percent: +pct.value }, function () { showDetail(cid); }); });
+    }
+    var ns = root.querySelector('#co-notes-save');
+    if (ns) ns.addEventListener('click', function () {
+      patch({ notes: root.querySelector('#co-notes').value }, function () {
+        var msg = root.querySelector('#co-notes-msg'); if (msg) { msg.textContent = ' Saved ✓'; setTimeout(function () { msg.textContent = ''; }, 1800); }
+      });
+    });
+    var del = root.querySelector('#co-del');
+    if (del) del.addEventListener('click', function () {
+      Deck.modal({
+        title: 'Delete course?', width: 420,
+        body: '<div class="co-muted">This removes the course record from CyberDeck. Your original files on disk are never touched.</div>',
+        footer: '<button class="co-btn" id="cd-no">Cancel</button><button class="co-btn co-btn--danger" id="cd-yes">Delete</button>',
+        onMount: function (m) {
+          m.querySelector('#cd-no').addEventListener('click', Deck.closeModal);
+          m.querySelector('#cd-yes').addEventListener('click', function () { Deck.closeModal(); doDelete(cid); });
+        },
+      });
+    });
+  }
+
+  function doDelete(cid) {
+    fetch('/api/courses/' + encodeURIComponent(cid), { method: 'DELETE' }).then(function (r) { return r.json(); }).then(function () {
+      Deck.toast('Course deleted'); showList();
     });
   }
 

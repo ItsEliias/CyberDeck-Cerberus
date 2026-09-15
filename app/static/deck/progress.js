@@ -35,11 +35,12 @@
 
       // ── What you've learned ──
       var pbDone = pbs.filter(function (p) { return p.total > 0 && p.done >= p.total; }).length;
+      var cDone = courses.filter(function (c) { return (c.status || (c.kind === 'manual' ? 'completed' : '')) === 'completed'; }).length;
       var learned = '<div class="pg-stats">' +
         stat(fc.mature || 0, 'cards mastered') +
         stat((fc.reviewed || 0) + '/' + (fc.total || 0), 'cards reviewed') +
         stat(pbDone + '/' + pbs.length, 'playbooks done') +
-        stat(courses.length, 'courses') +
+        stat(cDone + '/' + courses.length, 'courses completed') +
         stat(rs.count != null ? rs.count : (rs.items || []).length, 'bookmarks') +
         '</div>';
       // Topics covered — de-duped across decks, playbooks, courses.

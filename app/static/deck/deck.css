@@ -1,8 +1,9 @@
 /* CyberDeck shell extras — everything themes off the Cerberus vars (--bg/--fg/--panel/--border/--red). */
 
 /* Cerberus ships a global `button { height:32px }`. Our multi-line card buttons must
-   size to their content, or their labels overflow below the box. */
-.hm-tile, .co-card, .hm-note, .deck-swatch, .fc-deck {
+   size to their content, or their labels overflow below the box (cards then overlap). */
+.hm-tile, .co-card, .hm-note, .deck-swatch, .fc-deck,
+.lp-card, .qz-choice, .hm-plan {
   height: auto !important;
   white-space: normal;
   line-height: normal;
@@ -128,6 +129,34 @@
 .md-body .md-wikilink { color: var(--red); border-bottom: 1px dashed color-mix(in srgb, var(--red) 55%, transparent); cursor: pointer; }
 .md-fallback { white-space: pre-wrap; font-family: 'Fira Code', monospace; font-size: 13px; }
 
+/* Obsidian #tags */
+.md-body .md-tag { display: inline; color: var(--deck-accent); background: color-mix(in srgb, var(--deck-accent) 12%, transparent); border-radius: 5px; padding: 1px 6px; font-size: .9em; font-weight: 500; cursor: pointer; white-space: nowrap; }
+.md-body .md-tag:hover { background: color-mix(in srgb, var(--deck-accent) 24%, transparent); }
+
+/* Note embeds ![[Other Note]] */
+.md-embed { border: 1px solid var(--border); border-left: 3px solid var(--deck-accent); border-radius: 8px; margin: 1em 0; background: color-mix(in srgb, var(--fg) 3%, transparent); overflow: hidden; }
+.md-embed-h { display: flex; align-items: center; gap: 7px; padding: 8px 12px; font-weight: 600; font-size: 13px; color: var(--deck-accent); border-bottom: 1px solid var(--border); text-decoration: none; cursor: pointer; }
+.md-embed-i { opacity: .8; }
+.md-embed-body { padding: 4px 16px 10px; }
+.md-embed-body > *:first-child { margin-top: .4em; }
+.md-embed-missing { padding: 10px 14px; color: var(--fg); opacity: .55; font-size: 13px; border-left-color: var(--border); }
+
+/* Tag browser */
+.kb-tagcloud { display: flex; flex-wrap: wrap; gap: 8px; padding: 18px 4px; }
+.kb-tagchip { display: inline-flex; align-items: center; gap: 6px; }
+.kb-tagn { background: color-mix(in srgb, var(--deck-accent) 18%, transparent); border-radius: 999px; padding: 0 7px; font-size: 11px; }
+.kb-taglist { display: flex; flex-direction: column; gap: 6px; padding: 14px 0; }
+.kb-taglist .kb-bl { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; margin: 0; padding: 8px 12px; width: 100%; }
+.kb-bl-t { font-weight: 600; }
+.kb-bl-p { font-size: 11px; opacity: .5; font-family: 'Fira Code', monospace; }
+
+/* [[ ]] autocomplete popup */
+.kb-ac { position: fixed; z-index: 9999; min-width: 240px; max-width: 380px; max-height: 260px; overflow-y: auto; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 8px 28px rgba(0,0,0,.4); padding: 4px; }
+.kb-ac-item { display: flex; flex-direction: column; gap: 1px; padding: 6px 10px; border-radius: 6px; cursor: pointer; }
+.kb-ac-item.on, .kb-ac-item:hover { background: color-mix(in srgb, var(--deck-accent) 20%, transparent); }
+.kb-ac-t { font-size: 13px; color: var(--fg); }
+.kb-ac-p { font-size: 11px; opacity: .5; font-family: 'Fira Code', monospace; }
+
 /* ── Courses module ──────────────────────────────────────────────────────────── */
 .co-head { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; row-gap: 8px; padding: 16px 22px; border-bottom: 1px solid var(--border); }
 .co-title { font-family: 'Fira Code', monospace; font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--red); }
@@ -154,6 +183,54 @@
 .co-chips, .co-chip { font-family: 'Fira Code', monospace; }
 .co-chips { display: flex; flex-wrap: wrap; gap: 5px; }
 .co-chip { font-size: 10px; padding: 2px 7px; border: 1px solid var(--border); border-radius: 20px; opacity: .8; }
+
+/* Course status badges + progress (task #7) */
+.co-st { font-size: 10px; font-weight: 600; padding: 1px 8px; border-radius: 20px; margin-left: 8px; vertical-align: middle; white-space: nowrap; }
+.co-st--completed { color: var(--green); background: color-mix(in srgb, var(--green) 16%, transparent); }
+.co-st--in-progress { color: var(--warn); background: color-mix(in srgb, var(--warn) 16%, transparent); }
+.co-st--planned { color: var(--fg); opacity: .6; background: color-mix(in srgb, var(--fg) 10%, transparent); }
+.co-cardbar { height: 4px; border-radius: 999px; background: color-mix(in srgb, var(--fg) 10%, transparent); overflow: hidden; margin: 8px 0; }
+.co-cardbar-f { height: 100%; background: var(--deck-accent); border-radius: 999px; }
+
+.co-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+.co-tab { background: transparent; border: 1px solid var(--border); border-radius: 20px; color: var(--fg); opacity: .7; font-size: 12px; padding: 5px 14px; cursor: pointer; }
+.co-tab:hover { border-color: var(--deck-accent); }
+.co-tab--on { opacity: 1; color: var(--deck-accent); border-color: var(--deck-accent); background: color-mix(in srgb, var(--deck-accent) 12%, transparent); }
+
+.co-statusbar { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 14px 22px; border-bottom: 1px solid var(--border); }
+.co-stbtns { display: inline-flex; gap: 6px; }
+.co-stbtn { background: transparent; border: 1px solid var(--border); border-radius: 6px; color: var(--fg); opacity: .7; font-size: 12px; padding: 5px 12px; cursor: pointer; }
+.co-stbtn:hover { border-color: var(--deck-accent); opacity: 1; }
+.co-stbtn--on { opacity: 1; }
+.co-stbtn--completed { color: var(--green); border-color: var(--green); background: color-mix(in srgb, var(--green) 14%, transparent); }
+.co-stbtn--in-progress { color: var(--warn); border-color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }
+.co-stbtn--planned { color: var(--fg); border-color: var(--fg); background: color-mix(in srgb, var(--fg) 10%, transparent); }
+.co-pctwrap { display: inline-flex; align-items: center; gap: 8px; }
+.co-pctwrap input[type=range] { accent-color: var(--deck-accent); width: 130px; }
+.co-pctv { font-family: 'Fira Code', monospace; font-size: 12px; color: var(--deck-accent); min-width: 38px; }
+.co-provider { font-size: 12px; opacity: .6; font-family: 'Fira Code', monospace; }
+.co-extlink { font-size: 12px; color: var(--deck-accent); text-decoration: none; }
+.co-extlink:hover { text-decoration: underline; }
+.co-notesrow { display: flex; align-items: flex-start; gap: 10px; padding: 12px 22px; border-bottom: 1px solid var(--border); }
+.co-notesrow .co-input { resize: vertical; min-height: 40px; }
+.co-manualbody { padding: 22px; }
+.co-btn--danger { color: var(--red); border-color: color-mix(in srgb, var(--red) 50%, var(--border)); }
+.co-btn--danger:hover { border-color: var(--red); background: color-mix(in srgb, var(--red) 12%, transparent); }
+
+/* Assignments checklist + quiz-from-course (task #8) */
+.co-asgwrap { padding: 14px 22px; border-bottom: 1px solid var(--border); }
+.co-asg-head { font-family: 'Fira Code', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--deck-accent); margin-bottom: 10px; }
+.co-asglist { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
+.co-asg { display: flex; align-items: center; gap: 8px; }
+.co-asg-lbl { display: flex; align-items: center; gap: 9px; cursor: pointer; flex: 1; }
+.co-asg-cb { accent-color: var(--green); width: 15px; height: 15px; flex-shrink: 0; }
+.co-asg-txt { font-size: 13px; }
+.co-asg-txt--done { opacity: .5; text-decoration: line-through; }
+.co-asg-del { background: transparent; border: none; color: var(--fg); opacity: .4; font-size: 17px; line-height: 1; cursor: pointer; padding: 0 6px; }
+.co-asg-del:hover { opacity: 1; color: var(--red); }
+.co-asg-add { display: flex; gap: 8px; }
+.co-quizbox { padding: 12px 22px; font-size: 13px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.co-quizbox.co-warn { padding: 12px 22px; }
 
 .co-form { max-width: 680px; }
 .co-label { display: block; font-family: 'Fira Code', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; opacity: .6; margin-bottom: 6px; }

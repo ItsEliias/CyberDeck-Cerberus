@@ -321,6 +321,9 @@ def detail(cid):
     rec = _record(cid)
     if not rec:
         return jsonify(error="not found"), 404
+    # Manual courses have no source folder — nothing to scan.
+    if not (rec.get("source") or "").strip():
+        return jsonify(course=rec, categories={}, total=0)
     # Re-scan source live so the listing is always current (index-in-place).
     result = scan_folder(Path(rec["source"]), set(rec["categories"]))
     return jsonify(course=rec, categories=result["categories"], total=result["total"])
@@ -333,6 +336,172 @@ def remove(cid):
         f.unlink()
         return jsonify(ok=True)
     return jsonify(error="not found"), 404
+
+
+def _save(rec: dict) -> None:
+    COURSES_DIR.mkdir(parents=True, exist_ok=True)
+    (COURSES_DIR / f"{rec['id']}.json").write_text(json.dumps(rec, indent=2), "utf-8")
+
+
+_STATUSES = {"planned", "in-progress", "completed"}
+
+
+@bp.route("/status/<cid>", methods=["POST"])
+def set_status(cid):
+    """Update a course's progress: status (planned/in-progress/completed), percent, notes, provider."""
+    rec = _record(cid)
+    if not rec:
+        return jsonify(error="not found"), 404
+    data = request.get_json(silent=True) or {}
+    if "status" in data:
+        st = str(data["status"]).strip().lower()
+        if st not in _STATUSES:
+            return jsonify(error="bad status"), 400
+        rec["status"] = st
+        if st == "completed":
+            rec["percent"] = 100
+            rec["completed_at"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
+        else:
+            rec.pop("completed_at", None)
+    if "percent" in data:
+        try:
+            pct = max(0, min(100, int(data["percent"])))
+        except (TypeError, ValueError):
+            pct = rec.get("percent", 0)
+        rec["percent"] = pct
+        if pct >= 100:
+            rec["status"] = "completed"
+            rec.setdefault("completed_at", datetime.now(timezone.utc).isoformat(timespec="seconds"))
+        elif pct > 0 and rec.get("status", "planned") == "planned":
+            rec["status"] = "in-progress"
+    for k in ("notes", "provider"):
+        if k in data:
+            rec[k] = str(data[k]).strip()
+    _save(rec)
+    return jsonify(course=rec)
+
+
+@bp.route("/manual", methods=["POST"])
+def manual():
+    """Log a course you did elsewhere — no files to import. Title/provider/status/notes only."""
+    data = request.get_json(silent=True) or {}
+    title = (data.get("title") or "").strip()
+    if not title:
+        return jsonify(error="title required"), 400
+    COURSES_DIR.mkdir(parents=True, exist_ok=True)
+    cid = base = _slug(title)
+    i = 2
+    while (COURSES_DIR / f"{cid}.json").exists():
+        cid = f"{base}-{i}"; i += 1
+    status = str(data.get("status") or "completed").strip().lower()
+    if status not in _STATUSES:
+        status = "completed"
+    stamp = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    rec = {
+        "id": cid, "title": title, "source": "", "categories": [], "total": 0, "counts": {},
+        "imported_at": stamp, "kind": "manual",
+        "provider": (data.get("provider") or "").strip(),
+        "url": (data.get("url") or "").strip(),
+        "notes": (data.get("notes") or "").strip(),
+        "status": status,
+        "percent": 100 if status == "completed" else int(data.get("percent") or 0),
+    }
+    if status == "completed":
+        rec["completed_at"] = stamp
+    _save(rec)
+    return jsonify(course=rec)
+
+
+def _next_aid(rec: dict) -> int:
+    return max([a.get("id", 0) for a in rec.get("assignments", [])] or [0]) + 1
+
+
+@bp.route("/assignments/<cid>", methods=["POST"])
+def assignments(cid):
+    """Per-course assignment checklist. action = add | toggle | remove."""
+    rec = _record(cid)
+    if not rec:
+        return jsonify(error="not found"), 404
+    data = request.get_json(silent=True) or {}
+    action = data.get("action")
+    items = rec.setdefault("assignments", [])
+    if action == "add":
+        text = (data.get("text") or "").strip()
+        if not text:
+            return jsonify(error="empty"), 400
+        items.append({"id": _next_aid(rec), "text": text[:300], "done": False})
+    elif action == "toggle":
+        for a in items:
+            if a.get("id") == data.get("id"):
+                a["done"] = not a.get("done", False)
+                break
+    elif action == "remove":
+        rec["assignments"] = [a for a in items if a.get("id") != data.get("id")]
+    else:
+        return jsonify(error="bad action"), 400
+    _save(rec)
+    return jsonify(assignments=rec.get("assignments", []))
+
+
+# Text-bearing files we can pull course content from for quiz generation.
+_TEXT_EXT = {".md", ".markdown", ".txt", ".rtf", ".csv", ".srt", ".vtt",
+             ".py", ".js", ".ts", ".sh", ".c", ".cpp", ".h", ".java", ".go", ".rs",
+             ".html", ".css", ".json", ".yaml", ".yml", ".sql", ".php"}
+_TEXT_BUDGET = 45000   # cap total characters fed to the generator
+
+
+@bp.route("/course-text/<cid>")
+def course_text(cid):
+    """Concatenate the readable text of a course (notes/docs/code + PDFs), bounded.
+
+    Feeds the frontend's "Make quiz from this course" → flashcards generator.
+    Kept in the data layer so modules never import each other (CyberDeck rule).
+    """
+    rec = _record(cid)
+    if not rec:
+        return jsonify(error="not found"), 404
+    root = Path(rec.get("source") or "").resolve()
+    if not str(rec.get("source") or "").strip() or not root.is_dir():
+        return jsonify(text="", chars=0, files=0)
+    chunks, used, files = [], 0, 0
+    for r, dirs, names in os.walk(root):
+        dirs[:] = [d for d in dirs if d not in _HIDE and not d.startswith(".")]
+        for name in sorted(names):
+            if used >= _TEXT_BUDGET:
+                break
+            if name.startswith(".") or name in _HIDE:
+                continue
+            p = Path(r) / name
+            ext = p.suffix.lower()
+            text = ""
+            if ext in _TEXT_EXT:
+                try:
+                    text = p.read_text("utf-8", errors="ignore")
+                except OSError:
+                    continue
+            elif ext == ".pdf":
+                try:
+                    import pypdf
+                    reader = pypdf.PdfReader(str(p))
+                    pages = []
+                    for i, pg in enumerate(reader.pages):
+                        if i >= 40:
+                            break
+                        pages.append(pg.extract_text() or "")
+                    text = "\n\n".join(pages)
+                except Exception:
+                    continue
+            else:
+                continue
+            text = text.strip()
+            if not text:
+                continue
+            room = _TEXT_BUDGET - used
+            snippet = text[:room]
+            chunks.append(f"## {p.stem}\n\n{snippet}")
+            used += len(snippet)
+            files += 1
+    return jsonify(text="\n\n".join(chunks), chars=used, files=files)
 
 
 @bp.route("/file/<cid>")

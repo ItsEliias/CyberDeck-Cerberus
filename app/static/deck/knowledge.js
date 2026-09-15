@@ -105,11 +105,14 @@
       '<span style="margin-left:auto;display:flex;gap:8px;"><button class="kb-edit-btn" id="kb-cancel">Cancel</button>' +
       '<button class="co-btn co-btn--primary" id="kb-save">Save</button></span></div>' +
       '<textarea id="kb-editor" class="kb-editor" spellcheck="false"></textarea>';
-    pane.querySelector('#kb-editor').value = currentRaw;
-    pane.querySelector('#kb-editor').focus();
-    pane.querySelector('#kb-cancel').addEventListener('click', function () { openNote(rootEl, current); });
+    var ta = pane.querySelector('#kb-editor');
+    ta.value = currentRaw;
+    ta.focus();
+    wireAutocomplete(ta);
+    pane.querySelector('#kb-cancel').addEventListener('click', function () { if (ta._acCleanup) ta._acCleanup(); openNote(rootEl, current); });
     pane.querySelector('#kb-save').addEventListener('click', function () {
-      var content = pane.querySelector('#kb-editor').value;
+      var content = ta.value;
+      if (ta._acCleanup) ta._acCleanup();
       fetch('/api/knowledge/save', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path: current, content: content }) })
         .then(function (r) { return r.json(); }).then(function () { if (window.Deck) Deck.toast('Saved'); openNote(rootEl, current); });
     });
@@ -151,16 +154,145 @@
     });
   }
 
+  // ---- Tags -------------------------------------------------------------
+  function showAllTags(rootEl) {
+    current = null;
+    var pane = rootEl.querySelector('#kb-note');
+    pane.innerHTML = '<div class="kb-loading">Loading tags…</div>';
+    drawTree(rootEl);
+    fetch('/api/knowledge/tags').then(function (r) { return r.json(); }).then(function (d) {
+      var tags = d.tags || [];
+      if (!tags.length) { pane.innerHTML = '<div class="kb-loading">No #tags in the vault yet.</div>'; return; }
+      pane.innerHTML = '<div class="kb-note-head"><span># Tags <span class="co-muted">(' + tags.length + ')</span></span></div>' +
+        '<div class="kb-tagcloud">' +
+        tags.map(function (t) {
+          return '<button class="md-tag kb-tagchip" data-tag="' + esc(t.tag) + '">#' + esc(t.tag) + '<span class="kb-tagn">' + t.count + '</span></button>';
+        }).join('') + '</div>';
+      pane.scrollTop = 0;
+    });
+  }
+
+  function showTag(rootEl, tag) {
+    var pane = rootEl.querySelector('#kb-note');
+    pane.innerHTML = '<div class="kb-loading">Loading #' + esc(tag) + '…</div>';
+    fetch('/api/knowledge/tags').then(function (r) { return r.json(); }).then(function (d) {
+      var hit = (d.tags || []).filter(function (t) { return t.tag.toLowerCase() === tag.toLowerCase(); })[0];
+      var notes = hit ? hit.notes : [];
+      pane.innerHTML = '<div class="kb-note-head"><button class="kb-edit-btn" id="kb-tagback">← Tags</button>' +
+        '<span style="margin-left:8px;">#' + esc(tag) + ' <span class="co-muted">(' + notes.length + ')</span></span></div>' +
+        '<div class="kb-taglist">' +
+        notes.map(function (n) {
+          return '<button class="kb-bl" data-file="' + esc(n.path) + '"><span class="kb-bl-t">' + esc(n.title) + '</span><span class="kb-bl-p">' + esc(n.path) + '</span></button>';
+        }).join('') + '</div>';
+      pane.scrollTop = 0;
+    });
+  }
+
+  // ---- [[ ]] autocomplete ----------------------------------------------
+  var noteCache = null;
+  function ensureNotes(cb) {
+    if (noteCache) { cb(noteCache); return; }
+    fetch('/api/knowledge/notes').then(function (r) { return r.json(); }).then(function (d) { noteCache = d.notes || []; cb(noteCache); });
+  }
+
+  // Pixel position of the textarea caret, via a hidden mirror element.
+  function caretXY(ta) {
+    var mirror = document.createElement('div');
+    var s = getComputedStyle(ta);
+    ['fontFamily', 'fontSize', 'fontWeight', 'lineHeight', 'letterSpacing', 'textTransform', 'wordSpacing',
+      'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft', 'borderTopWidth', 'borderLeftWidth'].forEach(function (p) { mirror.style[p] = s[p]; });
+    mirror.style.position = 'absolute'; mirror.style.visibility = 'hidden';
+    mirror.style.whiteSpace = 'pre-wrap'; mirror.style.wordWrap = 'break-word';
+    mirror.style.width = ta.clientWidth + 'px';
+    var r = ta.getBoundingClientRect();
+    mirror.style.left = r.left + 'px'; mirror.style.top = r.top + 'px';
+    mirror.textContent = ta.value.substring(0, ta.selectionStart);
+    var marker = document.createElement('span'); marker.textContent = '​';
+    mirror.appendChild(marker);
+    document.body.appendChild(mirror);
+    var x = r.left + marker.offsetLeft - ta.scrollLeft;
+    var y = r.top + marker.offsetTop - ta.scrollTop;
+    var lh = parseFloat(s.lineHeight) || 18;
+    document.body.removeChild(mirror);
+    return { x: x, y: y + lh };
+  }
+
+  function wireAutocomplete(ta) {
+    var pop = document.createElement('div');
+    pop.className = 'kb-ac'; pop.style.display = 'none';
+    document.body.appendChild(pop);
+    var matches = [], sel = 0, queryStart = -1;
+
+    function close() { pop.style.display = 'none'; queryStart = -1; matches = []; }
+
+    function render() {
+      if (!matches.length) { close(); return; }
+      pop.innerHTML = matches.map(function (m, i) {
+        return '<div class="kb-ac-item' + (i === sel ? ' on' : '') + '" data-i="' + i + '">' +
+          '<span class="kb-ac-t">' + esc(m.title) + '</span><span class="kb-ac-p">' + esc(m.path) + '</span></div>';
+      }).join('');
+      var xy = caretXY(ta);
+      pop.style.left = Math.round(xy.x) + 'px';
+      pop.style.top = Math.round(xy.y) + 'px';
+      pop.style.display = 'block';
+    }
+
+    function refresh() {
+      var upto = ta.value.substring(0, ta.selectionStart);
+      var m = /\[\[([^\]\n|]*)$/.exec(upto);
+      if (!m) { close(); return; }
+      queryStart = m.index;              // position of the "[["
+      var q = m[1].toLowerCase();
+      ensureNotes(function (notes) {
+        matches = notes.filter(function (n) { return n.title.toLowerCase().indexOf(q) !== -1; }).slice(0, 8);
+        sel = 0; render();
+      });
+    }
+
+    function accept(i) {
+      var m = matches[i]; if (!m) return;
+      var before = ta.value.substring(0, queryStart);
+      var after = ta.value.substring(ta.selectionStart);
+      // strip an auto-inserted trailing ]] if present, then re-add cleanly.
+      after = after.replace(/^\]\]/, '');
+      var insert = '[[' + m.title + ']]';
+      ta.value = before + insert + after;
+      var caret = (before + insert).length;
+      ta.setSelectionRange(caret, caret);
+      close(); ta.focus();
+    }
+
+    ta.addEventListener('input', refresh);
+    ta.addEventListener('keydown', function (e) {
+      if (pop.style.display === 'none') return;
+      if (e.key === 'ArrowDown') { sel = (sel + 1) % matches.length; render(); e.preventDefault(); }
+      else if (e.key === 'ArrowUp') { sel = (sel - 1 + matches.length) % matches.length; render(); e.preventDefault(); }
+      else if (e.key === 'Enter' || e.key === 'Tab') { accept(sel); e.preventDefault(); }
+      else if (e.key === 'Escape') { close(); }
+    });
+    pop.addEventListener('mousedown', function (e) {
+      var it = e.target.closest('.kb-ac-item'); if (!it) return;
+      e.preventDefault(); accept(parseInt(it.getAttribute('data-i'), 10));
+    });
+    ta.addEventListener('blur', function () { setTimeout(close, 150); });
+    ta.addEventListener('scroll', function () { if (pop.style.display !== 'none') render(); });
+    ta._acCleanup = function () { if (pop.parentNode) pop.parentNode.removeChild(pop); };
+  }
+
   window.DeckViews.knowledge = function (root) {
     root.innerHTML =
       '<div class="kb-wrap">' +
-      '  <div class="kb-side"><div class="kb-side-head">Vault<button class="kb-new-btn" id="kb-new" title="New note">+</button></div><div id="kb-tree" class="kb-tree"></div></div>' +
+      '  <div class="kb-side"><div class="kb-side-head">Vault<button class="kb-new-btn" id="kb-tags" title="Browse tags">#</button><button class="kb-new-btn" id="kb-new" title="New note">+</button></div><div id="kb-tree" class="kb-tree"></div></div>' +
       '  <div id="kb-note" class="kb-note"><div class="kb-loading">Select a note from the vault.</div></div>' +
       '</div>';
 
     root.addEventListener('click', function (e) {
+      var tg = e.target.closest('.md-tag');
+      if (tg) { showTag(root, tg.getAttribute('data-tag') || tg.textContent.replace(/^#/, '')); return; }
       var wl = e.target.closest('.md-wikilink');
       if (wl) { resolveWiki(root, wl.getAttribute('data-target') || wl.textContent); return; }
+      if (e.target.closest('#kb-tagback')) { showAllTags(root); return; }
+      if (e.target.closest('#kb-tags')) { showAllTags(root); return; }
       if (e.target.closest('#kb-edit')) { editNote(root); return; }
       if (e.target.closest('#kb-fc')) { makeFlashcards(root); return; }
       if (e.target.closest('#kb-new')) { newNoteModal(root); return; }

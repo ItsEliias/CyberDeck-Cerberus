@@ -68,6 +68,18 @@ def resolve():
     return jsonify(path=vault.resolve_wikilink(request.args.get("target", "")))
 
 
+@bp.route("/notes")
+def notes_list():
+    """Flat list of every note {path,title} — powers the [[ ]] autocomplete."""
+    return jsonify(notes=vault.note_list())
+
+
+@bp.route("/tags")
+def tags():
+    """Every #tag in the vault with counts and the notes that carry it."""
+    return jsonify(tags=vault.all_tags())
+
+
 @bp.route("/asset")
 def asset():
     """Serve an image (or other file) referenced from a note, contained to the vault."""
