@@ -26,10 +26,11 @@
       g('/api/flashcards/decks', { decks: [] }),
       g('/api/playbooks/list', { playbooks: [] }),
       g('/api/resources/list', { items: [] }),
+      g('/api/ratings/list', { ratings: {} }),
     ]).then(function (res) {
       var a = res[0], tree = res[1].tree || { children: [] };
       var courses = res[2].courses || [], fc = res[3] || {}, decks = res[4].decks || [];
-      var pbs = res[5].playbooks || [], rs = res[6] || {};
+      var pbs = res[5].playbooks || [], rs = res[6] || {}, ratings = res[7].ratings || {};
       var body = root.querySelector('#pg-body');
 
       // ── What you've learned ──
@@ -50,6 +51,13 @@
       var topics = uniq.slice(0, 28).map(function (t) { return '<span class="co-chip">' + esc(t) + '</span>'; }).join('') ||
         '<span class="co-muted">import a course or review some cards to build this</span>';
 
+      // ── Self-assessment (weak-area heatmap) ──
+      var assess = uniq.slice(0, 24).map(function (t) {
+        var r = ratings[t] || 0;
+        var dots = [1, 2, 3, 4, 5].map(function (n) { return '<button class="sa-dot' + (n <= r ? ' sa-dot--on' : '') + '" data-topic="' + esc(t) + '" data-r="' + n + '" title="' + n + '/5"></button>'; }).join('');
+        return '<div class="sa-row sa-r' + r + '"><span class="sa-topic">' + esc(t) + '</span><span class="sa-dots">' + dots + '</span></div>';
+      }).join('') || '<span class="co-muted">rate topics once you have decks/courses</span>';
+
       var kinds = Object.keys(a.by_kind || {}).map(function (k) { return '<span class="co-chip">' + esc(k) + ' ' + a.by_kind[k] + '</span>'; }).join('') || '<span class="co-muted">no activity logged yet</span>';
       var cover = (tree.children || []).filter(function (c) { return c.type === 'folder'; }).map(function (f) {
         return '<div class="pg-cov"><span class="pg-cov-name">' + esc(f.name) + '</span><span class="pg-cov-n">' + (f.count || 0) + '</span></div>';
@@ -58,6 +66,8 @@
       body.innerHTML =
         '<div class="deck-panel-title" style="margin:2px 0 10px;">What you’ve learned</div>' + learned +
         '<div class="deck-panel-title" style="margin:24px 0 10px;">Topics covered</div><div class="co-chips">' + topics + '</div>' +
+        '<div class="deck-panel-title" style="margin:26px 0 10px;">Self-assessment <span class="co-muted" style="font-weight:400;text-transform:none;letter-spacing:0;">— rate your confidence; red = revisit</span></div>' +
+        '<div class="sa-grid">' + assess + '</div>' +
         '<div class="deck-panel-title" style="margin:26px 0 10px;">Streak &amp; activity</div>' +
         '<div class="pg-stats">' +
         stat(a.streak + '🔥', 'day streak') + stat(a.longest || 0, 'longest') +
@@ -68,6 +78,15 @@
         '<div class="pg-legend">less <span class="pg-cell pg-l0"></span><span class="pg-cell pg-l1"></span><span class="pg-cell pg-l2"></span><span class="pg-cell pg-l3"></span><span class="pg-cell pg-l4"></span> more</div>' +
         '<div class="deck-panel-title" style="margin:26px 0 10px;">By type</div><div class="co-chips">' + kinds + '</div>' +
         '<div class="deck-panel-title" style="margin:26px 0 10px;">Vault coverage</div><div class="pg-covwrap">' + cover + '</div>';
+
+      body.addEventListener('click', function (e) {
+        var dot = e.target.closest ? e.target.closest('.sa-dot') : null;
+        if (!dot) return;
+        var topic = dot.getAttribute('data-topic'), r = +dot.getAttribute('data-r');
+        var nr = (ratings[topic] || 0) === r ? 0 : r;   // click the same level to clear
+        fetch('/api/ratings/set', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ topic: topic, rating: nr }) })
+          .then(function () { ratings[topic] = nr; view(root); });
+      });
     });
   }
   function stat(v, l) { return '<div class="pg-stat"><div class="pg-stat-v">' + v + '</div><div class="pg-stat-l">' + esc(l) + '</div></div>'; }
