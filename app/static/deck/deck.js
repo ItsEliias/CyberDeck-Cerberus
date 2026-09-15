@@ -33,7 +33,8 @@
     settings: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
     panel: '<rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/>',
     resources: '<path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>',
-    toolkit: '<path d="M14.7 6.3a4 4 0 0 0-5.4 5.3L3 18v3h3l6.4-6.3a4 4 0 0 0 5.3-5.4l-2.6 2.6-2-2z"/>'
+    toolkit: '<path d="M14.7 6.3a4 4 0 0 0-5.4 5.3L3 18v3h3l6.4-6.3a4 4 0 0 0 5.3-5.4l-2.6 2.6-2-2z"/>',
+    quiz: '<circle cx="12" cy="12" r="9"/><path d="M9.1 9.5a3 3 0 0 1 5.6 1.2c0 1.8-2.7 2.3-2.7 3.8"/><line x1="12" y1="17.5" x2="12" y2="17.5"/>'
   };
   function svg(key, size) {
     size = size || 16;
@@ -48,6 +49,7 @@
     { id: 'knowledge', label: 'Knowledge', blurb: 'Your vault, Obsidian-style' },
     { id: 'playbooks', label: 'Playbooks', blurb: 'Repeatable procedures' },
     { id: 'flashcards', label: 'Flashcards', blurb: 'Spaced-repetition review' },
+    { id: 'quiz', label: 'Quiz', blurb: 'Test yourself (MCQ)' },
     { id: 'progress', label: 'Progress', blurb: 'Streaks + activity heatmap' },
     { id: 'netlab', label: 'NetLab', blurb: 'Network tools' },
     { id: 'targets', label: 'Targets', blurb: 'Engagement targets + findings' },
@@ -161,7 +163,7 @@
   function renderSidebar() {
     var inner = document.getElementById('sidebar-inner');
     var html = '<div class="section"><div class="section-header-flex"><span class="section-title">Study</span></div>';
-    ['home', 'courses', 'knowledge', 'playbooks', 'flashcards', 'progress'].forEach(function (id) { html += navItem(id); });
+    ['home', 'courses', 'knowledge', 'playbooks', 'flashcards', 'quiz', 'progress'].forEach(function (id) { html += navItem(id); });
     html += '</div><div class="section"><div class="section-header-flex"><span class="section-title">Engagement</span></div>';
     ['sessions', 'netlab', 'targets', 'board', 'scan', 'topology', 'reports', 'credentials'].forEach(function (id) { html += navItem(id); });
     html += '</div><div class="section"><div class="section-header-flex"><span class="section-title">Feeds &amp; tools</span></div>';

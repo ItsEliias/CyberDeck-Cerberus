@@ -575,3 +575,22 @@ body.deck-reduce-motion *, body.deck-reduce-motion *::before, body.deck-reduce-m
 .hm-plan-main b { color: var(--deck-accent); }
 .hm-plan-sub { font-size: 11px; opacity: .55; font-weight: 400; }
 .hm-plan-arrow { opacity: .4; flex-shrink: 0; }
+
+/* Quiz */
+.qz-hrow { display: flex; justify-content: space-between; padding: 6px 0; border-top: 1px solid color-mix(in srgb, var(--border) 55%, transparent); font-size: 13px; }
+.qz-hrow:first-of-type { border-top: none; }
+.qz-pct { color: var(--deck-accent); font-family: 'Fira Code', monospace; font-size: 12px; }
+.qz-q { font-size: 17px; font-weight: 600; line-height: 1.4; margin: 8px 0 20px; }
+.qz-choices { display: flex; flex-direction: column; gap: 10px; }
+.qz-choice { text-align: left; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 13px 15px; color: var(--fg); font-size: 14px; cursor: pointer; transition: border-color .12s, background .12s; }
+.qz-choice:hover:not(:disabled) { border-color: color-mix(in srgb, var(--deck-accent) 45%, var(--border)); }
+.qz-choice:disabled { cursor: default; }
+.qz-correct { border-color: #2ecc71 !important; background: color-mix(in srgb, #2ecc71 14%, transparent) !important; }
+.qz-wrong { border-color: var(--red) !important; background: color-mix(in srgb, var(--red) 14%, transparent) !important; }
+.qz-score { text-align: center; padding: 20px; border: 1px solid var(--border); border-radius: 12px; background: var(--panel); }
+.qz-score-v { font-size: 34px; font-weight: 700; font-family: 'Orbitron', sans-serif; color: var(--deck-accent); }
+.qz-score-p { opacity: .6; margin-top: 4px; }
+.qz-miss { padding: 10px 0; border-top: 1px solid color-mix(in srgb, var(--border) 55%, transparent); }
+.qz-miss:first-of-type { border-top: none; }
+.qz-miss-q { font-weight: 600; font-size: 13px; }
+.qz-miss-a { font-size: 13px; color: var(--deck-accent); margin-top: 3px; }

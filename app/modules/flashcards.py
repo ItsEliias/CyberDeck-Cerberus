@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import os
+import random
 import re
 import secrets
 from datetime import datetime, timezone, timedelta
@@ -309,6 +310,47 @@ def stats():
     return jsonify(total=len(cards), due=sum(1 for c in cards if _is_due(c)),
                    reviewed=sum(1 for c in cards if c.get("reps", 0) > 0),
                    mature=sum(1 for c in cards if c.get("interval", 0) >= 21))
+
+
+# ── Quiz / mock-exam (MCQ from the card pool) ──────────────────────────────────
+@bp.route("/quiz")
+def quiz():
+    deck = request.args.get("deck")
+    try:
+        n = min(max(int(request.args.get("n", 10)), 1), 40)
+    except ValueError:
+        n = 10
+    d = _load()
+    pool = [c for c in d["cards"] if c.get("front") and c.get("back") and (not deck or c.get("deck") == deck)]
+    backs = list({c["back"] for c in d["cards"] if c.get("back")})
+    random.shuffle(pool)
+    qs = []
+    for c in pool[:n]:
+        distractors = [b for b in backs if b != c["back"]]
+        random.shuffle(distractors)
+        choices = [c["back"]] + distractors[:3]
+        random.shuffle(choices)
+        qs.append({"id": c["id"], "front": c["front"], "correct": c["back"],
+                   "choices": choices, "deck": c.get("deck", "General")})
+    return jsonify(questions=qs, count=len(qs))
+
+
+@bp.route("/quiz-result", methods=["POST"])
+def quiz_result():
+    data = request.get_json(silent=True) or {}
+    d = _load()
+    rec = {"date": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+           "deck": str(data.get("deck") or "All")[:60],
+           "score": int(data.get("score", 0)), "total": int(data.get("total", 0))}
+    d.setdefault("quizzes", []).append(rec)
+    d["quizzes"] = d["quizzes"][-50:]
+    _save(d)
+    return jsonify(ok=True, history=list(reversed(d["quizzes"]))[:8])
+
+
+@bp.route("/quiz-history")
+def quiz_history():
+    return jsonify(history=list(reversed(_load().get("quizzes", [])))[:8])
 
 
 # ── Generator (#4) ─────────────────────────────────────────────────────────────
