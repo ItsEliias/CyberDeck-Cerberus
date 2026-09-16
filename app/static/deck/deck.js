@@ -252,6 +252,34 @@
           seg('side', getPref('side'), [{ v: 'left', l: 'Left' }, { v: 'right', l: 'Right' }])) +
         setRow('Frosted glass', 'Blur behind the sidebar and panels.', toggle('frost', getPref('frost') === '1')) +
         setRow('Reduce motion', 'Minimise animations and transitions.', toggle('motion', getPref('motion') === '1')) +
+      '</div>' +
+      displayPanel() + aboutPanel();
+  }
+
+  // Window mode is stored server-side (in the profile) so it survives relaunches and
+  // desktop.py can read it at startup. Fullscreen/borderless apply on the next launch.
+  function displayPanel() {
+    var W = window.DeckWelcome;
+    var wm = (W && W.getProfile && (W.getProfile().window_mode)) || 'windowed';
+    var opts = [{ v: 'windowed', l: 'Windowed' }, { v: 'fullscreen', l: 'Fullscreen' }, { v: 'borderless', l: 'Borderless' }];
+    var segs = '<div class="deck-seg" role="group">' + opts.map(function (o) {
+      return '<button class="deck-seg-btn' + (o.v === wm ? ' deck-seg-btn--on' : '') + '" data-winmode="' + o.v + '">' + o.l + '</button>';
+    }).join('') + '</div>';
+    return '<div class="deck-panel"><div class="deck-panel-title">' + svg('board', 18) + '<span>Display</span></div>' +
+      '<p class="deck-muted">How the app window opens. Fullscreen &amp; borderless take effect on the next launch.</p>' +
+      setRow('Window mode', 'Windowed, fullscreen, or borderless fullscreen.', segs) +
+      setRow('Fullscreen now', 'Toggle fullscreen immediately (press again or Esc to exit).',
+        '<button class="co-btn" id="deck-fs-toggle">Toggle fullscreen</button>') +
+      '</div>';
+  }
+
+  function aboutPanel() {
+    return '<div class="deck-panel deck-about"><div class="deck-panel-title">' + svg('settings', 18) + '<span>About</span></div>' +
+      '<div class="deck-about-mark">[<span class="deck-about-c">C</span>YBERDECK]<span class="deck-about-tm">™</span></div>' +
+      '<div class="deck-about-ver">Version 0.1.0</div>' +
+      '<div class="deck-about-line">© 2026 ItsEliias. All rights reserved.</div>' +
+      '<div class="deck-about-line deck-muted">CyberDeck™ is an unregistered trademark of ItsEliias. ' +
+      'This software and its design are proprietary; see the LICENSE for terms.</div>' +
       '</div>';
   }
 
@@ -320,8 +348,34 @@
       });
     }
     // Theme swatches — re-layer prefs so an accent override survives the switch.
+    // Also persist the theme to the server profile (webview localStorage doesn't survive relaunch).
     Array.prototype.forEach.call(root.querySelectorAll('[data-theme]'), function (btn) {
-      btn.addEventListener('click', function () { applyTheme(btn.getAttribute('data-theme')); applyPrefs(); route('settings'); });
+      btn.addEventListener('click', function () {
+        var t = btn.getAttribute('data-theme');
+        applyTheme(t); applyPrefs();
+        try { fetch('/api/profile', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ theme: t }) }); } catch (e) {}
+        route('settings');
+      });
+    });
+    // Window mode → saved in the profile (read by desktop.py at startup).
+    Array.prototype.forEach.call(root.querySelectorAll('[data-winmode]'), function (btn) {
+      btn.addEventListener('click', function () {
+        var m = btn.getAttribute('data-winmode');
+        var W = window.DeckWelcome;
+        if (W && W.getProfile && W.setProfile) { var p = W.getProfile() || {}; p.window_mode = m; W.setProfile(p); }
+        else { try { fetch('/api/profile', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ window_mode: m }) }); } catch (e) {} }
+        if (window.Deck) Deck.toast(m === 'windowed' ? 'Windowed (applies next launch)' : m.charAt(0).toUpperCase() + m.slice(1) + ' — applies next launch');
+        route('settings');
+      });
+    });
+    // Live fullscreen toggle — native bridge when packaged, browser Fullscreen API in the dev browser.
+    var fsb = root.querySelector('#deck-fs-toggle');
+    if (fsb) fsb.addEventListener('click', function () {
+      if (window.pywebview && window.pywebview.api && window.pywebview.api.toggle_fullscreen) { window.pywebview.api.toggle_fullscreen(); return; }
+      try {
+        if (document.fullscreenElement) document.exitFullscreen();
+        else document.documentElement.requestFullscreen();
+      } catch (e) { if (window.Deck) Deck.toast('Fullscreen not available here', 'error'); }
     });
     // Segmented prefs (font / density / side).
     Array.prototype.forEach.call(root.querySelectorAll('[data-set]'), function (btn) {

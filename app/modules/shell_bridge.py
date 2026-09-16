@@ -60,6 +60,17 @@ class DesktopApi:
     def term_cwd(self) -> str:
         return self._sh.cwd
 
+    def toggle_fullscreen(self) -> bool:
+        """Flip the native window in/out of fullscreen right now (Settings → Display)."""
+        try:
+            import webview
+            if webview.windows:
+                webview.windows[0].toggle_fullscreen()
+                return True
+        except Exception:
+            pass
+        return False
+
     def open_external(self, url: str) -> bool:
         """Open a URL in the system browser — called when the user clicks an
         external link in a note so it never navigates the app window away.

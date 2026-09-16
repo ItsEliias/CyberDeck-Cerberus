@@ -36,6 +36,7 @@ from modules.paths import bp as paths_bp
 from modules.journal import bp as journal_bp
 from modules.glossary import bp as glossary_bp
 from modules.cheatsheets import bp as cheatsheets_bp
+from modules.profile import bp as profile_bp
 
 # When frozen by PyInstaller, static/ + templates/ are unpacked into sys._MEIPASS.
 if getattr(sys, "frozen", False):
@@ -49,7 +50,7 @@ for _bp in (knowledge_bp, courses_bp, credentials_bp, targets_bp, netlab_bp,
             home_bp, playbooks_bp, reports_bp, feeds_bp, topology_bp, board_bp,
             flashcards_bp, snippets_bp, search_bp, activity_bp, scan_bp, sessions_bp,
             resources_bp, toolkit_bp, ratings_bp, paths_bp, journal_bp, glossary_bp,
-            cheatsheets_bp):
+            cheatsheets_bp, profile_bp):
     app.register_blueprint(_bp)
 
 # ── The 12 CyberDeck modules the shell navigates between. ──────────────────────

@@ -27,13 +27,16 @@
       if (thm.length) {
         var rooms = thm.reduce(function (n, p) { return n + p.total; }, 0);
         var done = thm.reduce(function (n, p) { return n + p.done; }, 0);
-        html += '<div class="lp-group"><span class="lp-group-t">TryHackMe Roadmap</span>' +
+        html += '<div class="lp-group"><div class="lp-group-head"><span class="lp-group-t">TryHackMe Roadmap</span>' +
+          '<button class="co-btn" id="lp-browse-all">Browse all ' + rooms + ' rooms →</button></div>' +
           '<span class="lp-group-sub">' + done + '/' + rooms + ' rooms · ' + thm.length + ' topics · free' +
           (d.thm_source ? ' · <a class="lp-src" href="' + esc(d.thm_source) + '" target="_blank" rel="noopener">source ↗</a>' : '') +
           '</span></div>';
         html += '<div class="lp-grid">' + thm.map(card).join('') + '</div>';
       }
       root.querySelector('#lp-body').innerHTML = html;
+      var ba = root.querySelector('#lp-browse-all');
+      if (ba) ba.addEventListener('click', allRooms);
       Array.prototype.forEach.call(root.querySelectorAll('[data-path]'), function (b) { b.addEventListener('click', function () { detail(b.getAttribute('data-path')); }); });
     });
   }
@@ -59,6 +62,76 @@
         });
       });
       Array.prototype.forEach.call(root.querySelectorAll('.lp-go'), function (b) { b.addEventListener('click', function () { go(b.getAttribute('data-go')); }); });
+    });
+  }
+
+  // ── All-rooms browse: search + filter by topic (tag), each room checkable ─────────
+  var roomState = { rooms: [], topics: [], topic: 'all', q: '' };
+
+  function allRooms() {
+    root.innerHTML = '<div class="co-head"><button class="co-btn" id="lp-back">← Paths</button>' +
+      '<span class="co-title" style="margin-left:10px;">TryHackMe — All Rooms</span></div>' +
+      '<div class="co-body" id="lp-allbody"><div class="kb-loading">Loading rooms…</div></div>';
+    root.querySelector('#lp-back').addEventListener('click', list);
+    get('/api/paths/thm-rooms').then(function (d) {
+      roomState.rooms = d.rooms || [];
+      roomState.topics = d.topics || [];
+      roomState.topic = 'all'; roomState.q = '';
+      var body = root.querySelector('#lp-allbody');
+      body.innerHTML =
+        '<div class="lp-searchrow"><input class="co-input" id="lp-search" placeholder="Search all ' + roomState.rooms.length + ' rooms…" autocomplete="off">' +
+        '<span class="lp-count" id="lp-count"></span></div>' +
+        '<div class="lp-tags" id="lp-tags"></div>' +
+        '<div class="lp-rooms" id="lp-rooms"></div>';
+      body.querySelector('#lp-search').addEventListener('input', function (e) { roomState.q = e.target.value; renderRoomList(); });
+      renderTags(); renderRoomList();
+    });
+  }
+
+  function chip(id, label, n) {
+    return '<button class="lp-tag' + (roomState.topic === id ? ' lp-tag--on' : '') + '" data-topic="' + esc(id) + '">' + esc(label) + ' <span class="lp-tag-n">' + n + '</span></button>';
+  }
+
+  function renderTags() {
+    var el = root.querySelector('#lp-tags'); if (!el) return;
+    el.innerHTML = chip('all', 'All', roomState.rooms.length) +
+      roomState.topics.map(function (t) { return chip(t.id, t.title, t.total); }).join('');
+    Array.prototype.forEach.call(el.querySelectorAll('[data-topic]'), function (b) {
+      b.addEventListener('click', function () { roomState.topic = b.getAttribute('data-topic'); renderTags(); renderRoomList(); });
+    });
+  }
+
+  function filteredRooms() {
+    var q = roomState.q.toLowerCase();
+    return roomState.rooms.filter(function (r) {
+      if (roomState.topic !== 'all' && r.pid !== roomState.topic) return false;
+      if (q && r.text.toLowerCase().indexOf(q) === -1) return false;
+      return true;
+    });
+  }
+
+  function renderRoomList() {
+    var el = root.querySelector('#lp-rooms'); if (!el) return;
+    var rooms = filteredRooms();
+    var cnt = root.querySelector('#lp-count');
+    if (cnt) cnt.textContent = rooms.filter(function (r) { return r.done; }).length + '/' + rooms.length + ' done';
+    el.innerHTML = rooms.map(function (r) {
+      return '<div class="lp-room' + (r.done ? ' lp-room--done' : '') + '" data-pid="' + esc(r.pid) + '" data-i="' + r.i + '">' +
+        '<button class="lp-check" data-done="' + (r.done ? 1 : 0) + '">' + (r.done ? '✓' : '') + '</button>' +
+        '<a class="lp-room-name" href="' + esc(r.url) + '" target="_blank" rel="noopener">' + esc(r.text) + '</a>' +
+        '<span class="lp-room-topic">' + esc(r.topic) + '</span></div>';
+    }).join('') || '<div class="co-muted" style="padding:16px 0;">No rooms match.</div>';
+    Array.prototype.forEach.call(el.querySelectorAll('.lp-check'), function (chk) {
+      chk.addEventListener('click', function () {
+        var row = chk.closest('.lp-room');
+        var pid = row.getAttribute('data-pid'), i = +row.getAttribute('data-i');
+        var done = chk.getAttribute('data-done') !== '1';
+        fetch('/api/paths/' + pid + '/toggle', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ step: i, done: done }) })
+          .then(function () {
+            roomState.rooms.forEach(function (r) { if (r.pid === pid && r.i === i) r.done = done; });
+            renderRoomList();
+          });
+      });
     });
   }
 

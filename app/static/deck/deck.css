@@ -619,6 +619,14 @@ body.deck-reduce-motion *, body.deck-reduce-motion *::before, body.deck-reduce-m
 #dw-card .deck-swatches { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .ob-copyright { margin-top: 22px; font-size: 10px; opacity: .4; letter-spacing: .03em; }
 
+/* Settings → About (in-app trademark/copyright) */
+.deck-about-mark { font-family: 'Orbitron', 'Fira Code', monospace; font-weight: 700; font-size: 20px; letter-spacing: .08em; color: var(--fg); margin: 4px 0 10px; }
+.deck-about-c { color: var(--deck-accent); }
+.deck-about-tm { font-size: 11px; vertical-align: super; opacity: .7; margin-left: 2px; }
+.deck-about-ver { font-family: 'Fira Code', monospace; font-size: 12px; color: var(--deck-accent); margin-bottom: 8px; }
+.deck-about-line { font-size: 12px; opacity: .75; margin: 3px 0; max-width: 620px; line-height: 1.5; }
+.deck-about-line.deck-muted { opacity: .5; }
+
 /* Courses — recommended one-click imports */
 .co-rec { margin-top: 20px; border-top: 1px solid var(--border); padding-top: 14px; }
 .co-rec-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; font-family: 'Fira Code', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--deck-accent); }
@@ -747,6 +755,23 @@ body.deck-reduce-motion *, body.deck-reduce-motion *::before, body.deck-reduce-m
 .lp-src:hover { text-decoration: underline; }
 .lp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; }
 .lp-grid .lp-card { margin-bottom: 0; }
+.lp-group-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+
+/* All-rooms browse: search + tag filter + room list */
+.lp-searchrow { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.lp-searchrow .co-input { flex: 1; }
+.lp-count { font-family: 'Fira Code', monospace; font-size: 12px; color: var(--deck-accent); white-space: nowrap; }
+.lp-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+.lp-tag { background: transparent; border: 1px solid var(--border); border-radius: 20px; color: var(--fg); opacity: .7; font-size: 11px; padding: 4px 10px; cursor: pointer; }
+.lp-tag:hover { border-color: var(--deck-accent); opacity: 1; }
+.lp-tag--on { opacity: 1; color: var(--deck-accent); border-color: var(--deck-accent); background: color-mix(in srgb, var(--deck-accent) 12%, transparent); }
+.lp-tag-n { opacity: .6; font-size: 10px; }
+.lp-rooms { display: flex; flex-direction: column; gap: 6px; }
+.lp-room { display: flex; align-items: center; gap: 12px; padding: 9px 12px; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; }
+.lp-room-name { flex: 1; font-size: 13px; color: var(--fg); text-decoration: none; }
+.lp-room-name:hover { color: var(--deck-accent); text-decoration: underline; }
+.lp-room--done .lp-room-name { opacity: .55; text-decoration: line-through; }
+.lp-room-topic { font-size: 10px; font-family: 'Fira Code', monospace; opacity: .5; background: color-mix(in srgb, var(--fg) 7%, transparent); padding: 2px 8px; border-radius: 20px; white-space: nowrap; }
 
 /* Journal */
 .jn-entry { border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; margin-bottom: 10px; background: var(--panel); }

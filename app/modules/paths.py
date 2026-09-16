@@ -97,6 +97,25 @@ def list_paths():
     return jsonify(paths=out, thm_source=THM_SOURCE)
 
 
+@bp.route("/thm-rooms")
+def thm_rooms():
+    """Every TryHackMe room across the 28 topics, flat, with per-room done state.
+    Powers the 'all rooms' browse/search/tag-filter view."""
+    runs = _runs()
+    rooms, topics = [], []
+    for p in PATHS:
+        if p.get("source") != "thm":
+            continue
+        st = runs.get(p["id"], {})
+        done = sum(1 for i in range(len(p["steps"])) if st.get(str(i)))
+        topics.append({"id": p["id"], "title": p["title"], "total": len(p["steps"]), "done": done})
+        for i, s in enumerate(p["steps"]):
+            rooms.append({"pid": p["id"], "topic": p["title"], "i": i,
+                          "text": s["text"], "url": s.get("url"), "done": bool(st.get(str(i)))})
+    return jsonify(rooms=rooms, topics=topics, total=len(rooms),
+                   done=sum(1 for r in rooms if r["done"]), source=THM_SOURCE)
+
+
 @bp.route("/<pid>")
 def detail(pid):
     p = next((x for x in PATHS if x["id"] == pid), None)

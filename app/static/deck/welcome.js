@@ -22,8 +22,14 @@
   ];
   var WORDMARK = '<div class="ob-wordmark" aria-hidden="true"><span class="ob-bracket">[</span><span class="ob-lead">C</span>YBERDECK<span class="ob-bracket">]</span></div>';
 
+  // Profile lives server-side (survives relaunch; the packaged webview does NOT persist
+  // localStorage). localStorage is only a synchronous cache for getProfile() callers.
   function load() { try { return JSON.parse(localStorage.getItem(PROFILE_KEY)) || {}; } catch (e) { return {}; } }
-  function save(p) { try { localStorage.setItem(PROFILE_KEY, JSON.stringify(p)); } catch (e) {} }
+  function saveLocal(p) { try { localStorage.setItem(PROFILE_KEY, JSON.stringify(p)); } catch (e) {} }
+  function saveServer(p) {
+    try { fetch('/api/profile', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(p) }); } catch (e) {}
+  }
+  function save(p) { saveLocal(p); saveServer(p); }
   function esc(s) { var d = document.createElement('div'); d.textContent = String(s == null ? '' : s); return d.innerHTML; }
 
   // Reflect the saved profile into the sidebar user bar (name + avatar).
@@ -201,6 +207,7 @@
     var p = load();
     p.onboarded = true; p.name = S.name; p.handle = S.handle; p.focus = S.focus;
     if (S.avatar) p.avatar = S.avatar;
+    if (window.DeckTheme && window.DeckTheme.current) { try { p.theme = window.DeckTheme.current(); } catch (e) {} }
     save(p);
     applyToSidebar(p);
     try { document.dispatchEvent(new CustomEvent('deck:onboarded', { detail: { profile: p } })); } catch (e) {}
@@ -210,17 +217,32 @@
   function showOnboarding() { S = { step: 0, name: '', handle: '', focus: [], avatar: null }; mount(); render(); }
 
   // ── Boot ──────────────────────────────────────────────────────────────────────
-  function boot() {
-    var p = load();
+  function proceed(p) {
     applyToSidebar(p);
+    // Re-apply the saved theme (also not reliably persisted by the packaged webview).
+    if (p.theme && window.DeckTheme && window.DeckTheme.apply) {
+      try { window.DeckTheme.apply(p.theme); } catch (e) {}
+    }
     if (!p.onboarded) showOnboarding();
     else showLogin(p);
+  }
+
+  function boot() {
+    // Server profile is the source of truth; prime the local cache from it, then decide.
+    fetch('/api/profile').then(function (r) { return r.json(); }).then(function (d) {
+      var sp = (d && d.profile) || {};
+      if (sp && Object.keys(sp).length) saveLocal(sp);
+      proceed(load());
+    }).catch(function () { proceed(load()); });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
 
   window.DeckWelcome = {
-    reset: function () { try { localStorage.removeItem(PROFILE_KEY); } catch (e) {} },
+    reset: function () {
+      try { localStorage.removeItem(PROFILE_KEY); } catch (e) {}
+      saveServer({ onboarded: false });   // clear the persisted flag too
+    },
     getProfile: load,
     setProfile: function (p) { save(p); applyToSidebar(p); },
     applyToSidebar: applyToSidebar,

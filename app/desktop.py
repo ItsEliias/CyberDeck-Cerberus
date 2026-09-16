@@ -49,6 +49,7 @@ def _persist_data_env() -> None:
         "CYBERDECK_COURSES": "courses", "CYBERDECK_RESOURCES": "resources.json",
         "CYBERDECK_RATINGS": "ratings.json", "CYBERDECK_PATHS": "paths.json",
         "CYBERDECK_JOURNAL": "journal.json", "CYBERDECK_CHEATSHEETS": "cheatsheets.json",
+        "CYBERDECK_PROFILE": "profile.json",
     }
     for var, sub in mapping.items():
         os.environ.setdefault(var, str(root / sub))
@@ -105,12 +106,23 @@ def main():
 
     import webview  # imported here so headless component checks don't require a display
     from modules.shell_bridge import DesktopApi
+    from modules import profile
+
+    # Window mode is a saved preference (Settings → Display). Frameless/fullscreen can
+    # only be chosen at creation in this pywebview, so it applies from the next launch.
+    kwargs = dict(width=1400, height=900, min_size=(940, 620))
+    mode = profile.window_mode()
+    if mode == "fullscreen":
+        kwargs["fullscreen"] = True
+    elif mode == "borderless":
+        kwargs["frameless"] = True
+        kwargs["maximized"] = True
 
     webview.create_window(
         "CyberDeck",
         f"http://127.0.0.1:{port}/",
         js_api=DesktopApi(),   # Terminal talks to this in-process, not over the web port
-        width=1400, height=900, min_size=(940, 620),
+        **kwargs,
     )
     webview.start()  # blocks on the main thread until the window closes (Cocoa requirement)
 
