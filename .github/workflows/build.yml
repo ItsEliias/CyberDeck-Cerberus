@@ -44,3 +44,26 @@ jobs:
         with:
           name: CyberDeck-macos
           path: dist/CyberDeck-macos.zip
+
+  # On a version tag (vX.Y.Z), publish a GitHub Release with the built binaries
+  # attached. The repo is public, so these become plain download links (no login).
+  release:
+    needs: [windows, macos]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${{ github.ref_name }}" \
+            artifacts/CyberDeck-windows/CyberDeck.exe \
+            artifacts/CyberDeck-macos/CyberDeck-macos.zip \
+            --repo "${{ github.repository }}" \
+            --title "${{ github.ref_name }}" \
+            --generate-notes
