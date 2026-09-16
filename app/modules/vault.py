@@ -12,10 +12,29 @@ import re
 import urllib.parse
 from pathlib import Path
 
-# Vault root: override with CYBERDECK_VAULT, else default to the CyberBase vault
-# that ships with the Electron project (used here for testing).
-_DEFAULT = "/Users/codyliddell/Documents/Claude/Projects/Cyberdeck/.reference/CyberBase"
-VAULT_ROOT = Path(os.environ.get("CYBERDECK_VAULT", _DEFAULT)).expanduser()
+# Vault root resolution (portable across macOS / Windows / Linux):
+#   1. CYBERDECK_VAULT env var wins (point it at your own Obsidian vault).
+#   2. else the CyberBase dev vault, if it happens to exist on this machine.
+#   3. else a per-user vault under ~/Documents/CyberDeck/Vault, created on demand
+#      so a fresh install (e.g. a Windows laptop) has a working Knowledge base.
+_CYBERBASE = "/Users/codyliddell/Documents/Claude/Projects/Cyberdeck/.reference/CyberBase"
+_USER_VAULT = Path.home() / "Documents" / "CyberDeck" / "Vault"
+
+
+def _resolve_vault_root() -> Path:
+    env = os.environ.get("CYBERDECK_VAULT")
+    if env:
+        return Path(env).expanduser()
+    if Path(_CYBERBASE).exists():
+        return Path(_CYBERBASE)
+    try:
+        _USER_VAULT.mkdir(parents=True, exist_ok=True)
+    except OSError:
+        pass
+    return _USER_VAULT
+
+
+VAULT_ROOT = _resolve_vault_root()
 
 # Folders we never surface in the tree.
 _HIDE = {".git", ".obsidian", ".claude-flow", ".claude", "node_modules", "__pycache__"}

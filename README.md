@@ -125,6 +125,38 @@ There's no `package.json`/task runner — everything is invoked directly against
 
 There is currently no automated test suite or linter configured in this repo.
 
+## Installing on Windows
+
+A macOS `.app` will not run on Windows, and PyInstaller cannot cross-compile, so the
+Windows `.exe` must be produced on Windows. Two ways:
+
+**A. Download a prebuilt `.exe` from CI (no toolchain needed) — recommended**
+
+1. On GitHub → **Actions** → **Build desktop app** → **Run workflow** (or push a `vX.Y.Z`
+   tag). The `windows` job builds `CyberDeck.exe`.
+2. When it finishes, download the **`CyberDeck-windows`** artifact and unzip it.
+3. Double-click **`CyberDeck.exe`**. SmartScreen may warn on an unsigned binary →
+   *More info → Run anyway*. Needs the **Edge WebView2 runtime** (preinstalled on
+   Windows 11 and most Windows 10; otherwise a free download from Microsoft).
+
+**B. Build/run from source on the Windows machine**
+
+```powershell
+git clone https://github.com/ItsEliias/CyberDeck-Cerberus.git
+cd CyberDeck-Cerberus
+py -3 -m venv .venv
+.\.venv\Scripts\pip install -r requirements.txt pyinstaller pythonnet
+# Run it directly in a native window:
+.\.venv\Scripts\python app\desktop.py
+# …or package a standalone exe (dist\CyberDeck.exe):
+.\.venv\Scripts\pyinstaller --noconfirm cyberdeck.spec
+```
+
+**Data & vault on Windows.** App data (progress, credentials, courses, etc.) is stored
+under `%APPDATA%\CyberDeck\data`. The Knowledge vault defaults to
+`%USERPROFILE%\Documents\CyberDeck\Vault` (created on first run) — point `CYBERDECK_VAULT`
+at your own Obsidian vault to use that instead.
+
 ## Project Structure
 
 | Path | Purpose |
