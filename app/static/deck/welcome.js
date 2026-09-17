@@ -21,6 +21,7 @@
     { key: 'facebook', label: 'Facebook', svg: '<svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.4h-1.2c-1.2 0-1.6.8-1.6 1.6V12h2.7l-.4 2.9h-2.3v7A10 10 0 0 0 22 12z"/></svg>' }
   ];
   var WORDMARK = '<div class="ob-wordmark" aria-hidden="true"><span class="ob-bracket">[</span><span class="ob-lead">C</span>YBERDECK<span class="ob-bracket">]</span></div>';
+  var LOGO = '<img class="ob-logo" src="/static/img/cyberdeck-logo.png" alt="CyberDeck" draggable="false">';
 
   // Profile lives server-side (survives relaunch; the packaged webview does NOT persist
   // localStorage). localStorage is only a synchronous cache for getProfile() callers.
@@ -77,7 +78,7 @@
   function showLogin(p) {
     var o = mount();
     var dots = o.querySelector('#dw-dots'); if (dots) dots.remove();
-    o.querySelector('#dw-card').innerHTML = WORDMARK +
+    o.querySelector('#dw-card').innerHTML = LOGO + WORDMARK +
       '<div class="ob-tag">// OFFLINE STUDY HUB</div>' +
       (p.name ? '<p class="ob-lead-copy">Welcome back, ' + esc(p.name) + '.</p>'
               : '<p class="ob-lead-copy">Ready when you are.</p>') +
@@ -106,7 +107,7 @@
   }
 
   function wWelcome() {
-    return WORDMARK +
+    return LOGO + WORDMARK +
       '<div class="ob-tag">// INITIALISING OPERATOR</div>' +
       '<p class="ob-lead-copy">Let’s set up your deck.</p>' +
       '<div class="ob-actions"><button class="ob-btn ob-btn--primary" data-action="next">[ BEGIN ]</button></div>';

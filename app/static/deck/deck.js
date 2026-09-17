@@ -275,6 +275,7 @@
 
   function aboutPanel() {
     return '<div class="deck-panel deck-about"><div class="deck-panel-title">' + svg('settings', 18) + '<span>About</span></div>' +
+      '<img class="deck-about-logo" src="/static/img/cyberdeck-logo.png" alt="CyberDeck" draggable="false">' +
       '<div class="deck-about-mark">[<span class="deck-about-c">C</span>YBERDECK]<span class="deck-about-tm">™</span></div>' +
       '<div class="deck-about-ver">Version 0.1.0</div>' +
       '<div class="deck-about-line">© 2026 ItsEliias. All rights reserved.</div>' +
