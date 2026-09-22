@@ -24,6 +24,7 @@ jobs:
         with:
           name: CyberDeck-windows
           path: dist/CyberDeck.exe
+          retention-days: 1
 
   macos:
     runs-on: macos-latest
@@ -44,6 +45,7 @@ jobs:
         with:
           name: CyberDeck-macos
           path: dist/CyberDeck-macos.zip
+          retention-days: 1
 
   linux:
     runs-on: ubuntu-latest
@@ -63,7 +65,9 @@ jobs:
       - name: Install deps
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt pyinstaller pycairo PyGObject
+          # PyGObject 3.52+ switched to girepository-2.0; the 3.50 series still builds
+          # against girepository-1.0 (libgirepository1.0-dev, installed above).
+          pip install -r requirements.txt pyinstaller pycairo "PyGObject<3.52"
       - name: Build CyberDeck (Linux)
         run: pyinstaller --noconfirm cyberdeck.spec
       - name: Package tarball
@@ -72,6 +76,7 @@ jobs:
         with:
           name: CyberDeck-linux
           path: dist/CyberDeck-linux.tar.gz
+          retention-days: 1
 
   # On a version tag (vX.Y.Z), publish a GitHub Release with the built binaries
   # attached. The repo is public, so these become plain download links (no login).
