@@ -1,10 +1,17 @@
 name: Build desktop app
 
-# Windows-first, then macOS. Manual trigger (or on a version tag).
+# Builds Windows / macOS / Linux desktop binaries. Manual trigger for CI verification,
+# or on a version tag (vX.Y.Z) — on a tag each job uploads its binary straight to the
+# GitHub Release. We deliberately DON'T use upload-artifact for the release hand-off:
+# that consumes the Actions artifact-storage quota (which filled up and blocked uploads).
+# Release storage is separate and unlimited on public repos.
 on:
   workflow_dispatch:
   push:
     tags: ["v*"]
+
+permissions:
+  contents: write   # each job needs this to attach files to the release
 
 jobs:
   windows:
@@ -20,11 +27,12 @@ jobs:
           pip install -r requirements.txt pyinstaller pythonnet
       - name: Build CyberDeck.exe
         run: pyinstaller --noconfirm cyberdeck.spec
-      - uses: actions/upload-artifact@v4
+      - name: Attach to release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
         with:
-          name: CyberDeck-windows
-          path: dist/CyberDeck.exe
-          retention-days: 1
+          files: dist/CyberDeck.exe
+          generate_release_notes: true
 
   macos:
     runs-on: macos-latest
@@ -41,11 +49,12 @@ jobs:
         run: pyinstaller --noconfirm cyberdeck.spec
       - name: Zip app
         run: cd dist && zip -r CyberDeck-macos.zip CyberDeck.app
-      - uses: actions/upload-artifact@v4
+      - name: Attach to release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
         with:
-          name: CyberDeck-macos
-          path: dist/CyberDeck-macos.zip
-          retention-days: 1
+          files: dist/CyberDeck-macos.zip
+          generate_release_notes: true
 
   linux:
     runs-on: ubuntu-latest
@@ -72,32 +81,9 @@ jobs:
         run: pyinstaller --noconfirm cyberdeck.spec
       - name: Package tarball
         run: cd dist && chmod +x CyberDeck && tar -czf CyberDeck-linux.tar.gz CyberDeck
-      - uses: actions/upload-artifact@v4
+      - name: Attach to release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
         with:
-          name: CyberDeck-linux
-          path: dist/CyberDeck-linux.tar.gz
-          retention-days: 1
-
-  # On a version tag (vX.Y.Z), publish a GitHub Release with the built binaries
-  # attached. The repo is public, so these become plain download links (no login).
-  release:
-    needs: [windows, macos, linux]
-    if: startsWith(github.ref, 'refs/tags/v')
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          path: artifacts
-      - name: Publish release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release create "${{ github.ref_name }}" \
-            artifacts/CyberDeck-windows/CyberDeck.exe \
-            artifacts/CyberDeck-macos/CyberDeck-macos.zip \
-            artifacts/CyberDeck-linux/CyberDeck-linux.tar.gz \
-            --repo "${{ github.repository }}" \
-            --title "${{ github.ref_name }}" \
-            --generate-notes
+          files: dist/CyberDeck-linux.tar.gz
+          generate_release_notes: true
