@@ -157,6 +157,36 @@ under `%APPDATA%\CyberDeck\data`. The Knowledge vault defaults to
 `%USERPROFILE%\Documents\CyberDeck\Vault` (created on first run) — point `CYBERDECK_VAULT`
 at your own Obsidian vault to use that instead.
 
+## Installing on Linux
+
+Grab **`CyberDeck-linux.tar.gz`** from the release (or the CI `CyberDeck-linux`
+artifact), extract, and run the `CyberDeck` binary:
+
+```bash
+tar -xzf CyberDeck-linux.tar.gz
+./CyberDeck
+```
+
+**Runtime prerequisite (one-time).** Unlike Windows/macOS, the Linux build is *not*
+fully self-contained — pywebview renders through **WebKit2GTK**, which must be present
+on your machine. Most GTK desktops (GNOME, etc.) already have GTK; install the WebKit
+piece if the window doesn't open:
+
+```bash
+# Debian/Ubuntu
+sudo apt install libwebkit2gtk-4.1-0 gir1.2-webkit2-4.1
+# Fedora
+sudo dnf install webkit2gtk4.1
+# Arch
+sudo pacman -S webkit2gtk-4.1
+```
+
+App data is stored under `$XDG_DATA_HOME/CyberDeck/data` (defaults to
+`~/.local/share/CyberDeck/data`); the vault defaults to `~/Documents/CyberDeck/Vault`
+(override with `CYBERDECK_VAULT`). Build from source with the same
+`pyinstaller --noconfirm cyberdeck.spec` after installing the GTK dev libs
+(`libgirepository1.0-dev libcairo2-dev gir1.2-webkit2-4.1`) plus `pip install PyGObject pycairo`.
+
 ## Project Structure
 
 | Path | Purpose |
