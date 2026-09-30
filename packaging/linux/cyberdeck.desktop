@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=CyberDeck
+GenericName=Security Study & Engagement Tracker
+Comment=Offline-first cybersecurity study, notes, playbooks, and engagement tracking
+Exec=__EXEC__
+Icon=cyberdeck
+Terminal=false
+Categories=Education;Security;
+Keywords=cybersecurity;pentest;ctf;notes;flashcards;playbooks;vault;
+StartupNotify=true
+StartupWMClass=cyberdeck

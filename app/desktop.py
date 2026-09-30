@@ -99,7 +99,25 @@ def _wait_ready(port: int, tries: int = 60):
     return False
 
 
+def _set_linux_app_identity() -> None:
+    """Give the GTK/Wayland window a stable app-id so the compositor matches it to
+    the ``cyberdeck.desktop`` launcher (icon in the dock/switcher, proper grouping).
+    Without this the app-id defaults to the script name (``desktop.py``). GTK3 on
+    Wayland derives the app-id from the program name, so set that before GTK inits.
+    No-op on macOS/Windows and if PyGObject isn't importable.
+    """
+    if sys.platform not in ("linux", "linux2"):
+        return
+    try:
+        from gi.repository import GLib
+        GLib.set_prgname("cyberdeck")
+        GLib.set_application_name("CyberDeck")
+    except Exception:
+        pass
+
+
 def main():
+    _set_linux_app_identity()
     port = _pick_port()
     threading.Thread(target=_serve, args=(port,), daemon=True).start()
     _wait_ready(port)
