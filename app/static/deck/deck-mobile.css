@@ -1,0 +1,87 @@
+/* CyberDeck on a phone: sidebar as a drawer, menu button, bottom tab bar.
+   Desktop and the packaged window are unchanged: everything here is inside
+   the 768px breakpoint the inherited Cerberus mobile rules already use. */
+
+.deck-menu-btn,
+.deck-tabbar { display: none !important; }
+
+@media (max-width: 768px) {
+  body {
+    padding-top: env(safe-area-inset-top);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+
+  /* Menu button top-right, matching Cerberus on mobile. */
+  .deck-menu-btn {
+    display: flex !important;
+    top: calc(8px + env(safe-area-inset-top));
+    opacity: 0.85;
+    color: var(--fg);
+  }
+
+  /* The drawer sits above the tab bar and the menu button. */
+  .sidebar { z-index: 220; padding-bottom: env(safe-area-inset-bottom); }
+  #sidebar-backdrop { z-index: 215; }
+
+  /* One compact title row: section name left, search, then the menu button. */
+  #deck-main.chat-container { padding-top: 8px; }
+  #deck-main .chat-top-bar {
+    margin-top: 0;
+    padding: 4px 52px 4px 6px;
+    min-height: 44px;
+    align-items: center;
+    gap: 10px;
+  }
+  #deck-main .chat-meta-overlay {
+    position: static;
+    transform: none;
+    max-width: none;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .deck-search-pill kbd { display: none; }
+
+  /* Content scrolls above the tab bar. */
+  #deck-view { padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
+
+  .deck-tabbar {
+    display: flex !important;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 190;
+    gap: 4px;
+    padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+    background: color-mix(in srgb, var(--bg) 92%, transparent);
+    border-top: 1px solid var(--border);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+  }
+
+  .deck-tabbar button {
+    flex: 1;
+    min-height: 44px;
+    font: inherit;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    color: var(--fg);
+    opacity: 0.7;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .deck-tabbar button.active {
+    opacity: 1;
+    color: var(--deck-accent, var(--red));
+    border-color: color-mix(in srgb, var(--deck-accent, var(--red)) 45%, var(--border));
+    background: color-mix(in srgb, var(--deck-accent, var(--red)) 12%, transparent);
+  }
+}

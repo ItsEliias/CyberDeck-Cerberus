@@ -12,52 +12,16 @@ Package later with PyInstaller for a standalone app.
 """
 from __future__ import annotations
 
-import os
 import socket
-import sys
 import threading
 import time
 import urllib.request
-from pathlib import Path
 
+from datapaths import persist_data_env
 
-def _persist_data_env() -> None:
-    """Frozen builds are onefile, so sys._MEIPASS (and the modules' default
-    ``parents[2]/data``) is a temp dir wiped on exit — which would reset flashcard
-    progress, playbook ticks, course imports, etc. every launch. Point each
-    module's data path at a persistent per-user dir instead. No-op in dev, and
-    an explicit CYBERDECK_* env var still wins (setdefault). The vault
-    (CYBERDECK_VAULT) is intentionally left alone — it lives with the notes.
-    """
-    if not getattr(sys, "frozen", False):
-        return
-    if sys.platform == "darwin":
-        base = Path.home() / "Library" / "Application Support"
-    elif os.name == "nt":
-        base = Path(os.environ.get("APPDATA", Path.home()))
-    else:
-        base = Path(os.environ.get("XDG_DATA_HOME", Path.home() / ".local" / "share"))
-    root = base / "CyberDeck" / "data"
-    root.mkdir(parents=True, exist_ok=True)
-    mapping = {
-        "CYBERDECK_SESSIONS": "sessions.json", "CYBERDECK_BOARD": "board.json",
-        "CYBERDECK_PLAYBOOKS": "playbooks", "CYBERDECK_TARGETS": "targets.json",
-        "CYBERDECK_EVIDENCE": "evidence", "CYBERDECK_CREDS": "credentials/vault.json",
-        "CYBERDECK_FEEDS": "feeds", "CYBERDECK_FLASHCARDS": "flashcards.json",
-        "CYBERDECK_ACTIVITY": "activity.json", "CYBERDECK_TOPOLOGY": "topology.json",
-        "CYBERDECK_SNIPPETS": "snippets.json", "CYBERDECK_REPORTS": "reports",
-        "CYBERDECK_COURSES": "courses", "CYBERDECK_RESOURCES": "resources.json",
-        "CYBERDECK_RATINGS": "ratings.json", "CYBERDECK_PATHS": "paths.json",
-        "CYBERDECK_JOURNAL": "journal.json", "CYBERDECK_CHEATSHEETS": "cheatsheets.json",
-        "CYBERDECK_PROFILE": "profile.json",
-    }
-    for var, sub in mapping.items():
-        os.environ.setdefault(var, str(root / sub))
+persist_data_env()
 
-
-_persist_data_env()
-
-from app import app  # noqa: E402 — must follow _persist_data_env so modules read the env
+from app import app  # noqa: E402 — must follow persist_data_env so modules read the env
 
 
 # A STABLE loopback port so the webview origin (and thus its localStorage — theme,

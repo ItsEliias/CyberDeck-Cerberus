@@ -427,8 +427,39 @@
     document.getElementById('rail-toggle').addEventListener('click', function () {
       setCollapsed(!document.getElementById('sidebar').classList.contains('hidden'), true);
     });
+
+    // Phone: the sidebar is a drawer behind a menu button (deck-mobile.css). It
+    // starts closed, closes after picking a section, and never touches the
+    // saved desktop collapse state.
+    var phone = window.matchMedia('(max-width: 768px)');
+    var backdrop = document.getElementById('sidebar-backdrop');
+    var menuBtn = document.getElementById('deck-menu-btn');
+    function setDrawer(open) {
+      document.getElementById('sidebar').classList.toggle('hidden', !open);
+      if (backdrop) backdrop.classList.toggle('visible', open);
+      if (menuBtn) menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+    function drawerOpen() { return !document.getElementById('sidebar').classList.contains('hidden'); }
+    function applyLayout() {
+      if (phone.matches) { setDrawer(false); return; }
+      if (backdrop) backdrop.classList.remove('visible');
+      var collapsed = false;
+      try { collapsed = localStorage.getItem(SIDEBAR_KEY) === '1'; } catch (e) {}
+      setCollapsed(collapsed, false);
+    }
+    applyLayout();
+    if (phone.addEventListener) phone.addEventListener('change', applyLayout);
+    if (menuBtn) menuBtn.addEventListener('click', function () { setDrawer(!drawerOpen()); });
+    if (backdrop) backdrop.addEventListener('click', function () { setDrawer(false); });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && phone.matches && drawerOpen()) setDrawer(false);
+    });
+    var moreTab = document.querySelector('[data-tab-menu]');
+    if (moreTab) moreTab.addEventListener('click', function () { setDrawer(true); });
+
     document.body.addEventListener('click', function (e) {
       var t = e.target.closest ? e.target.closest('[data-nav]') : null;
+      if (t && phone.matches) setDrawer(false);
       if (t) route(t.getAttribute('data-nav'));
     });
     // External links must NEVER navigate the app window (in the packaged

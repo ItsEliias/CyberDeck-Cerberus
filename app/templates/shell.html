@@ -2,9 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>CyberDeck</title>
   <meta name="theme-color" content="#1a1d23">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="CyberDeck">
+  <link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2L4 7V18C4 24 10 29 16 31C22 29 28 24 28 18V7Z' fill='none' stroke='%23c0392b' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
 
   <!-- Cerberus theme bootstrap: apply the saved palette before first paint so
@@ -40,8 +46,14 @@
   <link rel="stylesheet" href="/static/jarvis-v2/tool-tabs-hud.css">
   <link rel="stylesheet" href="/static/dashboard.css">
   <link rel="stylesheet" href="/static/deck/deck.css">
+  <link rel="stylesheet" href="/static/deck/deck-mobile.css">
 </head>
 <body>
+  <!-- Phone only (deck-mobile.css): menu button + backdrop for the sidebar drawer -->
+  <button type="button" class="hamburger-btn deck-menu-btn" id="deck-menu-btn" aria-label="Open menu" aria-controls="sidebar" aria-expanded="false">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+  </button>
+  <div id="sidebar-backdrop" aria-hidden="true"></div>
   <!-- Left icon rail (populated by deck.js) -->
   <div class="icon-rail" id="icon-rail"></div>
 
@@ -87,6 +99,15 @@
     <div id="deck-view"><!-- active module rendered here by deck.js --></div>
   </main>
 
+  <!-- Phone only: bottom tab bar -->
+  <nav class="deck-tabbar" id="deck-tabbar" aria-label="Quick sections">
+    <button type="button" data-nav="home">Home</button>
+    <button type="button" data-nav="courses">Courses</button>
+    <button type="button" data-nav="knowledge">Notes</button>
+    <button type="button" data-nav="flashcards">Cards</button>
+    <button type="button" data-tab-menu>More</button>
+  </nav>
+
   <script src="/static/deck/deck.js"></script>
   <script src="/static/deck/deck-ui.js"></script>
   <script src="/static/deck/deck-cmd.js"></script>
@@ -116,5 +137,10 @@
   <script src="/static/deck/journal.js"></script>
   <script src="/static/deck/terminal.js"></script>
   <script src="/static/deck/welcome.js"></script>
+  <script>
+    if ('serviceWorker' in navigator && !window.pywebview && location.protocol !== 'file:') {
+      navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(function () {});
+    }
+  </script>
 </body>
 </html>
