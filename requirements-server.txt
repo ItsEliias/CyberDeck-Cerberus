@@ -1,0 +1,4 @@
+# Headless server (app/serve.py) for phone access: everything in
+# requirements.txt except pywebview, which is only for the desktop window and
+# fails to build on older Python (e.g. macOS's built-in 3.9).
+-r requirements-core.txt

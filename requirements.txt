@@ -1,20 +1,6 @@
-# CyberDeck-on-Cerberus — Python deps (kept minimal; grows per module in P2)
-Flask>=3.0,<4.0
-Markdown>=3.5
-cryptography>=42
-# P4 desktop wrap — native window. On this macOS/Xcode Python, install with prebuilt
+# CyberDeck-on-Cerberus: full desktop install (app + native window).
+# For the headless phone server use requirements-server.txt instead.
+-r requirements-core.txt
+# P4 desktop wrap: native window. On this macOS/Xcode Python, install with prebuilt
 # wheels to avoid a pyobjc source build:  pip install --only-binary :all: pywebview
 pywebview>=3.4
-# Headless server for phone access (app/serve.py)
-waitress>=3.0
-# P2+ (added as modules land):
-# PyYAML>=6.0          # course/playbook frontmatter
-# Markdown>=3.5        # note rendering
-# cryptography>=42     # credential vault
-# weasyprint>=60       # report PDF export
-html2text>=2020.1.16
-certifi
-pypdf
-youtube-transcript-api
-pymdown-extensions
-pygments
