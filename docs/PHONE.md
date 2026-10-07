@@ -24,7 +24,7 @@ sudo useradd --system --create-home --home-dir /var/lib/cyberdeck cyberdeck
 sudo git clone https://github.com/ItsEliias/CyberDeck-Cerberus.git /opt/cyberdeck
 cd /opt/cyberdeck
 sudo python3 -m venv .venv
-sudo .venv/bin/pip install -r requirements.txt
+sudo .venv/bin/pip install -r requirements-server.txt
 sudo cp deploy/cyberdeck.service /etc/systemd/system/
 sudo systemctl enable --now cyberdeck
 curl -s http://127.0.0.1:8137/api/health
@@ -34,7 +34,16 @@ Edit `CYBERDECK_VAULT` in the service file to point at your notes (a synced
 copy of your Obsidian vault). On the laptop, use the installed CyberDeck
 app from the homelab address too, so everything lives in one place.
 
-To run it by hand instead of as a service: `python app/serve.py`.
+To run it by hand instead of as a service (any OS, including a Mac):
+
+```bash
+python3 -m venv .venv && .venv/bin/pip install -r requirements-server.txt
+.venv/bin/python app/serve.py
+```
+
+`requirements-server.txt` skips `pywebview` (the desktop window), which the
+server doesn't use and which fails to build on older Python such as macOS's
+built-in 3.9.
 
 ## 2. Share it on your tailnet
 

@@ -96,3 +96,23 @@ def test_serve_defaults_to_loopback_desktop_port():
     assert serve.DEFAULT_PORT == 8137
     src = Path(serve.__file__).read_text()
     assert 'default="127.0.0.1"' in src
+
+
+def test_server_requirements_skip_desktop_window():
+    root = Path(__file__).resolve().parents[1]
+
+    def resolved(name):
+        out = []
+        for line in (root / name).read_text().splitlines():
+            line = line.split("#", 1)[0].strip()
+            if line.startswith("-r "):
+                out += resolved(line[3:].strip())
+            elif line:
+                out.append(line.lower())
+        return out
+
+    server, desktop = resolved("requirements-server.txt"), resolved("requirements.txt")
+    assert not any(r.startswith("pywebview") for r in server)
+    assert any(r.startswith("pywebview") for r in desktop)
+    assert any(r.startswith("waitress") for r in server)
+    assert set(server) <= set(desktop)

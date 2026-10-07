@@ -1,0 +1,17 @@
+# Shared app dependencies (server and desktop).
+Flask>=3.0,<4.0
+Markdown>=3.5
+cryptography>=42
+# Headless server for phone access (app/serve.py)
+waitress>=3.0
+# P2+ (added as modules land):
+# PyYAML>=6.0          # course/playbook frontmatter
+# Markdown>=3.5        # note rendering
+# cryptography>=42     # credential vault
+# weasyprint>=60       # report PDF export
+html2text>=2020.1.16
+certifi
+pypdf
+youtube-transcript-api
+pymdown-extensions
+pygments
