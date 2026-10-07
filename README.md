@@ -187,6 +187,15 @@ App data is stored under `$XDG_DATA_HOME/CyberDeck/data` (defaults to
 `pyinstaller --noconfirm cyberdeck.spec` after installing the GTK dev libs
 (`libgirepository1.0-dev libcairo2-dev gir1.2-webkit2-4.1`) plus `pip install PyGObject pycairo`.
 
+## On Your Phone
+
+CyberDeck installs on a phone as an app (home-screen icon, full screen, bottom
+tabs). Run it on your laptop or headless on an always-on box
+(`python app/serve.py`), share it privately with `tailscale serve`, then use
+*Add to Home Screen*. Notes, cards and the credential vault are never cached
+on the phone, and the Terminal stays desktop-only. Full steps:
+[docs/PHONE.md](docs/PHONE.md).
+
 ## Project Structure
 
 | Path | Purpose |

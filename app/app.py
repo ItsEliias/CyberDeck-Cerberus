@@ -10,7 +10,7 @@ from __future__ import annotations
 import os
 import sys
 
-from flask import Flask, render_template, jsonify
+from flask import Flask, abort, jsonify, render_template, request, send_from_directory
 
 from modules.knowledge import bp as knowledge_bp
 from modules.courses import bp as courses_bp
@@ -79,6 +79,40 @@ MODULES = [
 @app.route("/")
 def index():
     return render_template("shell.html", modules=MODULES)
+
+
+@app.route("/sw.js")
+def service_worker():
+    # Served from the root (not /static/) so its scope covers the whole app.
+    resp = send_from_directory(app.static_folder, "sw.js", mimetype="text/javascript", max_age=0)
+    resp.headers["Cache-Control"] = "no-cache"
+    resp.headers["Service-Worker-Allowed"] = "/"
+    return resp
+
+
+@app.route("/manifest.webmanifest")
+def manifest():
+    return send_from_directory(app.static_folder, "manifest.webmanifest",
+                               mimetype="application/manifest+json", max_age=0)
+
+
+# ── Phone access over Tailscale ───────────────────────────────────────────────
+# `tailscale serve` proxies tailnet requests to this loopback port and adds a
+# Tailscale-User-Login header naming who is connecting. When
+# CYBERDECK_ALLOWED_USERS is set (comma-separated tailnet logins), only those
+# people get in that way. Requests without the header are local (the desktop
+# window on this machine) and are unaffected.
+def _allowed_users() -> set[str]:
+    raw = os.environ.get("CYBERDECK_ALLOWED_USERS", "")
+    return {u.strip().lower() for u in raw.split(",") if u.strip()}
+
+
+@app.before_request
+def _tailnet_allowlist():
+    login = request.headers.get("Tailscale-User-Login")
+    allowed = _allowed_users()
+    if login is not None and allowed and login.strip().lower() not in allowed:
+        abort(403)
 
 
 @app.route("/api/health")

@@ -1,0 +1,28 @@
+# CyberDeck headless server (app/serve.py) for an always-on Linux box or LXC.
+# Install: see docs/PHONE.md. Listens on 127.0.0.1:8137 only; phones reach it
+# through `tailscale serve`, never an open port.
+[Unit]
+Description=CyberDeck study hub (headless)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=cyberdeck
+WorkingDirectory=/opt/cyberdeck/app
+Environment=CYBERDECK_DATA=/var/lib/cyberdeck
+# Point this at your notes vault (a synced copy of your Obsidian vault).
+Environment=CYBERDECK_VAULT=/var/lib/cyberdeck/vault
+# Optional: only these tailnet logins may connect (comma-separated).
+# Environment=CYBERDECK_ALLOWED_USERS=you@example.com
+ExecStart=/opt/cyberdeck/.venv/bin/python serve.py
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/cyberdeck
+
+[Install]
+WantedBy=multi-user.target
